@@ -307,14 +307,14 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         const normalizedEmail = normalizeEmail(email);
- 
+
         if (!normalizedEmail || !password) {
             return res.status(400).json({
                 success: false,
                 message: "Email and password are required"
             });
         }
- 
+
         if (!EMAIL_FORMAT_REGEX.test(normalizedEmail)) {
             return res.status(400).json({
                 success: false,
@@ -411,7 +411,9 @@ router.get("/google/callback",
             { expiresIn: "7d" }
         );
 
-        res.redirect(`http://localhost:8080/login.html?token=${token}`);
+        res.redirect(
+            `${process.env.FRONTEND_URL}/login.html?token=${token}`
+        );
     }
 );
 
