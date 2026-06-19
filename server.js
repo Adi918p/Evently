@@ -26,15 +26,8 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/contact", contactRoute);
 app.use("/api/admin", adminRoutes);
-app.use(
-    express.static(
-        path.join(__dirname, "public")
-    )
-);
+app.use(express.static("public"));
 
-app.get('/',(req,res)=>{
-    res.send("Hello World")
-})
 
 app.get("/profile", authMiddleware.authM, (req, res) => {
     res.json({
