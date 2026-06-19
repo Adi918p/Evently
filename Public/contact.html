@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+    <div id="content">
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+            <div id="userDropdown" class="user-dropdown hidden">
+
+                <button id="dropdownBtn" class="dropdown-btn">
+                    👤 <span id="username">User</span> ▼
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-menu hidden">
+                    <a href="/profile.html">My Profile</a>
+                    <a href="/mybookings.html">My Bookings</a>
+                    <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                    <button id="logoutBtn">Logout</button>
+
+                </div>
+
+            </div>
+        </div>
+        <section class="contact">
+            <div class="contact-container">
+
+                <div class="contact-header">
+                    <h1>Contact Us</h1>
+                    <p>Have questions, feedback, or need support? We'd love to hear from you.</p>
+                </div>
+
+                <div class="contact-content">
+
+                    <div class="contact-info">
+                        <div class="info-card">
+                            <h3>Email</h3>
+                            <p>support@event-ly.in</p>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Phone</h3>
+                            <p>+91 79862 85027</p>
+                            <p>+91 82840 62208</p>
+                        </div>
+
+                        <div class="info-card">
+                            <h3>Address</h3>
+                            <p>Ludhiana, Punjab, India</p>
+                        </div>
+                    </div>
+
+                    <form id="contactForm" class="contact-form">
+                        <input type="text" id="name" placeholder="Your Name" required>
+
+                        <input type="email" id="email" placeholder="Your Email" required>
+
+                        <input type="text" id="subject" placeholder="Subject" required>
+
+                        <textarea id="message" rows="6" placeholder="Write your message..." required></textarea>
+
+                        <button type="submit">Send Message</button>
+
+                        <p id="successMessage"></p>
+                    </form>
+
+                </div>
+
+            </div>
+        </section>
+        <hr class="bar">
+        <footer class="footer">
+            <div class="footer-container">
+
+                <div class="footer-brand">
+                    <h2>Evently</h2>
+                    <p>
+                        Discover, book, and experience unforgettable events near you.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="/index.html">Home</a>
+                    <a href="/index.html#trending">Events</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <a href="/faq.html">FAQ</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                    <a href="/support.html">Support</a>
+                </div>
+
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a
+                            href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 EventHub. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+<script src="/js/nav.js"></script>
+</body>
+<script>
+    const form = document.getElementById("contactForm");
+    const successMessage = document.getElementById("successMessage");
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const data = {
+            name: document.getElementById("name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            subject: document.getElementById("subject").value.trim(),
+            message: document.getElementById("message").value.trim()
+        };
+
+        try {
+            const response = await fetch(
+                "/api/contact",
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                }
+            );
+
+            const result = await response.json();
+
+            if (result.success) {
+                successMessage.textContent =
+                    "Message sent successfully!";
+
+                successMessage.style.color = "limegreen";
+
+                form.reset();
+            } else {
+                successMessage.textContent =
+                    result.message || "Failed to send message.";
+
+                successMessage.style.color = "red";
+            }
+
+        } catch (error) {
+            console.error(error);
+
+            successMessage.textContent =
+                "Server error. Please try again later.";
+
+            successMessage.style.color = "red";
+        }
+    });
+</script>
+<script src="./js/script.js"></script>
+
+
+
+</html>

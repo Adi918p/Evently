@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Event</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0a0a0a;
+            color: white;
+        }
+
+        .container {
+            width: 50%;
+            margin: 100px auto;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            outline: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: #ef4444;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+    </style>
+<link rel="stylesheet" href="/css/responsive.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Edit Event</h1>
+
+        <form id="eventForm">
+
+            <input type="text" id="title" placeholder="Event Title">
+
+            <textarea id="description" placeholder="Description"></textarea>
+
+            <textarea id="about" placeholder="About Event"></textarea>
+
+            <input type="text" id="venue" placeholder="Venue">
+
+            <input type="text" id="location" placeholder="Location">
+
+            <input type="date" id="date">
+
+            <input type="time" id="time">
+
+            <input type="number" id="price" placeholder="Price">
+
+            <input type="text" id="agelim" placeholder="Age Limit">
+
+            <input type="number" id="seats" placeholder="Seats">
+
+            <input type="text" id="banner" placeholder="Banner URL">
+
+            <input type="text" id="maploc" placeholder="Map Link">
+
+            <textarea id="gallery" placeholder="Gallery (comma separated)"></textarea>
+
+            <textarea id="lineup" placeholder="Lineup (name:image,name:image)"></textarea>
+
+            <button type="submit">Update Event</button>
+
+        </form>
+
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const eventId = params.get("id");
+
+        const token = localStorage.getItem("token");
+
+        /* ---------------- GET EVENT DATA ---------------- */
+
+        async function loadEvent() {
+
+            try {
+
+                const res = await fetch(`/api/events/${eventId}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert("Failed to load event");
+                    return;
+                }
+
+                const event = data.event;
+
+                /* PREFILL FORM */
+                document.getElementById("title").value = event.title || "";
+                document.getElementById("description").value = event.description || "";
+                document.getElementById("about").value = event.about || "";
+                document.getElementById("venue").value = event.venue || "";
+                document.getElementById("location").value = event.location || "";
+                document.getElementById("date").value = new Date(event.date).toLocaleDateString()?.split("T")[0] || "";
+                document.getElementById("time").value = event.time || "";
+                document.getElementById("price").value = event.price || "";
+                document.getElementById("agelim").value = event.agelim || "";
+                document.getElementById("seats").value = event.seats || "";
+                document.getElementById("banner").value = event.banner || "";
+                document.getElementById("maploc").value = event.maploc || "";
+
+                document.getElementById("gallery").value =
+                    (event.gallery || []).join(",");
+
+                document.getElementById("lineup").value =
+                    (event.lineup || [])
+                        .map(l => `${l.name}:${l.image}`)
+                        .join(",");
+
+            } catch (err) {
+                console.log(err);
+                alert("Error loading event");
+            }
+        }
+
+        /* ---------------- UPDATE EVENT ---------------- */
+
+        document.getElementById("eventForm")
+            .addEventListener("submit", async (e) => {
+
+                e.preventDefault();
+
+                const gallery = document.getElementById("gallery")
+                    .value.split(",").map(i => i.trim());
+
+                const lineup = document.getElementById("lineup")
+                    .value.split(",").map(item => {
+                        const [name, image] = item.split(":");
+                        return { name, image };
+                    });
+
+                const updatedEvent = {
+
+                    title: document.getElementById("title").value,
+                    description: document.getElementById("description").value,
+                    about: document.getElementById("about").value,
+                    venue: document.getElementById("venue").value,
+                    location: document.getElementById("location").value,
+                    date: document.getElementById("date").value,
+                    time: document.getElementById("time").value,
+                    price: document.getElementById("price").value,
+                    agelim: document.getElementById("agelim").value,
+                    seats: document.getElementById("seats").value,
+                    banner: document.getElementById("banner").value,
+                    maploc: document.getElementById("maploc").value,
+                    gallery,
+                    lineup
+                };
+
+                try {
+
+                    const res = await fetch(`/api/events/${eventId}`, {
+                        method: "PUT",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify(updatedEvent)
+                    });
+
+                    const data = await res.json();
+
+                    if (data.success) {
+                        alert("Event updated successfully");
+                        window.location.href = "/dashboard.html";
+                    } else {
+                        alert(data.message);
+                    }
+
+                } catch (err) {
+                    console.log(err);
+                    alert("Update failed");
+                }
+
+            });
+
+        loadEvent();
+    </script>
+
+</body>
+
+</html>

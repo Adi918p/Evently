@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Eventify-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <style>
+        .scanner-ring,
+        #reader {
+            overflow: visible !important;
+        }
+
+        body {
+
+            background:
+                radial-gradient(circle at top,
+                    #161127,
+                    #09090b 50%);
+
+            min-height: 100vh;
+
+            color: white;
+
+            font-family: Inter, sans-serif;
+
+            overflow-x: hidden;
+        }
+
+        /* PAGE */
+
+        .scan-page {
+
+            max-width: 1200px;
+
+            margin: auto;
+
+            padding: calc(var(--nav-height) + 24px) 20px 40px;
+        }
+
+        /* HEADER */
+
+        .scan-header {
+
+            text-align: center;
+
+            margin-bottom: 50px;
+        }
+
+        .scan-header h1 {
+
+            font-size: 4rem;
+
+            letter-spacing: 4px;
+
+            margin-bottom: 10px;
+
+            background:
+                linear-gradient(90deg,
+                    #c084fc,
+                    #7c3aed);
+
+            -webkit-background-clip: text;
+
+            color: transparent;
+        }
+
+        .scan-header p {
+
+            color: #9ca3af;
+        }
+
+        /* SCANNER */
+
+        .scanner-panel {
+
+            display: flex;
+
+            justify-content: center;
+
+            margin-bottom: 40px;
+        }
+
+        .scanner-ring {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #reader {
+            width: 100% !important;
+            max-width: 350px;
+            margin: auto;
+        }
+
+        #reader video {
+            width: 100% !important;
+            height: auto !important;
+            object-fit: cover;
+        }
+
+        /* RESULT PANEL */
+
+        .result-panel {
+
+            background: #121212;
+
+            border: 1px solid #232323;
+
+            border-radius: 30px;
+
+            padding: 40px;
+
+            min-height: 280px;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            box-shadow:
+                0 20px 60px rgba(0,
+                    0,
+                    0,
+                    .5);
+        }
+
+        /* IDLE */
+
+        .idle-state {
+
+            text-align: center;
+        }
+
+        .pulse-circle {
+
+            width: 90px;
+
+            height: 90px;
+
+            border-radius: 50%;
+
+            margin: auto;
+
+            background:
+                rgba(124,
+                    58,
+                    237,
+                    .2);
+
+            position: relative;
+
+            margin-bottom: 20px;
+        }
+
+        .pulse-circle::after {
+
+            content: "";
+
+            position: absolute;
+
+            inset: -15px;
+
+            border-radius: 50%;
+
+            border: 2px solid rgba(124,
+                    58,
+                    237,
+                    .4);
+
+            animation:
+                pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
+        }
+
+        /* SUCCESS */
+
+        .success-card {
+
+            width: 100%;
+
+            text-align: center;
+        }
+
+        .success-icon {
+
+            font-size: 5rem;
+
+            color: #22c55e;
+
+            margin-bottom: 20px;
+        }
+
+        .success-card h2 {
+
+            color: #22c55e;
+
+            margin-bottom: 25px;
+        }
+
+        .pass-info {
+
+            background: #18181b;
+
+            border-radius: 20px;
+
+            padding: 25px;
+
+            text-align: left;
+        }
+
+        .pass-info p {
+
+            margin: 15px 0;
+
+            font-size: 1rem;
+        }
+
+        .pass-info strong {
+
+            color: #c084fc;
+        }
+
+        /* ERROR */
+
+        .error-card {
+
+            text-align: center;
+        }
+
+        .error-icon {
+
+            font-size: 5rem;
+
+            color: #ef4444;
+
+            margin-bottom: 20px;
+        }
+
+        /* MOBILE */
+
+        @media(max-width:768px) {
+
+            .scan-header h1 {
+
+                font-size: 2.5rem;
+            }
+
+            #reader {
+
+                width: 100%;
+            }
+
+        }
+
+        .success-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transform: translateX(200px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 9999;
+        }
+
+        .success-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="nav">
+        <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+        <div class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/index.html#trending">Events</a></li>
+                <li><a href="/Exp.html">Experience</a></li>
+                <li><a href="/contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="logsec" id="logw">
+            <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+            <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                Up</button>
+        </div>
+        <div id="userDropdown" class="user-dropdown hidden">
+
+            <button id="dropdownBtn" class="dropdown-btn">
+                👤 <span id="username">User</span> ▼
+            </button>
+
+            <div id="dropdownMenu" class="dropdown-menu hidden">
+                <a href="/profile.html">My Profile</a>
+                <a href="/mybookings.html">My Bookings</a>
+                <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                <button id="logoutBtn">Logout</button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="scan-page">
+
+        <div class="scan-header">
+
+            <h1>
+                EVENTLY ACCESS
+            </h1>
+
+            <p>
+                Organizer Check-In Terminal
+            </p>
+
+        </div>
+
+        <div class="scanner-panel">
+
+            <div class="scanner-ring">
+
+                <div id="reader"></div>
+
+            </div>
+
+        </div>
+
+        <div id="result" class="result-panel">
+
+            <div class="idle-state">
+
+                <div class="pulse-circle"></div>
+
+                <h2>
+                    Ready To Scan
+                </h2>
+
+                <p>
+                    Awaiting attendee ticket
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+    <script src="/js/nav.js"></script>
+</body>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    let html5QrCode;
+    let scanningLocked = false;
+    let lastScanTime = 0;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playErrorBeep() {
+        const oscillator = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        oscillator.type = "square";
+        oscillator.frequency.value = 200; // low harsh sound
+
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.2);
+    }
+    window.addEventListener("click", () => {
+        audioCtx.resume();
+    }, { once: true });
+    function showErrorToast(message) {
+        let toast = document.createElement("div");
+        toast.className = "success-toast";
+        toast.style.background = "#ef4444"; // red
+        toast.innerText = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => toast.classList.add("show"), 50);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }
+    function playBeep() {
+        const oscillator = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        oscillator.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        oscillator.type = "sine";
+        oscillator.frequency.value = 1000;
+
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + 0.1);
+    }
+    function showSuccessToast(message) {
+        let toast = document.createElement("div");
+        toast.className = "success-toast";
+        toast.innerText = message;
+
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.classList.add("show");
+        }, 50);
+
+        setTimeout(() => {
+            toast.classList.remove("show");
+            setTimeout(() => toast.remove(), 300);
+        }, 2000);
+    }
+    document.getElementById("reader").innerHTML = "";
+    function updateAuthUI() {
+
+        const user = getUserFromToken();
+        
+
+        const logsec = document.getElementById("logw");
+
+        const dropdown = document.getElementById("userDropdown");
+        const username = document.getElementById("username");
+
+        if (user) {
+
+            // hide login/signup
+            if (logsec) logsec.style.display = "none";
+
+            // show dropdown
+            dropdown.classList.remove("hidden");
+
+            username.innerText = user.name;
+
+        } else {
+
+            if (logBtn) logBtn.style.display = "block";
+            if (signBtn) signBtn.style.display = "block";
+
+            dropdown.classList.add("hidden");
+        }
+    }
+    function getUserFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return null;
+        }
+    }
+    const btn = document.getElementById("dropdownBtn");
+    const menu = document.getElementById("dropdownMenu");
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-dropdown")) {
+            menu?.classList.add("hidden");
+        }
+    });
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        location.reload();
+    });
+    updateAuthUI();
+
+
+    const token = localStorage.getItem("token");
+
+    let scanned = false;
+
+    async function onScanSuccess(decodedText) {
+        const now = Date.now();
+
+        if (scanningLocked || now - lastScanTime < 3000) return;
+
+        lastScanTime = now;
+        scanningLocked = true;
+
+        let qrData;
+
+        try {
+            qrData = JSON.parse(decodedText);
+        } catch {
+            scanningLocked = false;
+            return;
+        }
+
+        await html5QrCode.pause();
+        verifyTicket(qrData.bookingId);
+    }
+    window.addEventListener("DOMContentLoaded", async () => {
+        try {
+            html5QrCode = new Html5Qrcode("reader");
+
+            const config = {
+                fps: 10,
+                qrbox: (viewfinderWidth, viewfinderHeight) => {
+                    const minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                    const size = Math.floor(minEdge * 0.7);
+
+                    return {
+                        width: size,
+                        height: size
+                    };
+                },
+                aspectRatio: 1.0
+            };
+
+            await html5QrCode.start(
+                { facingMode: "environment" }, // ✅ THIS FIXES MOBILE CAMERA
+                config,
+                onScanSuccess
+            );
+
+        } catch (err) {
+            console.error("Camera start failed:", err);
+            alert("Camera access failed. Please allow permission.");
+        }
+    });
+
+
+    async function verifyTicket(bookingId) {
+        try {
+            const res = await fetch("/api/bookings/verify-ticket", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({ bookingId })
+            });
+
+            const data = await res.json();
+            const result = document.getElementById("result");
+
+            if (data.success) {
+                playBeep();
+                showSuccessToast("✔ Check-in Successful");
+
+                result.innerHTML = `
+                <div class="success-card">
+                    <div class="success-icon">✓</div>
+                    <h2>ACCESS GRANTED</h2>
+                </div>
+            `;
+            } else {
+                playErrorBeep();
+                showErrorToast(data.message || "Invalid Ticket");
+
+                result.innerHTML = `
+                <div class="error-card">
+                    <div class="error-icon">✗</div>
+                    <h2>ACCESS DENIED</h2>
+                </div>
+            `;
+            }
+
+        } catch (err) {
+            playErrorBeep();
+            showErrorToast("Server error");
+        } finally {
+            setTimeout(() => {
+                scanningLocked = false;
+                html5QrCode.resume();
+            }, 1500);
+        }
+    }
+
+
+</script>
+
+</html>

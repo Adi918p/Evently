@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify | DJ Night 2026</title>
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    
+    <style>
+        .head{
+            margin-top: 0;
+        }
+        #qrcode{
+            height: 400px;
+        }
+        .cont{
+            height: 50px;
+            width: 200px;
+            border-radius: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(99, 24, 99);
+            cursor: pointer;
+        }
+        #link{
+            text-decoration: none;
+        }
+        #primtext{
+            color: rgb(131, 211, 10);
+        }
+        #sectext{
+            color: rgb(114, 10, 211);
+
+        }
+    </style>
+<link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+<body>
+    <div id="content">
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign Up</button>
+            </div>
+        </div>
+        <div class="sec">
+            <h1 class="head" id="primtext">Payment Succesfull</h1>
+            <h2 id="sectext">Ticket genertaed</h2>
+            <img id="qrcode">
+            <div class="cont">
+                <a id="link">Download Your Ticket</a>
+            </div>
+        </div>
+        <hr class="bar">
+        <footer class="footer">
+            <div class="footer-container">
+
+                <div class="footer-brand">
+                    <h2>Evently</h2>
+                    <p>
+                        Discover, book, and experience unforgettable events near you.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="#">Home</a>
+                    <a href="#trending">Events</a>
+                    <a href="#">Pricing</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <a href="#">FAQ</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Support</a>
+                </div>
+
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-x-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 EventHub. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+<script src="./js/app.js"></script>
+<script src="/js/nav.js"></script>
+</body>
+</html>

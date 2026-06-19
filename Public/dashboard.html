@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, sans-serif;
+        }
+
+        body {
+            background: #09090b;
+            color: white;
+        }
+
+        .dashboard {
+
+            min-height: 100vh;
+
+            padding: calc(var(--nav-height) + 30px) 8% 40px;
+        }
+
+        /* HEADER */
+
+        .dashboard-header {
+
+            margin-bottom: 40px;
+        }
+
+        .dashboard-header h1 {
+
+            font-size: 3rem;
+
+            margin-bottom: 10px;
+        }
+
+        .dashboard-header p {
+
+            color: #94a3b8;
+        }
+
+        /* STATS */
+
+        .stats-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(250px, 1fr));
+
+            gap: 25px;
+
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+
+            padding: 30px;
+
+            border-radius: 24px;
+
+            background:
+                rgba(255, 255, 255, .05);
+
+            backdrop-filter: blur(20px);
+
+            border:
+                1px solid rgba(255, 255, 255, .08);
+
+            transition: .3s;
+        }
+
+        .stat-card:hover {
+
+            transform:
+                translateY(-5px);
+
+            border-color: #7c3aed;
+        }
+
+        .stat-card h2 {
+
+            font-size: 2.5rem;
+
+            margin-bottom: 10px;
+
+            background:
+                linear-gradient(135deg,
+                    #7c3aed,
+                    #2563eb);
+
+            -webkit-background-clip: text;
+
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-card p {
+
+            color: #94a3b8;
+        }
+
+        /* EVENTS SECTION */
+
+        .events-section {
+
+            margin-top: 20px;
+        }
+
+        .section-top {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 30px;
+        }
+
+        .section-top h2 {
+
+            font-size: 2rem;
+        }
+
+        #createBtn {
+
+            border: none;
+
+            padding: 14px 22px;
+
+            border-radius: 14px;
+
+            cursor: pointer;
+
+            color: white;
+
+            font-weight: 600;
+
+            background:
+                linear-gradient(135deg,
+                    #7c3aed,
+                    #2563eb);
+
+            transition: .3s;
+        }
+
+        #createBtn:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 10px 25px rgba(124, 58, 237, .4);
+        }
+
+
+        #scan-btn {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            padding: 14px 28px;
+
+            border: none;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(90deg,
+                    #7c3aed,
+                    #a855f7);
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: all .25s ease;
+
+            box-shadow:
+                0 8px 25px rgba(168, 85, 247, .3);
+        }
+
+        #scan-btn:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 12px 35px rgba(168, 85, 247, .5);
+        }
+
+        #scan-btn:active {
+
+            transform:
+                translateY(0);
+        }
+
+        #scan-btn i {
+
+            font-size: 18px;
+        }
+
+        /* EVENTS GRID */
+
+        #eventsContainer {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(350px, 1fr));
+
+            gap: 25px;
+        }
+
+        /* EVENT CARD */
+
+        .event-card {
+
+            overflow: hidden;
+
+            border-radius: 24px;
+
+            background:
+                rgba(255, 255, 255, .05);
+
+            backdrop-filter: blur(20px);
+
+            border:
+                1px solid rgba(255, 255, 255, .08);
+
+            transition: .3s;
+        }
+
+        .event-card:hover {
+
+            transform:
+                translateY(-8px);
+
+            border-color: #7c3aed;
+
+            box-shadow:
+                0 20px 40px rgba(124, 58, 237, .25);
+        }
+
+        .event-banner {
+
+            width: 100%;
+
+            height: 220px;
+
+            object-fit: cover;
+        }
+
+        .event-content {
+
+            padding: 24px;
+        }
+
+        .event-title {
+
+            font-size: 1.4rem;
+
+            margin-bottom: 15px;
+        }
+
+        .event-info {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            color: #cbd5e1;
+        }
+
+        .event-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .edit-btn,
+        .delete-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .edit-btn {
+            flex: 1;
+
+            background:
+                linear-gradient(135deg,
+                    #7c3aed,
+                    #2563eb);
+
+            color: white;
+
+            border: none;
+
+            padding: 12px;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            flex: 1;
+
+            background:
+                rgba(239, 68, 68, .15);
+
+            color: #ef4444;
+
+            border:
+                1px solid rgba(239, 68, 68, .3);
+
+            padding: 12px;
+
+            border-radius: 12px;
+
+            cursor: pointer;
+
+            font-weight: 600;
+        }
+
+        .edit-btn:hover,
+        .delete-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .edit-btn:hover,
+        .delete-btn:hover {
+
+            transform:
+                translateY(-2px);
+        }
+
+        /* MOBILE */
+
+        @media(max-width:768px) {
+
+            .dashboard {
+
+                padding: calc(var(--nav-height) + 24px) 5% 40px;
+            }
+
+            .dashboard-header h1 {
+
+                font-size: 2.2rem;
+            }
+
+            .section-top {
+
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+            #createBtn {
+
+                width: 100%;
+            }
+        }
+
+        .booking-btn {
+            padding: 12px 18px;
+
+            border: 1px solid rgba(124, 58, 237, 0.4);
+
+            background: rgba(124, 58, 237, 0.12);
+
+            color: #c4b5fd;
+
+            border-radius: 12px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.25s ease;
+
+            backdrop-filter: blur(10px);
+        }
+
+        .booking-btn:hover {
+            background: linear-gradient(135deg,
+                    #7c3aed,
+                    #2563eb);
+
+            color: white;
+
+            transform: translateY(-2px);
+
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
+        }
+
+        .booking-btn:active {
+            transform: scale(0.96);
+        }
+    </style>
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+    <div id="nav">
+        <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+        <div class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/index.html#trending">Events</a></li>
+                <li><a href="/Exp.html">Experience</a></li>
+                <li><a href="/contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="logsec" id="logw">
+            <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+            <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                Up</button>
+        </div>
+        <div id="userDropdown" class="user-dropdown hidden">
+
+            <button id="dropdownBtn" class="dropdown-btn">
+                👤 <span id="username">User</span> ▼
+            </button>
+
+            <div id="dropdownMenu" class="dropdown-menu hidden">
+                <a href="/profile.html">My Profile</a>
+                <a href="/mybookings.html">My Bookings</a>
+                <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                <button id="logoutBtn">Logout</button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <section class="dashboard">
+
+        <div class="dashboard-header">
+
+            <h1 id="welcomeText">
+                Welcome Organizer
+            </h1>
+
+        </div>
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <h2 id="eventCount">0</h2>
+                <p>Total Events</p>
+            </div>
+
+            <div class="stat-card">
+                <h2 id="bookingCount">0</h2>
+                <p>Total Bookings</p>
+            </div>
+
+            <div class="stat-card">
+                <h2 id="revenue">₹0</h2>
+                <p>Total Revenue</p>
+            </div>
+
+        </div>
+
+        <div class="events-section">
+
+            <div class="section-top">
+
+                <h2>Your Events</h2>
+
+                <button id="createBtn">
+                    Create Event
+                </button>
+                <button id="scan-btn" onclick="window.location.href='/scanner.html'">
+                    <i class="fa-solid fa-qrcode"></i>
+                    Scan Tickets
+                </button>
+                <div class="event-actions">
+
+                    <button class="edit-btn" onclick="editEvent('${event._id}')">
+                        Edit
+                    </button>
+
+                    <button class="delete-btn" onclick="deleteEvent('${event._id}')">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+            <div id="eventsContainer"></div>
+
+        </div>
+
+    </section>
+
+<script src="/js/nav.js"></script>
+</body>
+<script>
+
+    function viewBookings(id) {
+        window.location.href =
+            `/event-bookings.html?id=${id}`;
+
+    }
+    function updateAuthUI() {
+
+        const user = getUserFromToken();
+        
+
+        const logsec = document.getElementById("logw");
+
+        const dropdown = document.getElementById("userDropdown");
+        const username = document.getElementById("username");
+
+        if (user) {
+
+            // hide login/signup
+            if (logsec) logsec.style.display = "none";
+
+            // show dropdown
+            dropdown.classList.remove("hidden");
+
+            username.innerText = user.name;
+
+        } else {
+
+            if (logBtn) logBtn.style.display = "block";
+            if (signBtn) signBtn.style.display = "block";
+
+            dropdown.classList.add("hidden");
+        }
+    }
+
+
+    function getUserFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return null;
+        }
+    }
+    
+    
+    const btn = document.getElementById("dropdownBtn");
+    const menu = document.getElementById("dropdownMenu");
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-dropdown")) {
+            menu?.classList.add("hidden");
+        }
+    });
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        location.reload();
+    });
+    updateAuthUI();
+
+    function editEvent(id) {
+
+        window.location.href =
+            `/edit-event.html?id=${id}`;
+
+    }
+
+    async function deleteEvent(id) {
+
+        const confirmDelete =
+            confirm(
+                "Delete this event?"
+            );
+
+        if (!confirmDelete)
+            return;
+
+        try {
+
+            const token =
+                localStorage.getItem("token");
+
+            const res =
+                await fetch(
+                    `/api/events/${id}`,
+                    {
+                        method: "DELETE",
+
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            if (data.success) {
+
+                alert(
+                    "Event Deleted Successfully"
+                );
+
+                await loadMyEvents();
+
+                await loadStats();
+
+            }
+            else {
+
+                alert(
+                    data.message
+                );
+
+            }
+
+        }
+        catch (err) {
+
+            console.error(
+                "Delete Error:",
+                err
+            );
+
+            alert(
+                "Failed to delete event"
+            );
+
+        }
+
+    }
+
+
+    function getUserFromToken() {
+
+        const token = localStorage.getItem("token");
+
+        if (!token) return null;
+
+        try {
+
+            return JSON.parse(
+                atob(token.split(".")[1])
+            );
+
+        } catch {
+
+            return null;
+
+        }
+
+    }
+
+    const user = getUserFromToken();
+    if (!user) { window.location.href = "/login.html"; }
+    else if (user.role !== "organizer" && user.role !== "admin") {
+
+        window.location.href = "/";
+
+    }
+    const dashboardItem =
+        document.getElementById("dashboardItem");
+
+    if (user &&
+        (user.role === "admin" ||
+            user.role === "organizer")) {
+
+        dashboardItem.style.display = "block";
+
+    } else {
+
+        dashboardItem.style.display = "none";
+
+    }
+    async function loadStats() {
+
+        try {
+
+            const token =
+                localStorage.getItem("token");
+
+            const res =
+                await fetch(
+                    "/api/events/dashboard/stats",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            document.getElementById(
+                "eventCount"
+            ).innerText =
+                data.totalEvents || 0;
+
+            document.getElementById(
+                "bookingCount"
+            ).innerText =
+                data.totalBookings || 0;
+
+            document.getElementById(
+                "revenue"
+            ).innerText =
+                `₹${data.revenue || 0}`;
+
+        }
+        catch (err) {
+
+            console.error(
+                "Stats Error:",
+                err
+            );
+
+        }
+
+    }
+
+
+    async function loadMyEvents() {
+
+        try {
+
+            const token =
+                localStorage.getItem("token");
+
+            const res =
+                await fetch(
+                    "/api/events/my",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            const data =
+                await res.json();
+
+            const container =
+                document.getElementById(
+                    "eventsContainer"
+                );
+
+            container.innerHTML = "";
+
+            if (
+                !data.events ||
+                data.events.length === 0
+            ) {
+
+                container.innerHTML = `
+                    <h2>
+                        No Events Found
+                    </h2>
+                `;
+
+                return;
+            }
+
+            data.events.forEach(event => {
+
+                container.innerHTML += `
+                <div class="event-card">
+
+                    <img
+                        class="event-banner"
+                        src="${event.banner}"
+                        alt="${event.title}"
+                    >
+
+                    <div class="event-content">
+
+                        <h3 class="event-title">
+                            ${event.title}
+                        </h3>
+
+                        <div class="event-info">
+
+                            <span>
+                                📍 ${event.location}
+                            </span>
+
+                            <span>
+                                📅 ${new Date(event.date).toLocaleDateString()}
+                            </span>
+
+                            <span>
+                                💰 ₹${event.price}
+                            </span>
+
+                            <span>
+                                🎫 ${event.seats} seats
+                            </span>
+
+                        </div>
+
+                        <div class="event-actions">
+
+                            <button
+                                class="edit-btn"
+                                onclick="editEvent('${event._id}')"
+                            >
+                                Edit
+                            </button>
+
+                            <button
+                                class="delete-btn"
+                                onclick="deleteEvent('${event._id}')"
+                            >
+                                Delete
+                            </button>
+                            <button class="booking-btn" onclick="viewBookings('${event._id}')">
+                                <i class="fa-solid fa-users" ></i> Bookings
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+                `;
+
+            });
+
+        }
+        catch (err) {
+
+            console.error(
+                "Events Error:",
+                err
+            );
+
+        }
+
+    }
+
+
+    document.getElementById("createBtn").addEventListener(
+        "click",
+        () => {
+
+            window.location.href =
+                "/create-event.html";
+
+        }
+    );
+
+
+    loadStats();
+    loadMyEvents();
+
+</script>
+
+</html>

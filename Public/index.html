@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evently-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+
+<body>
+    <div id="searchover">
+        <div id="sbox">
+
+            <div class="ssec">
+                <h2>Location</h2>
+
+                <input type="text" id="location" list="cities" placeholder="Search city...">
+
+                <datalist id="cities">
+                    <option value="Ludhiana">
+                    <option value="Amritsar">
+                    <option value="Jalandhar">
+                    <option value="Mohali">
+                    <option value="Chandigarh">
+                    <option value="Patiala">
+                    <option value="Bathinda">
+                    <option value="Pathankot">
+                    <option value="Hoshiarpur">
+                    <option value="Delhi">
+                    <option value="Gurugram">
+                    <option value="Noida">
+                    <option value="Mumbai">
+                    <option value="Pune">
+                    <option value="Bangalore">
+                    <option value="Hyderabad">
+                </datalist>
+            </div>
+            <hr class="bar">
+            <div class="ssec">
+                <h2>Category</h2>
+
+                <select id="category">
+                    <option value="">All Categories</option>
+                    <option value="concert">Concerts</option>
+                    <option value="festival">Festivals</option>
+                    <option value="comedy">Comedy Shows</option>
+                    <option value="sports">Sports Events</option>
+                    <option value="tech">Tech Events</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="music">Music</option>
+                    <option value="workshop">Workshops</option>
+                    <option value="nightlife">Nightlife</option>
+                    <option value="food">Food & Drinks</option>
+                </select>
+            </div>
+            <hr class="bar">
+            <div class="ssec">
+                <h2>Date</h2>
+
+                <input type="date" id="date">
+            </div>
+            <hr class="bar">
+            <div>
+                <button class="btn searchbtn" onclick="process()">
+                    Search
+                </button>
+            </div>
+
+        </div>
+    </div>
+    <div id="content">
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+            <div id="userDropdown" class="user-dropdown hidden">
+
+                <button id="dropdownBtn" class="dropdown-btn">
+                    👤 <span id="username">User</span> ▼
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-menu hidden">
+                    <a href="/profile.html">My Profile</a>
+                    <a href="/mybookings.html">My Bookings</a>
+                    <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                    <button id="logoutBtn">Logout</button>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="section" id="hero">
+            <h1 class="white">Discover.</h1>
+            <h1 class="pink">Book.</h1>
+            <h1 class="red">Experience.</h1>
+            <p>Find the hottest events,clubs,concerts<br> and parties near you.</p>
+
+            <a href="#trending"><button id="exp" class="btn">Explore Events</button></a>
+
+            <div class="search">
+                <div class="parsec">
+                    <img src="/Media/Png/location.png" alt="location" class="pic">
+                    <div class="stxt">
+                        <h6>Location</h6>
+                        <p id="sloc">--Select Location--</p>
+                    </div>
+                </div>
+                <div class="vertical-divider"></div>
+                <div class="parsec">
+                    <img src="/Media/Png/categories.png" alt="Category" class="pic">
+                    <div class="stxt">
+                        <h6>Category</h6>
+                        <p id="scat">--Select Category--</p>
+                    </div>
+                </div>
+                <div class="vertical-divider"></div>
+                <div class="parsec">
+                    <img src="/Media/Png/calendar.png" alt="date" class="pic">
+                    <div class="stxt">
+                        <h6>Date</h6>
+                        <p id="sdate">--Select Date--</p>
+                    </div>
+                </div>
+                <button id="bsearch" class="btn" onclick="search()">
+                    <img class="pic" src="/Media/Png/search.png" alt="s"></img>
+                </button>
+            </div>
+        </div>
+        <div class="section" id="trending">
+            <h1 class="heading" id="htrending">Trending Events⚡</h1>
+            <div class="cardsec" id="trendsec">
+            </div>
+            <h1 id="hcat">Browse by Category</h1>
+            <div id="cat">
+                <div class="catup">
+                    <div class="catblocks" onclick="cat(1)">
+                        <div class="catpic">
+                            <img src="/Media/Png/music-cat.png" alt="">
+                        </div>
+                        <h4>Music</h4>
+                        <p></p>
+                    </div>
+                    <div class="catblocks" onclick="cat(2)">
+                        <div class="catpic">
+                            <img src="/Media/Png/club-cat.png" alt="">
+                        </div>
+                        <h4>Club</h4>
+                        <p></p>
+                    </div>
+                    <div class="catblocks" onclick="cat(3)">
+                        <div class="catpic">
+                            <img src="/Media/Png/networking-cat.png" alt="">
+                        </div>
+                        <h4>Networking</h4>
+                        <p></p>
+                    </div>
+                </div>
+                <div class="cardsec catsec">
+                    <div class="card" onclick="opevent(5)">
+                        <img src="Media/Png/no-event.jpg" alt="">
+                        <div class="text">
+                            <h1>No Event</h1>
+                            <div class="cinfo"><img src="/Media/Png/calendar.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                            <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                        </div>
+                        <div class="cbottom">
+                            <p class="rate"> ₹0</p>
+                        </div>
+                    </div>
+                    <div class="card" onclick="opevent(6)">
+                        <img src="Media/Png/no-event.jpg" alt="">
+                        <div class="text">
+                            <h1>No Event</h1>
+                            <div class="cinfo"><img src="/Media/Png/calendar.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                            <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                        </div>
+                        <div class="cbottom">
+                            <p class="rate"> ₹0</p>
+                        </div>
+                    </div>
+                    <div class="card" onclick="opevent(7)">
+                        <img src="Media/Png/no-event.jpg" alt="">
+                        <div class="text">
+                            <h1>No Event</h1>
+                            <div class="cinfo"><img src="/Media/Png/calendar.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                            <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                        </div>
+                        <div class="cbottom">
+                            <p class="rate"> ₹0</p>
+                        </div>
+                    </div>
+                    <div class="card" onclick="opevent(8)">
+                        <img src="Media/Png/no-event.jpg" alt="">
+                        <div class="text">
+                            <h1>No Event</h1>
+                            <div class="cinfo"><img src="/Media/Png/calendar.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                            <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                                <p>None</p>
+                            </div>
+                        </div>
+                        <div class="cbottom">
+                            <p class="rate"> ₹0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="section" id="loc">
+            <h1 class="heading" id="lochead">Featured Clubs</h1>
+            <div class="cardsec">
+                <div class="card" onclick="opclub(1)">
+                    <img src="/Media/Luna/banner.avif" alt="">
+                    <div class="text">
+                        <h1>Luna Club</h1>
+                        <div class="cinfo"><img src="/Media/Png/clock.png" alt="" class="cpic">
+                            <p>7 PM - 1 AM</p>
+                        </div>
+                        <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                            <p>Sukhmani Platinum Square - Ludhiana</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" onclick="opclub(2)">
+                    <img src="/Media/Pablo/banner.webp" alt="">
+                    <div class="text">
+                        <h1>Pablo Club</h1>
+                        <div class="cinfo"><img src="/Media/Png/clock.png" alt="" class="cpic">
+                            <p>7 PM - 1 AM</p>
+                        </div>
+                        <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                            <p>465-G, Khangura Complex - Ludhiana</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" onclick="opclub(3)">
+                    <img src="/Media/AfterHour/banner.avif" alt="">
+                    <div class="text">
+                        <h1>After Hour</h1>
+                        <div class="cinfo"><img src="/Media/Png/clock.png" alt="" class="cpic">
+                            <p>7 PM - 1 AM</p>
+                        </div>
+                        <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                            <p>4th floor Kartar Bhawan - Ludhiana</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card" onclick="opclub(4)">
+                    <img src="/Media/Club91/banner.avif" alt="">
+                    <div class="text">
+                        <h1>Club 91</h1>
+                        <div class="cinfo"><img src="/Media/Png/clock.png" alt="" class="cpic">
+                            <p>7 PM - 1 AM</p>
+                        </div>
+                        <div class="cinfo"><img src="/Media/Png/location.png" alt="" class="cpic">
+                            <p>South City - Ludhiana</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr class="bar">
+        <footer class="footer">
+            <div class="footer-container">
+
+                <div class="footer-brand">
+                    <h2>Evently</h2>
+                    <p>
+                        Discover, book, and experience unforgettable events near you.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="/index.html">Home</a>
+                    <a href="/index.html#trending">Events</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <a href="/faq.html">FAQ</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                    <a href="/support.html">Support</a>
+                </div>
+
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 EventHub. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+<script src="/js/nav.js"></script>
+</body>
+<script src="./js/script.js"></script>
+</html>

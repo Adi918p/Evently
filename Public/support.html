@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/legal.css">
+    <link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+<body>
+            <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+            <div id="userDropdown" class="user-dropdown hidden">
+
+                <button id="dropdownBtn" class="dropdown-btn">
+                    👤 <span id="username">User</span> ▼
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-menu hidden">
+                    <a href="/profile.html">My Profile</a>
+                    <a href="/mybookings.html">My Bookings</a>
+                    <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                    <button id="logoutBtn">Logout</button>
+
+                </div>
+
+            </div>
+        </div>
+    <section class="page-container">
+
+    <h1>Contact Support</h1>
+
+    <form id="supportForm">
+
+        <input
+            type="text"
+            placeholder="Your Name"
+            required
+        >
+
+        <input
+            type="email"
+            placeholder="Your Email"
+            required
+        >
+
+        <input
+            type="text"
+            placeholder="Subject"
+            required
+        >
+
+        <textarea
+            rows="6"
+            placeholder="Describe your issue"
+            required
+        ></textarea>
+
+        <button type="submit">
+            Send Message
+        </button>
+
+    </form>
+
+</section>
+<script>
+        const user = getUserFromToken();
+
+    const dashboardItem =
+        document.getElementById("dashboardItem");
+
+    if (user &&
+        (user.role === "admin" ||
+            user.role === "organizer")) {
+
+        dashboardItem.style.display = "block";
+
+    } else {
+
+        dashboardItem.style.display = "none";
+
+    }
+    function updateAuthUI() {
+
+    const user = getUserFromToken();
+    
+
+    const logsec = document.getElementById("logw");
+
+    const dropdown = document.getElementById("userDropdown");
+    const username = document.getElementById("username");
+
+    if (user) {
+
+        // hide login/signup
+        if (logsec) logsec.style.display = "none";
+
+        // show dropdown
+        dropdown.classList.remove("hidden");
+
+        username.innerText = user.name;
+
+    } else {
+
+        if (logBtn) logBtn.style.display = "block";
+        if (signBtn) signBtn.style.display = "block";
+
+        dropdown.classList.add("hidden");
+    }
+}
+    function getUserFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return null;
+        }
+    }
+    const btn = document.getElementById("dropdownBtn");
+    const menu = document.getElementById("dropdownMenu");
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-dropdown")) {
+            menu?.classList.add("hidden");
+        }
+    });
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        location.reload();
+    });
+    updateAuthUI();
+    document
+.getElementById("supportForm")
+.addEventListener("submit", (e) => {
+
+    e.preventDefault();
+
+    alert(
+        "Thank you! Your support request has been received."
+    );
+
+});
+</script>
+<script src="/js/nav.js"></script>
+</body>
+</html>

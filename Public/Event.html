@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            color: white;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Inter, sans-serif;
+            scrollbar-width: none;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: #09090b;
+            color: white;
+        }
+
+        .sect {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 850px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        /* HERO */
+
+        .hero {
+            position: relative;
+            height: 90vh;
+
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+
+            background:
+                linear-gradient(to top,
+                    rgba(0, 0, 0, .95),
+                    rgba(0, 0, 0, .3));
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 80px;
+            left: 5%;
+            max-width: 700px;
+            z-index: 10;
+        }
+
+        .event-tag {
+            padding: 8px 15px;
+            border-radius: 50px;
+
+            background: rgba(124, 58, 237, .2);
+            border: 1px solid #7c3aed;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-top: 20px;
+        }
+
+        .hero-desc {
+            margin-top: 15px;
+            color: #b3b3b3;
+        }
+
+        .hero-meta {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .hero-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* BUTTONS */
+
+        .primary-btn,
+        .secondary-btn {
+            border: none;
+            cursor: pointer;
+            padding: 14px 24px;
+            border-radius: 12px;
+        }
+
+        .primary-btn {
+            color: white;
+
+            background:
+                linear-gradient(135deg,
+                    #7c3aed,
+                    #2563eb);
+        }
+
+        .secondary-btn {
+            color: white;
+            background: #1b1b1f;
+        }
+
+        /* INFO CARDS */
+
+        .info-cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 20px;
+
+            margin-top: -60px;
+            position: relative;
+            z-index: 20;
+        }
+
+        .info-card {
+            padding: 25px;
+
+            background:
+                rgba(255, 255, 255, .05);
+
+            backdrop-filter: blur(20px);
+
+            border:
+                1px solid rgba(255, 255, 255, .08);
+
+            border-radius: 20px;
+
+            text-align: center;
+        }
+
+        .info-card i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* LAYOUT */
+
+        .page-layout {
+            display: grid;
+
+            grid-template-columns:
+                1fr 350px;
+
+            gap: 40px;
+
+            margin-top: 60px;
+        }
+
+        /* SECTION */
+
+        .sbox {
+            margin-bottom: 80px;
+        }
+
+        .sbox h2 {
+            margin-bottom: 25px;
+            font-size: 2rem;
+        }
+
+        /* GALLERY */
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .gallery img {
+            width: 100%;
+            border-radius: 15px;
+            transition: .3s;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.03);
+        }
+
+        /* ARTISTS */
+
+        .artists {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+
+        .artist-card {
+            background: #111827;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .artist-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .artist-card h3 {
+            padding: 20px;
+        }
+
+        /* TIMELINE */
+
+        .timeline {
+            border-left: 2px solid #7c3aed;
+            padding-left: 25px;
+        }
+
+        .timeline-item {
+            margin-bottom: 30px;
+        }
+
+        .timeline-item span {
+            color: #7c3aed;
+            font-weight: bold;
+        }
+
+        /* MAP */
+
+        .venue-box iframe {
+            width: 100%;
+            height: 350px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 15px;
+        }
+
+        /* REVIEWS */
+
+        .reviews {
+            display: grid;
+            gap: 20px;
+        }
+
+        .review-card {
+            padding: 25px;
+            border-radius: 20px;
+            background: #111827;
+        }
+
+        /* SIMILAR */
+
+        .similar-events {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .similar-card {
+            overflow: hidden;
+            border-radius: 20px;
+            background: #111827;
+        }
+
+        .similar-card img {
+            width: 100%;
+        }
+
+        .similar-card h3 {
+            padding: 20px;
+        }
+
+        /* TICKET PANEL */
+
+        .ticket-panel {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        .ticket-card {
+            position: sticky;
+            top: 105px;
+
+            background: #111827;
+
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .booking-card {
+            top: 390px;
+            width: 100%;
+            max-width: 380px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .booking-box {
+            width: 100%;
+            max-width: 380px;
+
+            padding: 25px;
+
+            background: #111827;
+
+            border: 1px solid rgba(255, 255, 255, 0.08);
+
+            border-radius: 18px;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .booking-box h3 {
+            color: white;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+
+        .ticket-selector label {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+        }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+
+            margin-top: 10px;
+        }
+
+        .counter button {
+            width: 40px;
+            height: 40px;
+
+            border: none;
+            border-radius: 10px;
+
+            background: #1f2937;
+
+            color: white;
+            font-size: 20px;
+
+            cursor: pointer;
+
+            transition: 0.2s;
+        }
+
+        .counter button:hover {
+            background: #374151;
+        }
+
+        .counter span {
+            min-width: 40px;
+            text-align: center;
+
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        #bookBtn {
+            width: 100%;
+
+            padding: 14px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: linear-gradient(135deg,
+                    #8b5cf6,
+                    #6366f1);
+
+            color: white;
+
+            font-size: 1rem;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        #bookBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.35);
+        }
+
+        .ticket-option {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0;
+            gap: 16px;
+        }
+
+        .full {
+            width: 100%;
+        }
+
+        /* MOBILE BOOK BUTTON */
+
+        .mobile-book {
+            display: none;
+        }
+
+        @media(max-width:1000px) {
+
+            .page-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .ticket-panel {
+                display: block;
+                position: static;
+                width: 100%;
+                margin-top: 30px;
+            }
+
+            .ticket-card,
+            .booking-card {
+                position: static;
+                width: min(100%, 420px);
+                max-width: 420px;
+                margin: 0 auto 18px;
+            }
+
+            .hero h1 {
+                font-size: 3rem;
+            }
+
+            .mobile-book {
+                display: block;
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                z-index: 100;
+            }
+
+            .mobile-book button {
+                width: 100%;
+                padding: 16px;
+
+                border: none;
+
+                border-radius: 15px;
+
+                color: white;
+
+                background:
+                    linear-gradient(135deg,
+                        #7c3aed,
+                        #2563eb);
+            }
+
+            .gallery {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+    <div id="content">
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+            <div id="userDropdown" class="user-dropdown hidden">
+
+                <button id="dropdownBtn" class="dropdown-btn">
+                    👤 <span id="username">User</span> ▼
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-menu hidden">
+                    <a href="/profile.html">My Profile</a>
+                    <a href="/mybookings.html">My Bookings</a>
+                    <a href="/dashboard.html" id="dashboardItem">Dashboard</a>
+
+                    <button id="logoutBtn">Logout</button>
+
+                </div>
+
+            </div>
+        </div>
+        <div id="eventsec"></div>
+        <div class="sect" id="err"></div>
+        <hr class="bar">
+        <footer class="footer">
+            <div class="footer-container">
+
+                <div class="footer-brand">
+                    <h2>Evently</h2>
+                    <p>
+                        Discover, book, and experience unforgettable events near you.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="/index.html">Home</a>
+                    <a href="/index.html#trending">Events</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <a href="/faq.html">FAQ</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                    <a href="/support.html">Support</a>
+                </div>
+
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a
+                            href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 EventHub. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+    <script src="/js/nav.js"></script>
+</body>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    let count = 1;
+
+    function attachBookingListeners() {
+
+        const ticketCount =
+            document.getElementById("ticketCount");
+
+        const minusBtn =
+            document.getElementById("minusBtn");
+
+        const plusBtn =
+            document.getElementById("plusBtn");
+
+        const bookBtn =
+            document.getElementById("bookBtn");
+
+        if (!ticketCount || !minusBtn || !plusBtn || !bookBtn) {
+            console.log("Booking elements not found");
+            return;
+        }
+
+        const updateUI = () => {
+            ticketCount.innerText = count;
+        };
+
+        minusBtn.addEventListener("click", () => {
+            if (count > 1) {
+                count--;
+                updateUI();
+            }
+        });
+
+        plusBtn.addEventListener("click", () => {
+            count++;
+            updateUI();
+        });
+
+        bookBtn.addEventListener("click", async () => {
+
+            try {
+
+                const token = localStorage.getItem("token");
+
+                if (!token) {
+
+                    alert("Login required");
+
+                    setTimeout(() => {
+                        window.location.href = "/login.html";
+                    }, 1000);
+
+                    return;
+                }
+
+                const eventId =
+                    new URLSearchParams(window.location.search)
+                        .get("id");
+
+                /* CREATE ORDER */
+
+                const orderRes = await fetch(
+                    "/api/payments/create-order",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json",
+                            "Authorization": `Bearer ${token}`
+                        },
+
+                        body: JSON.stringify({
+                            eventId,
+                            tickets: count
+                        })
+                    }
+                );
+
+                const orderData =
+                    await orderRes.json();
+
+                if (!orderData.success) {
+
+                    alert(orderData.message);
+
+                    return;
+                }
+
+                /* RAZORPAY OPTIONS */
+
+                const options = {
+
+                    key: orderData.keyId,
+
+                    amount: orderData.order.amount,
+
+                    currency: "INR",
+
+                    name: "Evently",
+
+                    description: "Event Booking",
+
+                    order_id: orderData.order.id,
+
+                    handler: async function (response) {
+
+                        try {
+
+                            /* VERIFY PAYMENT */
+
+                            const verifyRes =
+                                await fetch(
+                                    "/api/payments/verify",
+                                    {
+                                        method: "POST",
+
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            "Authorization":
+                                                `Bearer ${token}`
+                                        },
+
+                                        body: JSON.stringify({
+
+                                            eventId,
+
+                                            tickets: count,
+
+                                            razorpay_order_id:
+                                                response.razorpay_order_id,
+
+                                            razorpay_payment_id:
+                                                response.razorpay_payment_id,
+
+                                            razorpay_signature:
+                                                response.razorpay_signature
+
+                                        })
+
+                                    }
+                                );
+
+                            const verifyData =
+                                await verifyRes.json();
+
+                            if (verifyData.success) {
+
+                                alert("Payment Successful!");
+
+                                window.location.href =
+                                    "/mybookings.html";
+
+                            }
+                            else {
+
+                                alert(
+                                    verifyData.message ||
+                                    "Payment verification failed"
+                                );
+
+                            }
+
+                        }
+                        catch (err) {
+
+                            console.error(err);
+
+                            alert(
+                                "Verification failed"
+                            );
+
+                        }
+
+                    },
+
+                    prefill: {
+                        name: user?.name || "",
+                        email: user?.email || ""
+                    },
+
+                    theme: {
+                        color: "#6d28d9"
+                    }
+
+                };
+
+                /* OPEN CHECKOUT */
+
+                const rzp =
+                    new Razorpay(options);
+
+                rzp.open();
+
+            }
+            catch (err) {
+
+                console.error(err);
+
+                alert(
+                    "Something went wrong"
+                );
+
+            }
+
+        });
+    }
+    const params = new URLSearchParams(window.location.search);
+    const eid = params.get('id')
+
+    async function loadEvent() {
+        try {
+
+            const response =
+                await fetch(`/api/events/${eid}`);
+
+            const data = await response.json();
+            const event = data.event;
+
+            if (!data.success || !data.event) {
+                document.getElementById("err").innerHTML =
+                    "<h1>Event Not Found</h1>";
+                return;
+            }
+
+            if (event) {
+                document.getElementById("eventsec").innerHTML = `
+    <section class="hero" style="background:
+    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f')
+    center/cover;
+">
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+            <span class="event-tag">LIVE EVENT</span>
+
+            <h1>${event.title}</h1>
+
+            <p class="hero-desc">
+                ${event.description}
+            </p>
+
+            <div class="hero-meta">
+                <span><i class="fa-solid fa-location-dot"></i> ${event.location}</span>
+                <span><i class="fa-solid fa-calendar"></i> ${new Date(event.date).toLocaleDateString()}</span>
+                <span><i class="fa-solid fa-clock"></i> ${event.time}</span>
+            </div>
+
+            <div class="hero-buttons">
+                <a href="#bookcard"><button class="primary-btn" >Book Tickets</button></a>
+                <button class="secondary-btn">Share Event</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUICK INFO -->
+    <section class="info-cards container">
+
+        <div class="info-card">
+            <i class="fa-solid fa-building"></i>
+            <h3>Venue</h3>
+            <p>${event.venue}</p>
+        </div>
+
+        <div class="info-card">
+            <i class="fa-solid fa-ticket"></i>
+            <h3>Starting</h3>
+            <p>${event.price}</p>
+        </div>
+
+        <div class="info-card">
+            <i class="fa-solid fa-user-check"></i>
+            <h3>Age</h3>
+            <p>${event.agelim}</p>
+        </div>
+
+        <div class="info-card">
+            <i class="fa-solid fa-users"></i>
+            <h3>Seats Left</h3>
+            <p>${event.seats}</p>
+        </div>
+
+    </section>
+
+    <main class="container page-layout">
+
+        <!-- LEFT CONTENT -->
+        <div class="main-content">
+
+            <!-- ABOUT -->
+            <section class="sbox">
+                <h2>About The Event</h2>
+
+                <p>
+                    ${event.about}
+                </p>
+
+                <p>
+                    Join thousands of music lovers for one of the most awaited
+                    events of the year.
+                </p>
+            </section>
+
+            <!-- GALLERY -->
+            <section class="sbox">
+                <h2>Gallery</h2>
+
+                <div class="gallery">
+                    <img src="${event.gallery?.[0] || '/default.jpg'}">
+                    <img src="${event.gallery?.[1] || '/default.jpg'}">
+                    <img src="${event.gallery?.[2] || '/default.jpg'}">
+                    <img src="${event.gallery?.[3] || '/default.jpg'}">
+                </div>
+            </section>
+
+            <!-- LINEUP -->
+            <section class="sbox">
+                <h2>Artist Lineup</h2>
+
+                <div class="artists">
+
+                    <div class="artist-card">
+                        <img src="${event.lineup?.[0]?.image || '/default.jpg'}">
+                        <h3>${event.lineup?.[0]?.name || 'Artist'}</h3>
+                    </div>
+
+                    <div class="artist-card">
+                        <img src="${event.lineup?.[0]?.image || '/default.jpg'}">
+                        <h3>${event.lineup?.[0]?.name || 'Artist'}</h3>
+                    </div>
+
+                    <div class="artist-card">
+                        <img src="${event.lineup?.[0]?.image || '/default.jpg'}">
+                        <h3>${event.lineup?.[0]?.name || 'Artist'}</h3>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- TIMELINE -->
+            <section class="sbox">
+                <h2>Event Timeline</h2>
+
+                <div class="timeline">
+
+                    <div class="timeline-item">
+                        <span>7:00 PM</span>
+                        <p>Gates Open</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <span>8:00 PM</span>
+                        <p>Opening Show</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <span>9:30 PM</span>
+                        <p>Main Performance</p>
+                    </div>
+
+                    <div class="timeline-item">
+                        <span>11:00 PM</span>
+                        <p>DJ Set</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- VENUE -->
+            <section class="sbox">
+                <h2>Venue</h2>
+
+                <div class="venue-box">
+                    <h3>${event.venue}</h3>
+                    <p>${event.location}</p>
+
+                    <iframe
+                        src="${event.maploc}">
+                    </iframe>
+                </div>
+            </section>
+
+            <!-- REVIEWS -->
+            <section class="sbox">
+                <h2>Attendee Reviews</h2>
+
+                <div class="reviews">
+
+                    <div class="review-card">
+                        ⭐⭐⭐⭐⭐
+                        <p>One of the best events I've attended.</p>
+                    </div>
+
+                    <div class="review-card">
+                        ⭐⭐⭐⭐⭐
+                        <p>Lighting and sound quality were amazing.</p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- SIMILAR EVENTS -->
+            <section class="sbox">
+                <h2>You May Also Like</h2>
+
+                <div class="similar-events">
+
+                    <div class="similar-card">
+                        <img src="https://picsum.photos/400/250?8">
+                        <h3>Tech Fest 2026</h3>
+                    </div>
+
+                    <div class="similar-card">
+                        <img src="https://picsum.photos/400/250?9">
+                        <h3>Summer Music Fest</h3>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+
+        <!-- STICKY TICKET PANEL -->
+        <aside class="ticket-panel">
+
+            <div class="ticket-card">
+
+                <h2>Tickets</h2>
+
+                <div class="ticket-option">
+                    <span>General</span>
+                    <strong>₹499</strong>
+                </div>
+
+                <div class="ticket-option">
+                    <span>VIP</span>
+                    <strong>₹999</strong>
+                </div>
+
+                <div class="ticket-option">
+                    <span>VVIP</span>
+                    <strong>₹1999</strong>
+                </div>
+
+            </div>
+            <div class="booking-card ticket-card" id="bookcard">
+
+                <h3>Book Your Tickets</h3>
+
+                <div class="ticket-selector">
+
+                    <label>No. of Tickets</label>
+
+                    <div class="counter">
+
+                        <button id="minusBtn">−</button>
+
+                        <span id="ticketCount">1</span>
+
+                        <button id="plusBtn">+</button>
+
+                    </div>
+
+                </div>
+
+                <button id="bookBtn">
+                    Book Now
+                </button>
+            </div>
+
+        </aside>
+
+    </main>
+`;
+                const bookBtn = document.getElementById("bookBtn");
+
+                const seatsLeft = event.seats - event.ticketsSold;
+
+                if (seatsLeft <= 0) {
+                    bookBtn.innerText = "Sold Out";
+                    bookBtn.disabled = true;
+                    bookBtn.style.opacity = "0.5";
+                    bookBtn.style.cursor = "not-allowed";
+                }
+                document.getElementById("err").style.display = 'none';
+            }
+
+            else {
+                if (document.getElementById("clubsec")) {
+                    document.getElementById("clubsec").style.display = 'none';
+                    document.getElementById("err").innerHTML =
+                        "<h1>Club Not Found</h1>";
+                }
+            }
+            attachBookingListeners();
+
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    function updateAuthUI() {
+
+        const user = getUserFromToken();
+        
+
+        const logsec = document.getElementById("logw");
+
+        const dropdown = document.getElementById("userDropdown");
+        const username = document.getElementById("username");
+
+        if (user) {
+
+            // hide login/signup
+            if (logsec) logsec.style.display = "none";
+
+            // show dropdown
+            dropdown.classList.remove("hidden");
+
+            username.innerText = user.name;
+
+        } else {
+            dropdown.classList.add("hidden");
+        }
+    }
+    function getUserFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return null;
+        }
+    }
+    const btn = document.getElementById("dropdownBtn");
+    const menu = document.getElementById("dropdownMenu");
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-dropdown")) {
+            menu?.classList.add("hidden");
+        }
+    });
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        location.reload();
+    });
+    const user = getUserFromToken();
+
+    const dashboardItem =
+        document.getElementById("dashboardItem");
+
+    if (user &&
+        (user.role === "admin" ||
+            user.role === "organizer")) {
+
+        dashboardItem.style.display = "block";
+
+    } else {
+
+        dashboardItem.style.display = "none";
+
+    }
+    updateAuthUI();
+    loadEvent();
+
+</script>
+
+</html>

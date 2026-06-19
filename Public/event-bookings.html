@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Event Bookings</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: Inter, sans-serif;
+            background: #09090b;
+            color: white;
+        }
+
+        /* MAIN WRAPPER */
+        .wrapper {
+            padding: 120px 8%;
+        }
+
+        /* EVENT HEADER */
+        .event-header {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            backdrop-filter: blur(20px);
+        }
+
+        .event-header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+
+        .event-header p {
+            color: #aaa;
+            margin-top: 8px;
+        }
+
+        /* STATS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 18px;
+            backdrop-filter: blur(15px);
+        }
+
+        .stat-card h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .stat-card span {
+            color: #aaa;
+        }
+
+        /* BOOKINGS */
+        .bookings {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .booking-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 20px;
+            border-radius: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-info h3 {
+            margin: 0;
+        }
+
+        .user-info p {
+            margin: 5px 0 0;
+            color: #aaa;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 50px;
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+            font-size: 12px;
+        }
+
+        /* EMPTY */
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 50px;
+        }
+
+        .loader {
+            text-align: center;
+            color: #aaa;
+        }
+    </style>
+
+<link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+            <div id="userDropdown" class="user-dropdown hidden">
+
+                <button id="dropdownBtn" class="dropdown-btn">
+                    👤 <span id="username">User</span> ▼
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-menu hidden">
+                    <a href="/profile.html">My Profile</a>
+                    <a href="/mybookings.html">My Bookings</a>
+                    <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                    <button id="logoutBtn">Logout</button>
+
+                </div>
+
+            </div>
+        </div>
+
+    <div class="wrapper">
+
+        <!-- EVENT INFO -->
+        <div class="event-header">
+            <h1 id="eventTitle">Loading...</h1>
+            <p id="eventMeta"></p>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats">
+
+            <div class="stat-card">
+                <h2 id="totalTickets">0</h2>
+                <span>Total Tickets</span>
+            </div>
+
+            <div class="stat-card">
+                <h2 id="totalRevenue">₹0</h2>
+                <span>Total Revenue</span>
+            </div>
+
+            <div class="stat-card">
+                <h2 id="totalUsers">0</h2>
+                <span>Attendees</span>
+            </div>
+
+        </div>
+
+        <!-- BOOKINGS LIST -->
+        <div id="bookingsContainer" class="bookings">
+            <div class="loader">Loading bookings...</div>
+        </div>
+
+    </div>
+
+    <script>
+        function updateAuthUI() {
+
+            const user = getUserFromToken();
+            
+
+            const logBtn = document.getElementById("log");
+            const signBtn = document.getElementById("sup");
+
+            const dropdown = document.getElementById("userDropdown");
+            const username = document.getElementById("username");
+
+            if (user) {
+
+                // hide login/signup
+                if (logBtn) logBtn.style.display = "none";
+                if (signBtn) signBtn.style.display = "none";
+
+                // show dropdown
+                dropdown.classList.remove("hidden");
+
+                username.innerText = user.name;
+
+            } else {
+
+                if (logBtn) logBtn.style.display = "block";
+                if (signBtn) signBtn.style.display = "block";
+
+                dropdown.classList.add("hidden");
+            }
+        }
+        function getUserFromToken() {
+            const token = localStorage.getItem("token");
+            if (!token) return null;
+
+            try {
+                return JSON.parse(atob(token.split(".")[1]));
+            } catch {
+                return null;
+            }
+        }
+        const btn = document.getElementById("dropdownBtn");
+        const menu = document.getElementById("dropdownMenu");
+        btn.addEventListener("click", () => {
+            menu.classList.toggle("hidden");
+        });
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".user-dropdown")) {
+                menu?.classList.add("hidden");
+            }
+        });
+        document.getElementById("logoutBtn")?.addEventListener("click", () => {
+            localStorage.removeItem("token");
+            location.reload();
+        });
+        updateAuthUI();
+        function getUserFromToken() {
+            const token = localStorage.getItem("token");
+            if (!token) return null;
+
+            try {
+                return JSON.parse(atob(token.split(".")[1]));
+            } catch {
+                return null;
+            }
+        }
+
+        const user = getUserFromToken();
+
+        if (!user) {
+            window.location.href = "/login.html";
+        }
+
+        /* ---------------- EVENT ID ---------------- */
+
+        const params = new URLSearchParams(window.location.search);
+        const eventId = params.get("id");
+
+        if (!eventId) {
+            document.getElementById("bookingsContainer").innerHTML =
+                `<div class="empty">Invalid Event ID</div>`;
+        }
+
+        /* ---------------- LOAD BOOKINGS ---------------- */
+
+        async function loadBookings() {
+
+            try {
+
+                const token = localStorage.getItem("token");
+
+                const res = await fetch(
+                    `/api/events/${eventId}/bookings`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        },
+                        cache: "no-store"
+                    }
+                );
+
+                const data = await res.json();
+                if (!data.success) {
+                    document.getElementById("bookingsContainer").innerHTML =
+                        `<div class="empty">No bookings found</div>`;
+                    return;
+                }
+
+                const { event, bookings } = data;
+
+                /* ---------------- EVENT INFO ---------------- */
+
+                document.getElementById("eventTitle").innerText =
+                    event?.title || "Event";
+
+                document.getElementById("eventMeta").innerText =
+                    `${event?.location || ""} • ${event?.date || ""}`;
+
+                /* ---------------- STATS ---------------- */
+
+                let totalTickets = 0;
+                let revenue = 0;
+
+                const container = document.getElementById("bookingsContainer");
+                container.innerHTML = "";
+
+                if (!bookings || bookings.length === 0) {
+                    container.innerHTML =
+                        `<div class="empty">No bookings yet</div>`;
+                    return;
+                }
+
+                /* ---------------- RENDER BOOKINGS ---------------- */
+
+                bookings.forEach(b => {
+
+                    totalTickets += b.tickets || 0;
+                    revenue += b.totalPrice || 0;
+
+                    container.innerHTML += `
+                <div class="booking-card">
+
+                    <div class="user-info">
+                        <h3>${b.user?.name || "Unknown User"}</h3>
+                        <p>${b.user?.email || ""}</p>
+                    </div>
+
+                    <div>
+                        <strong>${b.tickets || 0} Tickets</strong>
+                        <div class="badge">Confirmed</div>
+                    </div>
+
+                </div>
+            `;
+                });
+
+                /* ---------------- UPDATE STATS ---------------- */
+
+                document.getElementById("totalTickets").innerText =
+                    totalTickets;
+
+                document.getElementById("totalRevenue").innerText =
+                    `₹${revenue}`;
+
+                document.getElementById("totalUsers").innerText =
+                    bookings.length;
+
+            } catch (err) {
+                console.error(err);
+
+                document.getElementById("bookingsContainer").innerHTML =
+                    `<div class="empty">Error loading bookings</div>`;
+            }
+        }
+
+        if (!user) {
+            window.location.href = "/login.html";
+        }
+
+        loadBookings();
+
+    </script>
+
+<script src="/js/nav.js"></script>
+</body>
+
+</html>

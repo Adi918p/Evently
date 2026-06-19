@@ -1,0 +1,380 @@
+/* ==========================
+   TABLETS & SMALL LAPTOPS
+========================== */
+
+@media (max-width: 1200px) {
+
+    #nav {
+        gap: 40px;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .navbar > ul {
+        gap: 50px;
+    }
+
+    .cardsec {
+        flex-wrap: wrap;
+        height: auto;
+        margin-bottom: 100px;
+    }
+
+    .search {
+        width: 90%;
+    }
+
+}
+
+/* ==========================
+   TABLETS
+========================== */
+
+@media (max-width: 992px) {
+
+    #hero > h1 {
+        font-size: 60px;
+    }
+
+    #hero > p {
+        font-size: 20px;
+    }
+
+    .navbar > ul {
+        gap: 25px;
+    }
+
+    .card {
+        width: 320px;
+    }
+
+    .footer-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    #sbox {
+        width: 80%;
+        padding: 50px;
+    }
+
+}
+
+/* ==========================
+   MOBILE
+========================== */
+
+@media (max-width: 768px) {
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .introcon {
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: #00030c;
+        overflow: hidden;
+    }
+
+    .intro {
+        width: 100%;
+        height: 100%;
+        min-width: 100%;
+        min-height: 100%;
+        object-fit: cover;
+        object-position: center center;
+    }
+
+    /* HERO */
+
+    .section {
+        height: auto;
+    }
+
+    #hero {
+        padding-top: 180px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    #hero > h1 {
+        font-size: 42px;
+        line-height: 1.2;
+    }
+
+    #hero > p {
+        font-size: 18px;
+    }
+
+    #exp {
+        width: 160px;
+    }
+
+    /* SEARCH */
+
+    .search {
+        width: 95%;
+        height: auto;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+        border-radius: 25px;
+    }
+
+    .parsec {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .vertical-divider {
+        display: none;
+    }
+
+    /* TRENDING */
+
+    #trending {
+        margin-bottom: 100px;
+    }
+
+    .heading {
+        margin: 0 20px;
+    }
+
+    .cardsec {
+        flex-direction: column;
+        align-items: center;
+        height: auto;
+        gap: 30px;
+        margin-top: 40px;
+        margin-bottom: 80px;
+    }
+
+    .card {
+        width: 95%;
+        max-width: 400px;
+    }
+
+    /* CATEGORY */
+
+    .catup {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .catsec {
+        width: 95%;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 20px;
+        gap: 15px;
+    }
+
+    .catblocks {
+        width: 100px;
+        height: 100px;
+    }
+
+    /* SEARCH MODAL */
+
+    #sbox {
+        width: 95%;
+        height: auto;
+        padding: 30px;
+        gap: 25px;
+    }
+
+    .ssec {
+        width: 100%;
+        padding: 0;
+    }
+
+    /* LOGIN */
+
+    .sec {
+        padding: 120px 20px 40px;
+    }
+
+    .fbox {
+        width: 95%;
+        padding: 25px;
+    }
+
+    .google {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* FOOTER */
+
+    .footer {
+        padding: 40px 20px;
+    }
+
+    .footer-container {
+        grid-template-columns: 1fr;
+        text-align: center;
+    }
+
+    .social-icons {
+        justify-content: center;
+    }
+
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+
+    .intro {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 100vh;
+        height: 100vw;
+        min-width: 100vh;
+        min-height: 100vw;
+        transform: translate(-50%, -50%) rotate(90deg);
+        transform-origin: center center;
+    }
+
+}
+
+/* ==========================
+   SMALL PHONES
+========================== */
+
+@media (max-width: 480px) {
+
+    #hero > h1 {
+        font-size: 32px;
+    }
+
+    #hero > p {
+        font-size: 16px;
+    }
+
+    .btn {
+        width: 70px;
+        font-size: 12px;
+    }
+
+    .card {
+        width: 100%;
+    }
+
+    .fbox {
+        padding: 20px;
+    }
+
+    .footer {
+        padding: 30px 15px;
+    }
+
+}
+
+/* Shared responsive polish for pages with inline styles */
+
+.container,
+.dashboard,
+.contact-container,
+.page-container,
+.analytics-container {
+    max-width: 1180px;
+}
+
+input,
+textarea,
+select,
+button {
+    max-width: 100%;
+}
+
+.event-card,
+.booking-card,
+.profile-card,
+.stat-card,
+.info-card,
+.ticket-card,
+.message-card,
+.user-card {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 768px) {
+    .search {
+        margin: 36px auto 0;
+    }
+
+    #trending {
+        margin-bottom: 60px;
+    }
+
+    .page-layout,
+    .contact-content,
+    .profile-grid,
+    .stats-grid,
+    .events-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    .hero,
+    .sect {
+        min-height: 680px;
+        height: auto !important;
+    }
+
+    .hero-content {
+        left: 20px !important;
+        right: 20px !important;
+        bottom: 42px !important;
+        max-width: none !important;
+    }
+
+    .hero h1,
+    .dashboard-header h1,
+    .page-container h1 {
+        font-size: clamp(2rem, 10vw, 3rem) !important;
+        line-height: 1.08;
+    }
+
+    .hero-buttons,
+    .message-header,
+    .page-header,
+    .user-card,
+    .event-card .btn-group {
+        flex-direction: column;
+        align-items: stretch !important;
+    }
+
+    .ticket-panel {
+        position: static !important;
+        display: flex !important;
+        flex-direction: column;
+        align-items: center;
+        gap: 18px;
+    }
+
+    .ticket-card,
+    .booking-card,
+    .booking-box {
+        width: min(100%, 420px) !important;
+        max-width: 420px !important;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .ticket-card,
+    .booking-card {
+        position: static !important;
+    }
+
+    .gallery {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn {
+        width: auto;
+        min-width: 70px;
+    }
+}

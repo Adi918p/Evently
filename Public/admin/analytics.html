@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evently Admin</title>
+
+    <link rel="stylesheet" href="./css/admin.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+</head>
+
+<body>
+    <div id="nav">
+        <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+        <div class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/index.html#trending">Events</a></li>
+                <li><a href="/Exp.html">Experience</a></li>
+                <li><a href="/contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="logsec" id="logw">
+            <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+            <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                Up</button>
+        </div>
+        <div id="userDropdown" class="user-dropdown hidden">
+
+            <button id="dropdownBtn" class="dropdown-btn">
+                👤 <span id="username">User</span> ▼
+            </button>
+
+            <div id="dropdownMenu" class="dropdown-menu hidden">
+                <a href="/profile.html">My Profile</a>
+                <a href="/mybookings.html">My Bookings</a>
+                <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                <button id="logoutBtn">Logout</button>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="admin-container">
+
+        <div class="sidebar">
+
+            <h2>EVENTLY</h2>
+
+            <a href="dashboard.html">Dashboard</a>
+            <a href="events.html">Events</a>
+            <a href="users.html">Users</a>
+            <a href="inbox.html">Inbox</a>
+            <a href="analytics.html">Analytics</a>
+
+        </div>
+
+        <main class="analytics-container">
+
+            <div class="page-header">
+                <h1>Analytics Dashboard</h1>
+                <p>Monitor platform performance and event activity.</p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <h2 id="totalUsers">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Organizers</h3>
+                    <h2 id="totalOrganizers">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Total Events</h3>
+                    <h2 id="totalEvents">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Interested Users</h3>
+                    <h2 id="totalInterested">0</h2>
+                </div>
+
+                <div class="stat-card">
+                    <h3>Tickets Sold</h3>
+                    <h2 id="ticketsSold">0</h2>
+                </div>
+
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-grid">
+
+                <div class="chart-card">
+                    <h3>User Distribution</h3>
+                    <canvas id="eventStatusChart"></canvas>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Platform Growth</h3>
+                    <canvas id="userGrowthChart"></canvas>
+                </div>
+
+            </div>
+
+            <!-- Bottom Section -->
+            <div class="bottom-grid">
+
+                <div class="activity-card">
+                    <h3>Recent Events</h3>
+
+                    <div id="recentEvents">
+                        Loading...
+                    </div>
+                </div>
+
+                <div class="activity-card">
+                    <h3>Top Organizers</h3>
+
+                    <div id="topOrganizers">
+                        Loading...
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+    <hr class="bar">
+    <footer class="footer">
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <h2>Evently</h2>
+                <p>
+                    Discover, book, and experience unforgettable events near you.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <a href="/index.html">Home</a>
+                <a href="/index.html#trending">Events</a>
+                <a href="contact.html">Contact</a>
+            </div>
+
+            <div class="footer-links">
+                <h3>Resources</h3>
+                <a href="/faq.html">FAQ</a>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms & Conditions</a>
+                <a href="/support.html">Support</a>
+            </div>
+
+            <div class="footer-social">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a
+                        href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 EventHub. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+
+        function getUserFromToken() {
+            const token = localStorage.getItem("token");
+            if (!token) return null;
+
+            try {
+                return JSON.parse(atob(token.split(".")[1]));
+            } catch {
+                return null;
+            }
+        }
+        const user = getUserFromToken();
+
+        const dashboardItem =
+            document.getElementById("dashboardItem");
+
+        if (user &&
+            (user.role === "admin" ||
+                user.role === "organizer")) {
+
+            dashboardItem.style.display = "block";
+
+        } else {
+
+            dashboardItem.style.display = "none";
+
+        }
+        function updateAuthUI() {
+
+            const user = getUserFromToken();
+            
+
+            const logsec = document.getElementById("logw");
+
+            const dropdown = document.getElementById("userDropdown");
+            const username = document.getElementById("username");
+
+            if (user) {
+
+                // hide login/signup
+                if (logsec) logsec.style.display = "none";
+
+                // show dropdown
+                dropdown.classList.remove("hidden");
+
+                username.innerText = user.name;
+
+            } else {
+
+                if (logBtn) logBtn.style.display = "block";
+                if (signBtn) signBtn.style.display = "block";
+
+                dropdown.classList.add("hidden");
+            }
+        }
+
+
+        const btn = document.getElementById("dropdownBtn");
+        const menu = document.getElementById("dropdownMenu");
+        btn.addEventListener("click", () => {
+            menu.classList.toggle("hidden");
+        });
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".user-dropdown")) {
+                menu?.classList.add("hidden");
+            }
+        });
+        document.getElementById("logoutBtn")?.addEventListener("click", () => {
+            localStorage.removeItem("token");
+            location.reload();
+        });
+        updateAuthUI();
+        const params = new URLSearchParams(window.location.search);
+        cid = params.get('id')
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            window.location.href = "/login.html";
+        }
+
+        const person =
+            JSON.parse(
+                atob(token.split(".")[1])
+            );
+
+        if (person.role !== "admin") {
+            alert("Access Denied");
+            window.location.href = "/";
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="./js/admin-analytics.js"></script>
+
+<script src="/js/nav.js"></script>
+</body>
+
+</html>

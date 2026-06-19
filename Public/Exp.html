@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        #nav{
+            top: 0;
+        }
+        *{
+            scrollbar-width: 0;
+            scroll-behavior: smooth;
+        }
+        .experience-section {
+            width: 90%;
+            margin: auto;
+            padding: 50px 0;
+            color: white;
+            margin-top: 0;
+            padding-top: calc(var(--nav-height) + 40px);
+        }
+
+        .experience-section h1 {
+            font-size: 3rem;
+            text-align: center;
+        }
+
+        .experience-section p {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .event-card {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            transition: 0.3s;
+            width: 80%;
+        }
+
+        .event-card:hover {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.12);
+        }
+
+        .event-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .event-header h2 {
+            margin: 0;
+        }
+
+        .event-header span {
+            font-size: 1.5rem;
+            transition: 0.3s;
+        }
+
+        .event-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.6s ease;
+        }
+
+        .event-card.active .event-content {
+            max-height: 1000px;
+        }
+
+        .event-card.active .event-header span {
+            transform: rotate(180deg);
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            padding: 20px;
+        }
+
+        .gallery img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 15px;
+            transition: 0.3s;
+        }
+
+        .gallery img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+            <div id="userDropdown" class="user-dropdown hidden">
+
+                <button id="dropdownBtn" class="dropdown-btn">
+                    👤 <span id="username">User</span> ▼
+                </button>
+
+                <div id="dropdownMenu" class="dropdown-menu hidden">
+                    <a href="/profile.html">My Profile</a>
+                    <a href="/mybookings.html">My Bookings</a>
+                    <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                    <button id="logoutBtn">Logout</button>
+
+                </div>
+
+            </div>
+        </div>
+    <div id="content">
+        <section class="sec experience-section">
+
+            <h1>Our Event Experiences</h1>
+            <p>Take a look at some unforgettable moments from our past events.</p>
+
+            <div class="event-card">
+                <div class="event-header" onclick="toggleEvent(this)">
+                    <h2>DJ Night 2026</h2>
+                    <span>▼</span>
+                </div>
+
+                <div class="event-content">
+                    <p>Over 1500 attendees enjoyed an electrifying night of music and lights.</p>
+
+                    <div class="gallery">
+                        <img src="https://picsum.photos/400/300?random=1">
+                        <img src="https://picsum.photos/400/300?random=2">
+                        <img src="https://picsum.photos/400/300?random=3">
+                        <img src="https://picsum.photos/400/300?random=4">
+                        <img src="https://picsum.photos/400/300?random=5">
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-header" onclick="toggleEvent(this)">
+                    <h2>College Fest 2025</h2>
+                    <span>▼</span>
+                </div>
+
+                <div class="event-content">
+                    <p>Music, dance, gaming and competitions across multiple venues.</p>
+
+                    <div class="gallery">
+                        <img src="https://picsum.photos/400/300?random=6">
+                        <img src="https://picsum.photos/400/300?random=7">
+                        <img src="https://picsum.photos/400/300?random=8">
+                        <img src="https://picsum.photos/400/300?random=9">
+                        <img src="https://picsum.photos/400/300?random=10">
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-header" onclick="toggleEvent(this)">
+                    <h2>Food Carnival</h2>
+                    <span>▼</span>
+                </div>
+
+                <div class="event-content">
+                    <p>Over 50 food stalls serving cuisines from around the world.</p>
+
+                    <div class="gallery">
+                        <img src="https://picsum.photos/400/300?random=11">
+                        <img src="https://picsum.photos/400/300?random=12">
+                        <img src="https://picsum.photos/400/300?random=13">
+                        <img src="https://picsum.photos/400/300?random=14">
+                        <img src="https://picsum.photos/400/300?random=15">
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-header" onclick="toggleEvent(this)">
+                    <h2>Tech Summit</h2>
+                    <span>▼</span>
+                </div>
+
+                <div class="event-content">
+                    <p>Industry leaders discussing AI, Cybersecurity and Innovation.</p>
+
+                    <div class="gallery">
+                        <img src="https://picsum.photos/400/300?random=16">
+                        <img src="https://picsum.photos/400/300?random=17">
+                        <img src="https://picsum.photos/400/300?random=18">
+                        <img src="https://picsum.photos/400/300?random=19">
+                        <img src="https://picsum.photos/400/300?random=20">
+                    </div>
+                </div>
+            </div>
+
+            <div class="event-card">
+                <div class="event-header" onclick="toggleEvent(this)">
+                    <h2>Holi Bash 2026</h2>
+                    <span>▼</span>
+                </div>
+
+                <div class="event-content">
+                    <p>A vibrant celebration with colors, music and live performances.</p>
+
+                    <div class="gallery">
+                        <img src="https://picsum.photos/400/300?random=21">
+                        <img src="https://picsum.photos/400/300?random=22">
+                        <img src="https://picsum.photos/400/300?random=23">
+                        <img src="https://picsum.photos/400/300?random=24">
+                        <img src="https://picsum.photos/400/300?random=25">
+                    </div>
+                </div>
+            </div>
+
+        </section>
+        <hr class="bar">
+        <footer class="footer">
+            <div class="footer-container">
+
+                <div class="footer-brand">
+                    <h2>Evently</h2>
+                    <p>
+                        Discover, book, and experience unforgettable events near you.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="/index.html">Home</a>
+                    <a href="/index.html#trending">Events</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <a href="/faq.html">FAQ</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                    <a href="/support.html">Support</a>
+                </div>
+
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 EventHub. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+<script src="/js/nav.js"></script>
+</body>
+<script src="./js/script.js"></script>
+<script>
+        function getUserFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return null;
+        }
+    }
+    const btn = document.getElementById("dropdownBtn");
+    const menu = document.getElementById("dropdownMenu");
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-dropdown")) {
+            menu?.classList.add("hidden");
+        }
+    });
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        location.reload();
+    });
+
+        function updateAuthUI() {
+
+    const user = getUserFromToken();
+    
+
+    const logsec = document.getElementById("logw");
+
+    const dropdown = document.getElementById("userDropdown");
+    const username = document.getElementById("username");
+
+    if (user) {
+
+        // hide login/signup
+        if (logsec) logsec.style.display = "none";
+
+        // show dropdown
+        dropdown.classList.remove("hidden");
+
+        username.innerText = user.name;
+
+    } else {
+
+        if (logBtn) logBtn.style.display = "block";
+        if (signBtn) signBtn.style.display = "block";
+
+        dropdown.classList.add("hidden");
+    }
+}
+    const dashboardItem =
+        document.getElementById("dashboardItem");
+    const user = getUserFromToken();
+    if (user &&
+        (user.role === "admin" ||
+            user.role === "organizer")) {
+
+        dashboardItem.style.display = "block";
+
+    } else {
+
+        dashboardItem.style.display = "none";
+
+    }
+updateAuthUI();
+</script>
+
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evently Admin</title>
+
+    <link rel="stylesheet" href="./css/admin.css">
+    <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+</head>
+
+<body>
+    <div id="nav">
+        <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+        <div class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/index.html#trending">Events</a></li>
+                <li><a href="/Exp.html">Experience</a></li>
+                <li><a href="/contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="logsec" id="logw">
+            <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+            <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                Up</button>
+        </div>
+        <div id="userDropdown" class="user-dropdown hidden">
+
+            <button id="dropdownBtn" class="dropdown-btn">
+                👤 <span id="username">User</span> ▼
+            </button>
+
+            <div id="dropdownMenu" class="dropdown-menu hidden">
+                <a href="/profile.html">My Profile</a>
+                <a href="/mybookings.html">My Bookings</a>
+                <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                <button id="logoutBtn">Logout</button>
+
+            </div>
+
+        </div>
+    </div>
+    <div class="admin-container">
+        <div class="sidebar">
+
+            <h2>EVENTLY</h2>
+
+            <a href="dashboard.html">Dashboard</a>
+            <a href="events.html">Events</a>
+            <a href="users.html">Users</a>
+            <a href="inbox.html">Inbox</a>
+            <a href="analytics.html">Analytics</a>
+
+        </div>
+        <div class="main">
+            <div class="inbox-top">
+
+                <h1>Inbox</h1>
+
+                <div class="message-count">
+                    <span id="messageCount">0</span>
+                    Messages
+                </div>
+
+            </div>
+
+            <h1>Contact Inbox</h1>
+
+            <div id="messagesContainer">
+
+            </div>
+
+        </div>
+    </div>
+
+    <hr class="bar">
+    <footer class="footer">
+        <div class="footer-container">
+
+            <div class="footer-brand">
+                <h2>Evently</h2>
+                <p>
+                    Discover, book, and experience unforgettable events near you.
+                </p>
+            </div>
+
+            <div class="footer-links">
+                <h3>Quick Links</h3>
+                <a href="/index.html">Home</a>
+                <a href="/index.html#trending">Events</a>
+                <a href="contact.html">Contact</a>
+            </div>
+
+            <div class="footer-links">
+                <h3>Resources</h3>
+                <a href="/faq.html">FAQ</a>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms & Conditions</a>
+                <a href="/support.html">Support</a>
+            </div>
+
+            <div class="footer-social">
+                <h3>Follow Us</h3>
+                <div class="social-icons">
+                    <a
+                        href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-bottom">
+            <p>© 2026 EventHub. All rights reserved.</p>
+        </div>
+    </footer>
+    <script>
+
+        function getUserFromToken() {
+            const token = localStorage.getItem("token");
+            if (!token) return null;
+
+            try {
+                return JSON.parse(atob(token.split(".")[1]));
+            } catch {
+                return null;
+            }
+        }
+        const user = getUserFromToken();
+
+        const dashboardItem =
+            document.getElementById("dashboardItem");
+
+        if (user &&
+            (user.role === "admin" ||
+                user.role === "organizer")) {
+
+            dashboardItem.style.display = "block";
+
+        } else {
+
+            dashboardItem.style.display = "none";
+
+        }
+        function updateAuthUI() {
+
+            const user = getUserFromToken();
+            
+
+            const logsec = document.getElementById("logw");
+
+            const dropdown = document.getElementById("userDropdown");
+            const username = document.getElementById("username");
+
+            if (user) {
+
+                // hide login/signup
+                if (logsec) logsec.style.display = "none";
+
+                // show dropdown
+                dropdown.classList.remove("hidden");
+
+                username.innerText = user.name;
+
+            } else {
+
+                if (logBtn) logBtn.style.display = "block";
+                if (signBtn) signBtn.style.display = "block";
+
+                dropdown.classList.add("hidden");
+            }
+        }
+
+
+        const btn = document.getElementById("dropdownBtn");
+        const menu = document.getElementById("dropdownMenu");
+        btn.addEventListener("click", () => {
+            menu.classList.toggle("hidden");
+        });
+        document.addEventListener("click", (e) => {
+            if (!e.target.closest(".user-dropdown")) {
+                menu?.classList.add("hidden");
+            }
+        });
+        document.getElementById("logoutBtn")?.addEventListener("click", () => {
+            localStorage.removeItem("token");
+            location.reload();
+        });
+        updateAuthUI();
+        const params = new URLSearchParams(window.location.search);
+        cid = params.get('id')
+        const token = localStorage.getItem("token");
+
+        if (!token) {
+            window.location.href = "/login.html";
+        }
+
+        const person =
+            JSON.parse(
+                atob(token.split(".")[1])
+            );
+
+        if (person.role !== "admin") {
+            alert("Access Denied");
+            window.location.href = "/";
+        }
+    </script>
+    <script src="./js/admin-inbox.js"></script>
+
+<script src="/js/nav.js"></script>
+</body>
+
+</html>

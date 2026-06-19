@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <style>
+        .bookings-page {
+
+            min-height: 100vh;
+
+            padding: calc(var(--nav-height) + 30px) 8% 40px;
+
+            background: #09090b;
+        }
+
+        .bookings-page h1 {
+
+            font-size: 3rem;
+
+            margin-bottom: 10px;
+        }
+
+        .booking-subtitle {
+
+            color: #94a3b8;
+
+            margin-bottom: 40px;
+        }
+
+        #bookingsContainer {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fill, minmax(380px, 1fr));
+
+            gap: 30px;
+        }
+
+        .booking-card {
+
+            overflow: hidden;
+
+            background:
+                rgba(255, 255, 255, .05);
+
+            backdrop-filter: blur(20px);
+
+            border:
+                1px solid rgba(255, 255, 255, .08);
+
+            border-radius: 25px;
+
+            transition: .3s;
+        }
+
+        .booking-card:hover {
+
+            transform:
+                translateY(-8px);
+
+            border-color: #7c3aed;
+
+            box-shadow:
+                0 20px 40px rgba(124, 58, 237, .25);
+        }
+
+        .booking-banner {
+
+            width: 100%;
+
+            height: 220px;
+
+            object-fit: cover;
+        }
+
+        .booking-content {
+
+            padding: 25px;
+        }
+
+        .booking-title {
+
+            font-size: 1.5rem;
+
+            margin-bottom: 15px;
+        }
+
+        .booking-meta {
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+
+            color: #cbd5e1;
+        }
+
+        .status {
+
+            display: inline-block;
+
+            margin-top: 20px;
+
+            padding: 8px 16px;
+
+            border-radius: 50px;
+
+            font-size: .9rem;
+
+            font-weight: 600;
+        }
+
+        .confirmed {
+
+            background:
+                rgba(34, 197, 94, .15);
+
+            color: #22c55e;
+        }
+
+        .pending {
+
+            background:
+                rgba(245, 158, 11, .15);
+
+            color: #f59e0b;
+        }
+
+        .cancelled {
+
+            background:
+                rgba(239, 68, 68, .15);
+
+            color: #ef4444;
+        }
+
+        .view-btn {
+
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 15px;
+
+            cursor: pointer;
+
+            color: white;
+
+            font-weight: 600;
+
+            background:
+                linear-gradient(135deg,
+                    #7c3aed,
+                    #2563eb);
+
+            transition: .3s;
+        }
+
+        .view-btn:hover {
+
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .ticket-modal {
+
+            position: fixed;
+
+            top: 0;
+            left: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, .8);
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            z-index: 9999;
+
+            backdrop-filter: blur(10px);
+        }
+
+        .ticket-box {
+            display: flex;
+            flex-direction: column;
+            width: 90%;
+            max-width: 550px;
+
+            background:
+                linear-gradient(135deg,
+                    #111,
+                    #1a1a1a);
+
+            border: 1px solid rgba(255, 255, 255, .1);
+
+            border-radius: 30px;
+
+            overflow: hidden;
+
+            position: relative;
+
+            box-shadow:
+                0 25px 80px rgba(0, 0, 0, .6);
+
+            animation: ticketPop .25s ease;
+        }
+
+        @keyframes ticketPop {
+
+            from {
+                transform: scale(.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .ticket-header {
+
+            background:
+                linear-gradient(90deg,
+                    #7c3aed,
+                    #a855f7);
+
+            padding: 25px;
+
+            text-align: center;
+        }
+
+        .ticket-header h2 {
+
+            margin: 0;
+
+            font-size: 2rem;
+
+            color: white;
+        }
+
+        .ticket-body {
+
+            padding: 25px;
+        }
+
+        .ticket-info {
+
+            display: grid;
+
+            grid-template-columns:
+                120px 1fr;
+
+            gap: 10px;
+
+            margin-bottom: 12px;
+        }
+
+        .ticket-info p {
+
+            margin: 0;
+
+            color: #aaa;
+        }
+
+        .ticket-info span {
+            color: black;
+            font-weight: 700;
+        }
+
+        .ticketQR {
+
+            width: 220px;
+
+            display: block;
+
+            margin: 20px auto;
+
+            padding: 12px;
+
+            background: white;
+
+            border-radius: 18px;
+        }
+
+        .ticket-footer {
+
+            padding: 20px;
+
+            border-top:
+                1px dashed rgba(255, 255, 255, .15);
+
+            text-align: center;
+        }
+
+        .ticket-id {
+
+            color: #a855f7;
+
+            font-weight: 700;
+
+            letter-spacing: 2px;
+        }
+
+        #closeTicket {
+
+            position: absolute;
+
+            top: 15px;
+            right: 20px;
+
+            font-size: 28px;
+
+            cursor: pointer;
+
+            color: #aaa;
+        }
+
+        #closeTicket:hover {
+
+            color: white;
+        }
+
+        .ticket-box::before {
+
+            content: "";
+
+            position: absolute;
+
+            top: 50%;
+
+            left: -15px;
+
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            background: #09090b;
+        }
+
+        .ticket-box::after {
+
+            content: "";
+
+            position: absolute;
+
+            top: 50%;
+
+            right: -15px;
+
+            width: 30px;
+            height: 30px;
+
+            border-radius: 50%;
+
+            background: #09090b;
+        }
+
+        .download-btn {
+            margin: 0 auto;
+            margin-top: 20px;
+
+            border: none;
+
+            padding: 14px 24px;
+
+            border-radius: 14px;
+
+            background:
+                linear-gradient(90deg,
+                    #7c3aed,
+                    #a855f7);
+
+            color: white;
+
+            font-size: 15px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            transition: .25s;
+        }
+
+        .download-btn:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 30px rgba(168, 85, 247, .4);
+        }
+
+        #ticketDownloadArea {
+            background: white;
+            color: black;
+        }
+
+        #ticketDownloadArea .ticket-info span {
+            color: black;
+        }
+
+        #ticketDownloadArea .ticket-info p {
+            color: #555;
+        }
+    </style>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+
+    <div id="nav">
+        <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+        <div class="navbar">
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/index.html#trending">Events</a></li>
+                <li><a href="/Exp.html">Experience</a></li>
+                <li><a href="/contact.html">Contact Us</a></li>
+            </ul>
+        </div>
+        <div class="logsec" id="logw">
+            <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+            <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                Up</button>
+        </div>
+        <div id="userDropdown" class="user-dropdown hidden">
+
+            <button id="dropdownBtn" class="dropdown-btn">
+                👤 <span id="username">User</span> ▼
+            </button>
+
+            <div id="dropdownMenu" class="dropdown-menu hidden">
+                <a href="/profile.html">My Profile</a>
+                <a href="/mybookings.html">My Bookings</a>
+                <a id="dashboardItem" href="/dashboard.html">Dashboard</a>
+
+                <button id="logoutBtn">Logout</button>
+
+            </div>
+
+        </div>
+    </div>
+
+    <section class="bookings-page">
+
+        <h1>My Bookings</h1>
+
+        <p class="booking-subtitle">
+            Your event reservations and tickets
+        </p>
+
+        <div id="bookingsContainer"></div>
+
+    </section>
+    <div id="ticketModal" class="ticket-modal hidden">
+
+        <div class="ticket-box">
+
+            <span id="closeTicket">&times;</span>
+
+            <div id="ticketContent"></div>
+
+            <button class="download-btn" onclick="downloadTicket()">
+                ⬇ Download Ticket
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="/js/nav.js"></script>
+</body>
+<script>
+    let allbookings = [];
+    async function loadBookings() {
+
+        const token =
+            localStorage.getItem("token");
+
+        if (!token) {
+
+            window.location.href =
+                "/login.html";
+
+            return;
+        }
+
+        try {
+
+            const res =
+                await fetch(
+                    "/api/bookings/my",
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+            const data =
+                await res.json();
+            allbookings = data.bookings;
+            const container =
+                document.getElementById(
+                    "bookingsContainer"
+                );
+
+            if (
+                !data.bookings ||
+                data.bookings.length === 0
+            ) {
+
+                container.innerHTML = `
+                <h2>No bookings yet</h2>
+            `;
+
+                return;
+            }
+
+            container.innerHTML = "";
+
+            data.bookings.forEach(
+                booking => {
+
+                    container.innerHTML += `
+
+                <div class="booking-card">
+
+                    <img
+                        class="booking-banner"
+                        src="${booking.event.banner ||
+                        booking.event.image ||
+                        'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f'
+                        }"
+                        alt="${booking.event.title}"
+                    >
+
+                    <div class="booking-content">
+
+                        <h2 class="booking-title">
+                            ${booking.event.title}
+                        </h2>
+
+                        <div class="booking-meta">
+
+                            <span>
+                                📍 ${booking.event.location || "Venue TBA"}
+                            </span>
+
+                            <span>
+                                📅 ${new Date(booking.event.date).toLocaleDateString()}
+                            </span>
+
+                            <span>
+                                🎫 ${booking.tickets} Ticket(s)
+                            </span>
+
+                            <span>
+                                💰 ₹${booking.totalPrice}
+                            </span>
+
+                            <span>
+                                🕒 Booked:
+                                ${new Date(
+                            booking.bookedAt
+                        ).toLocaleDateString()}
+                            </span>
+
+                        </div>
+
+                        <span
+                            class="status ${booking.status}"
+                        >
+                            ${booking.status}
+                        </span>
+
+                        <button
+                            class="view-btn"
+                            onclick="
+                                showTicket('${booking._id}')
+                            "
+                        >
+                            View Ticket
+                        </button>
+
+                    </div>
+
+                </div>
+                
+                `;
+                }
+            );
+
+
+        }
+        catch (err) {
+
+            console.error(err);
+
+            document
+                .getElementById(
+                    "bookingsContainer"
+                )
+                .innerHTML =
+                "<h2>Failed to load bookings</h2>";
+        }
+    }
+    function updateAuthUI() {
+
+        const user = getUserFromToken();
+        
+
+        const logsec = document.getElementById("logw");
+
+        const dropdown = document.getElementById("userDropdown");
+        const username = document.getElementById("username");
+
+        if (user) {
+
+            // hide login/signup
+            if (logsec) logsec.style.display = "none";
+
+            // show dropdown
+            dropdown.classList.remove("hidden");
+
+            username.innerText = user.name;
+
+        } else {
+
+            if (logBtn) logBtn.style.display = "block";
+            if (signBtn) signBtn.style.display = "block";
+
+            dropdown.classList.add("hidden");
+        }
+    }
+    function getUserFromToken() {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+
+        try {
+            return JSON.parse(atob(token.split(".")[1]));
+        } catch {
+            return null;
+        }
+    }
+    function showTicket(id) {
+        const booking =
+            allbookings.find(
+                b => b._id === id
+            );
+
+        document.getElementById("ticketContent").innerHTML = `
+        <div id="ticketDownloadArea">
+
+                <div class="ticket-header">
+                    <h2>${booking.event.title}</h2>
+                </div>
+
+                <div class="ticket-body">
+
+                    <div class="ticket-info">
+                        <p>Date</p>
+                        <span>${new Date(booking.event.date).toLocaleDateString()}</span>
+                    </div>
+
+                    <div class="ticket-info">
+                        <p>Venue</p>
+                        <span>${booking.event.location}</span>
+                    </div>
+
+                    <div class="ticket-info">
+                        <p>Tickets</p>
+                        <span>${booking.tickets}</span>
+                    </div>
+
+                    <div class="ticket-info">
+                        <p>Amount</p>
+                        <span>₹${booking.totalPrice}</span>
+                    </div>
+
+                    <img
+                        src="${booking.qrCode}"
+                        class="ticketQR"
+                    >
+
+                </div>
+
+                <div class="ticket-footer">
+
+                    <p>Ticket ID</p>
+
+                    <div class="ticket-id">
+                        ${booking.ticketId}
+                    </div>
+
+                </div>
+
+            </div>
+
+            `;
+
+        document
+            .getElementById("ticketModal")
+            .classList.remove("hidden");
+    }
+    async function downloadTicket() {
+
+        const ticket =
+            document.getElementById(
+                "ticketDownloadArea"
+            );
+
+        const canvas =
+            await html2canvas(ticket, {
+                scale: 2
+            });
+
+        const imgData =
+            canvas.toDataURL("image/png");
+
+        const { jsPDF } =
+            window.jspdf;
+
+        const pdf =
+            new jsPDF("p", "mm", "a4");
+
+        const width = 190;
+
+        const height =
+            canvas.height *
+            width /
+            canvas.width;
+
+        pdf.addImage(
+            imgData,
+            "PNG",
+            10,
+            10,
+            width,
+            height
+        );
+
+        pdf.save("Evently-Ticket.pdf");
+    }
+    const btn = document.getElementById("dropdownBtn");
+    const menu = document.getElementById("dropdownMenu");
+    btn.addEventListener("click", () => {
+        menu.classList.toggle("hidden");
+    });
+    document.addEventListener("click", (e) => {
+        if (!e.target.closest(".user-dropdown")) {
+            menu?.classList.add("hidden");
+        }
+    });
+    document.getElementById("logoutBtn")?.addEventListener("click", () => {
+        localStorage.removeItem("token");
+        location.reload();
+    });
+
+    const user = getUserFromToken();
+    const dashboardItem = document.getElementById("dashboardItem");
+    if (user && (user.role === "admin" || user.role === "organizer")) {
+
+        dashboardItem.style.display = "block";
+
+    }
+    else {
+
+        dashboardItem.style.display = "none";
+
+    }
+
+    document.getElementById("closeTicket")?.addEventListener("click", () => {
+
+        document.getElementById("ticketModal").classList.add("hidden");
+
+    });
+
+    updateAuthUI();
+    loadBookings();
+</script>
+
+</html>

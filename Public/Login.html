@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eventify-Enjoy Events Near You</title>
+    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+    <link rel="stylesheet" href="/css/nav.css">
+</head>
+
+<body>
+    <div id="content">
+        <div id="nav">
+            <a href="/"><img class="logo" src="/Media/Png/logo.jpg" alt="logo"></a>
+            <div class="navbar">
+                <ul>
+                    <li><a href="/index.html">Home</a></li>
+                    <li><a href="index.html#trending">Events</a></li>
+                    <li><a href="/Exp.html">Experience</a></li>
+                    <li><a href="/contact.html">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="logsec" id="logw">
+                <button class="btn" id="log" onclick="window.location.href = '/login.html?mode=login'">Log In</button>
+                <button class="btn grad" id="sup" onclick="window.location.href = '/login.html?mode=signup'">Sign
+                    Up</button>
+            </div>
+        </div>
+        <div class="sec">
+            <div class="fbox" id="logbox">
+                <h2>Login</h2>
+
+                <form id="loginForm">
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="Enter your email" id="email" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <input type="password" placeholder="Enter your password" id="pass" required>
+                    </div>
+
+                    <button type="submit">Login</button>
+
+                    <p>
+                        Don't have an account?
+                        <a id="showSignup" onclick="change(0)">Sign Up</a>
+                    </p>
+                </form>
+            </div>
+            <div class="fbox" id="signbox">
+                <h2>Create Account</h2>
+
+                <form id="signupForm">
+                    <div class="input-group">
+                        <label>Full Name</label>
+                        <input type="text" placeholder="Enter your name" id="sname" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Email</label>
+                        <input type="email" placeholder="Enter your email" id="semail" required>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Password</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="password" placeholder="Create a password" id="spassword" required style="flex:1;">
+                            <button type="button" id="togglePasswordBtn" aria-label="Show password" style="width:44px;">Show</button>
+                        </div>
+                        <small id="passwordStrengthMsg">Use 8+ chars with upper, lower, number, and symbol.</small>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Confirm Password</label>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <input type="password" placeholder="Confirm your password" id="sconfirmPassword" required style="flex:1;">
+                            <button type="button" id="toggleConfirmPasswordBtn" aria-label="Show confirm password" style="width:44px;">Show</button>
+                        </div>
+                    </div>
+
+                    <div class="input-group" id="otpGroup" style="display:none;">
+                        <label>Email OTP</label>
+                        <input type="text" placeholder="Enter 6-digit OTP" id="sotp" maxlength="6">
+                    </div>
+
+                    <button type="submit" id="signupSubmitBtn">Sign Up</button>
+                    <button type="button" id="resendOtpBtn" style="display:none;">Resend OTP</button>
+
+                    <p>
+                        Already have an account?
+                        <a id="showLogin" onclick="change(1)">Login</a>
+                    </p>
+                </form>
+            </div>
+            <div class="google" onclick="googleLogin()">
+                <img src="/Media/Png/google.png">
+                <p>Continue With Google</p>
+            </div>
+        </div>
+        <hr class="bar">
+        <footer class="footer">
+            <div class="footer-container">
+
+                <div class="footer-brand">
+                    <h2>Evently</h2>
+                    <p>
+                        Discover, book, and experience unforgettable events near you.
+                    </p>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Quick Links</h3>
+                    <a href="/index.html">Home</a>
+                    <a href="/index.html#trending">Events</a>
+                    <a href="contact.html">Contact</a>
+                </div>
+
+                <div class="footer-links">
+                    <h3>Resources</h3>
+                    <a href="/faq.html">FAQ</a>
+                    <a href="/privacy.html">Privacy Policy</a>
+                    <a href="/terms.html">Terms & Conditions</a>
+                    <a href="/support.html">Support</a>
+                </div>
+
+                <div class="footer-social">
+                    <h3>Follow Us</h3>
+                    <div class="social-icons">
+                        <a
+                            href="https://www.instagram.com/evently_hub?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw=="><i
+                                class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 EventHub. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+<script src="/js/nav.js"></script>
+</body>
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const token = params.get("token");
+
+if (token) {
+    localStorage.setItem("token", token);
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const role = (payload.role || "").toLowerCase();
+
+
+    if (role === "admin") {
+        window.location.replace("/admin/dashboard.html");
+    } 
+    else if (role === "organizer") {
+        window.location.replace("/dashboard.html");
+    } 
+    else {
+        window.location.replace("/index.html");
+    }
+}
+    function googleLogin() {
+        window.location.href = "/api/auth/google";
+    }
+    var change = (id) => {
+        if (!logbox || !signbox) return;
+        if (id == 0) {
+            logbox.style.display = 'none';
+            signbox.style.display = 'block';
+        }
+        else {
+            signbox.style.display = 'none';
+            logbox.style.display = 'block';
+
+        }
+    };
+
+    if (params.get("mode") === "signup") {
+        change(0);
+    }
+    else {
+        change(1);
+
+    }
+
+    const loginForm = document.getElementById("loginForm");
+
+    loginForm.addEventListener("submit", async (e) => {
+
+        e.preventDefault();
+
+        const email = document.getElementById("email").value;
+        const password = document.getElementById("pass").value;
+
+        try {
+
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email, password })
+            });
+
+            const data = await res.json();
+            if (!data.success) {
+                alert(data.message);
+                return;
+            }
+            localStorage.setItem("token", data.token);
+
+            alert("Login successful!");
+
+            const payload = JSON.parse(atob(data.token.split(".")[1]));
+
+            const role = (payload.role || "").toLowerCase();
+
+            setTimeout(() => {
+                if (role === "admin") {
+                    window.location.replace("/admin/dashboard.html");
+                }
+                else if (role === "organizer") {
+                    window.location.replace("/dashboard.html");
+                }
+                else {
+                    window.location.replace("/index.html");
+                }
+            }, 50);
+
+        } catch (err) {
+            console.log(err);
+            alert("Login failed");
+        }
+    });
+
+    const signupForm = document.getElementById("signupForm");
+    const otpGroup = document.getElementById("otpGroup");
+    const otpInput = document.getElementById("sotp");
+    const resendOtpBtn = document.getElementById("resendOtpBtn");
+    const signupSubmitBtn = document.getElementById("signupSubmitBtn");
+    const signupNameInput = document.getElementById("sname");
+    const signupEmailInput = document.getElementById("semail");
+    const signupPasswordInput = document.getElementById("spassword");
+    const signupConfirmPasswordInput = document.getElementById("sconfirmPassword");
+    const passwordStrengthMsg = document.getElementById("passwordStrengthMsg");
+    const togglePasswordBtn = document.getElementById("togglePasswordBtn");
+    const toggleConfirmPasswordBtn = document.getElementById("toggleConfirmPasswordBtn");
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const passwordStrengthRules = [
+        { regex: /.{8,}/, label: "8+ characters" },
+        { regex: /[a-z]/, label: "lowercase letter" },
+        { regex: /[A-Z]/, label: "uppercase letter" },
+        { regex: /\d/, label: "number" },
+        { regex: /[^A-Za-z0-9]/, label: "symbol" }
+    ];
+    let otpRequested = false;
+
+    const evaluatePasswordStrength = (password) => {
+        const value = String(password || "");
+        const matchedRules = passwordStrengthRules.filter((rule) => rule.regex.test(value));
+        const score = matchedRules.length;
+
+        if (score < 3) {
+            return {
+                label: "Weak password",
+                color: "#dc2626",
+                isStrong: false
+            };
+        }
+
+        if (score < 5) {
+            return {
+                label: "Medium password",
+                color: "#d97706",
+                isStrong: false
+            };
+        }
+
+        return {
+            label: "Strong password",
+            color: "#16a34a",
+            isStrong: true
+        };
+    };
+
+    const updatePasswordStrength = () => {
+        const strength = evaluatePasswordStrength(signupPasswordInput.value);
+        passwordStrengthMsg.textContent = strength.label + " — use 8+ chars with upper, lower, number, and symbol.";
+        passwordStrengthMsg.style.color = strength.color;
+        return strength;
+    };
+
+    const resetSignupVerificationState = () => {
+        otpRequested = false;
+        otpGroup.style.display = "none";
+        otpInput.value = "";
+        otpInput.required = false;
+        resendOtpBtn.style.display = "none";
+        signupSubmitBtn.textContent = "Sign Up";
+        signupNameInput.readOnly = false;
+        signupEmailInput.readOnly = false;
+        signupPasswordInput.readOnly = false;
+        signupConfirmPasswordInput.readOnly = false;
+        updatePasswordStrength();
+    };
+
+    const startOtpVerificationState = () => {
+        otpRequested = true;
+        otpGroup.style.display = "block";
+        otpInput.required = true;
+        resendOtpBtn.style.display = "inline-block";
+        signupSubmitBtn.textContent = "Verify OTP";
+        signupNameInput.readOnly = true;
+        signupEmailInput.readOnly = true;
+        signupPasswordInput.readOnly = true;
+        signupConfirmPasswordInput.readOnly = true;
+        otpInput.focus();
+    };
+
+    signupPasswordInput.addEventListener("input", updatePasswordStrength);
+
+    togglePasswordBtn.addEventListener("click", () => {
+        const isHidden = signupPasswordInput.type === "password";
+        signupPasswordInput.type = isHidden ? "text" : "password";
+        togglePasswordBtn.textContent = isHidden ? "Hide" : "Show";
+        togglePasswordBtn.setAttribute("aria-label", isHidden ? "Hide password" : "Show password");
+    });
+
+    toggleConfirmPasswordBtn.addEventListener("click", () => {
+        const isHidden = signupConfirmPasswordInput.type === "password";
+        signupConfirmPasswordInput.type = isHidden ? "text" : "password";
+        toggleConfirmPasswordBtn.textContent = isHidden ? "Hide" : "Show";
+        toggleConfirmPasswordBtn.setAttribute("aria-label", isHidden ? "Hide confirm password" : "Show confirm password");
+    });
+
+    signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const name = document.getElementById("sname").value.trim();
+        const email = document.getElementById("semail").value.trim().toLowerCase();
+        const password = document.getElementById("spassword").value;
+        const confirmPassword = document.getElementById("sconfirmPassword").value;
+        const otp = otpInput.value.trim();
+
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email format.");
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            alert("Password and confirm password must match.");
+            return;
+        }
+
+        const strength = updatePasswordStrength();
+        if (!strength.isStrong) {
+            alert("Please choose a stronger password.");
+            return;
+        }
+
+        try {
+            if (!otpRequested) {
+                const emailCheckRes = await fetch("/api/auth/check-email", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ email })
+                });
+
+                const emailCheckData = await emailCheckRes.json();
+
+                if (emailCheckData.registered) {
+                    alert("That email is already registered. Please log in instead.");
+                    return;
+                }
+
+                if (emailCheckData.deliverable === false) {
+                    alert(emailCheckData.message || "That email domain cannot receive mail.");
+                    return;
+                }
+
+                const res = await fetch("/api/auth/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        name,
+                        email,
+                        password
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert(data.message);
+                    return;
+                }
+
+                alert(data.message || "OTP sent. Please verify your email.");
+                startOtpVerificationState();
+                return;
+            }
+
+            if (!otp) {
+                alert("Please enter the OTP sent to your email.");
+                return;
+            }
+
+            const verifyRes = await fetch("/api/auth/verify-email-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    otp
+                })
+            });
+
+            const verifyData = await verifyRes.json();
+
+            if (!verifyData.success) {
+                alert(verifyData.message);
+                return;
+            }
+
+            alert("Email verified and account created! Please login.");
+            signupForm.reset();
+            resetSignupVerificationState();
+            change(1);
+
+        } catch (err) {
+            console.log(err);
+            alert("Signup failed");
+        }
+    });
+
+    resendOtpBtn.addEventListener("click", async () => {
+        const email = document.getElementById("semail").value.trim().toLowerCase();
+
+        if (!emailRegex.test(email)) {
+            alert("Please enter a valid email before resending OTP.");
+            return;
+        }
+
+        try {
+            const res = await fetch("/api/auth/resend-email-otp", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ email })
+            });
+
+            const data = await res.json();
+            alert(data.message || "OTP resent.");
+        } catch (err) {
+            console.log(err);
+            alert("Failed to resend OTP");
+        }
+    });
+
+</script>
+
+
+</html>
