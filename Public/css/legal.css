@@ -54,3 +54,15 @@ button{
     color:white;
     font-weight:600;
 }
+
+.page-container h1 { letter-spacing: -.03em; }
+.page-container h2 { color: #ef5da8; font-size: 1.25rem; }
+.page-container p { max-width: 70ch; }
+.faq-item { transition: transform .2s ease, border-color .2s ease, background .2s ease; }
+.faq-item:hover { transform: translateY(-2px); border-color: rgba(239,93,168,.35); background: rgba(255,255,255,.075); }
+.page-container form { max-width: 680px; padding: clamp(20px, 4vw, 34px); border: 1px solid rgba(255,255,255,.1); border-radius: 18px; background: rgba(255,255,255,.045); }
+.page-container input, .page-container textarea { box-sizing: border-box; border: 1px solid rgba(255,255,255,.11); outline: none; }
+.page-container input:focus, .page-container textarea:focus { border-color: #ef5da8; box-shadow: 0 0 0 3px rgba(239,93,168,.15); }
+.form-feedback { margin: 14px 0 0; color: #aeb8cb; }
+.form-feedback.success { color: #72e4c7; }
+.form-feedback.error { color: #ff9ca8; }

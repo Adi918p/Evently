@@ -1,242 +1,41 @@
-let allUsers = [];
-
-loadUsers();
-
-async function loadUsers() {
-
-    const response =
-        await fetch(
-            "/api/admin/users",
-            {
-                headers: {
-                    Authorization:
-                        `Bearer ${token}`
-                }
-            }
-        );
-
-    const data = await response.json();
-
-    allUsers = data.users;
-
-    renderUsers(allUsers);
-}
-function renderUsers(users) {
-
-    const container =
-        document.getElementById(
-            "usersContainer"
-        );
-
-    container.innerHTML = "";
-
-    users.forEach(user => {
-
-        container.innerHTML += `
-
-<div class="user-card">
-
-    <div>
-
-        <h3>${user.name}</h3>
-
-        <p>${user.email}</p>
-
-    </div>
-
-    <div class="user-actions">
-
-        <select
-            class="role-select"
-            data-id="${user._id}"
-        >
-            <option value="user"
-                ${user.role === "user" ? "selected" : ""}>
-                User
-            </option>
-
-            <option value="organizer"
-                ${user.role === "organizer" ? "selected" : ""}>
-                Organizer
-            </option>
-
-            <option value="admin"
-                ${user.role === "admin" ? "selected" : ""}>
-                Admin
-            </option>
-
-        </select>
-
-        <select
-            class="status-select"
-            data-id="${user._id}"
-        >
-            <option value="active"
-                ${user.status === "active" ? "selected" : ""}>
-                Active
-            </option>
-
-            <option value="suspended"
-                ${user.status === "suspended" ? "selected" : ""}>
-                Suspended
-            </option>
-
-            <option value="banned"
-                ${user.status === "banned" ? "selected" : ""}>
-                Banned
-            </option>
-
-        </select>
-
-        <button
-            class="delete-btn"
-            data-id="${user._id}">
-            Delete
-        </button>
-
-    </div>
-
-</div>
-
-`;
-
-    });
-    attachListeners();
-}
-async function updateRole(id, role) {
-
-    await fetch(
-        `/api/admin/users/${id}/role`,
-        {
-            method: "PATCH",
-
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-
-            body: JSON.stringify({ role })
-        }
-    );
-
+(() => {
+    const token = localStorage.getItem("token");
+    const container = document.getElementById("usersContainer");
+    const search = document.getElementById("searchUser");
+    const count = document.getElementById("userCount");
+    const feedback = document.getElementById("usersFeedback");
+    let allUsers = [];
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+    const setFeedback = (message = "", type = "") => { if (feedback) { feedback.textContent = message; feedback.className = `admin-feedback ${type}`.trim(); } };
+    async function request(url, options = {}) {
+        const response = await fetch(url, { ...options, headers: { Authorization: `Bearer ${token}`, ...(options.headers || {}) } });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.success === false) throw new Error(data.message || "Request failed");
+        return data;
+    }
+    function renderUsers(users) {
+        if (!container) return;
+        if (!users.length) { container.innerHTML = '<div class="admin-empty"><strong>No users found</strong><span>Try a different search.</span></div>'; if (count) count.textContent = "0 users"; return; }
+        container.innerHTML = users.map((user) => {
+            const initials = escapeHtml((user.name || "U").trim().split(/\s+/).map((part) => part[0]).join("").slice(0, 2).toUpperCase());
+            return `<article class="user-card"><div class="user-identity"><div class="user-avatar">${initials}</div><div><h3>${escapeHtml(user.name || "Unnamed user")}</h3><p>${escapeHtml(user.email)}</p><small>Joined ${new Date(user.createdAt).toLocaleDateString()}</small></div></div><div class="user-actions"><label>Role<select class="role-select" data-id="${escapeHtml(user._id)}"><option value="user" ${user.role === "user" ? "selected" : ""}>User</option><option value="organizer" ${user.role === "organizer" ? "selected" : ""}>Organizer</option><option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option></select></label><label>Status<select class="status-select" data-id="${escapeHtml(user._id)}"><option value="active" ${user.status === "active" ? "selected" : ""}>Active</option><option value="suspended" ${user.status === "suspended" ? "selected" : ""}>Suspended</option><option value="banned" ${user.status === "banned" ? "selected" : ""}>Banned</option></select></label></div></article>`;
+        }).join("");
+        if (count) count.textContent = `${users.length} ${users.length === 1 ? "user" : "users"}`;
+    }
+    async function loadUsers() {
+        if (!token || !container) return;
+        container.innerHTML = '<div class="admin-loading">Loading users...</div>';
+        try { const data = await request("/api/admin/users"); allUsers = Array.isArray(data.users) ? data.users : []; renderUsers(allUsers); setFeedback(""); }
+        catch (error) { container.innerHTML = '<div class="admin-empty"><strong>Users could not be loaded</strong><span>Check the database connection and try again.</span></div>'; setFeedback(error.message, "error"); }
+    }
+    async function updateUser(url, body, select) {
+        select.disabled = true;
+        try { await request(url, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); setFeedback("User updated", "success"); }
+        catch (error) { setFeedback(error.message, "error"); await loadUsers(); }
+        finally { select.disabled = false; }
+    }
+    search?.addEventListener("input", () => { const query = search.value.trim().toLowerCase(); renderUsers(allUsers.filter((user) => `${user.name} ${user.email} ${user.role} ${user.status}`.toLowerCase().includes(query))); });
+    container?.addEventListener("change", (event) => { const select = event.target; if (select.matches(".role-select")) updateUser(`/api/admin/users/${select.dataset.id}/role`, { role: select.value }, select); if (select.matches(".status-select")) updateUser(`/api/admin/users/${select.dataset.id}/status`, { status: select.value }, select); });
+    document.getElementById("refreshUsers")?.addEventListener("click", loadUsers);
     loadUsers();
-}
-async function updateStatus(id, status) {
-    await fetch(
-        `/api/admin/users/${id}/status`,
-        {
-            method: "PATCH",
-
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`
-            },
-
-            body: JSON.stringify({
-                status
-            })
-        }
-    );
-
-    loadUsers();
-}
-function attachListeners() {
-
-    document.querySelectorAll(".promote-btn").forEach(btn => {
-
-        btn.addEventListener("click", () => {
-
-            updateRole(
-                btn.dataset.id,
-                "organizer"
-            );
-
-        });
-
-    });
-
-    document.querySelectorAll(".demote-btn").forEach(btn => {
-
-        btn.addEventListener("click", () => {
-
-            updateRole(
-                btn.dataset.id,
-                "user"
-            );
-
-        });
-
-    });
-
-    document.querySelectorAll(".activate-btn").forEach(btn => {
-
-        btn.addEventListener("click", () => {
-
-            updateStatus(
-                btn.dataset.id,
-                "active"
-            );
-
-        });
-
-    });
-
-    document.querySelectorAll(".suspend-btn").forEach(btn => {
-
-        btn.addEventListener("click", () => {
-
-            updateStatus(
-                btn.dataset.id,
-                "suspended"
-            );
-
-        });
-
-    });
-
-    document.querySelectorAll(".ban-btn").forEach(btn => {
-
-        btn.addEventListener("click", () => {
-
-            updateStatus(
-                btn.dataset.id,
-                "banned"
-            );
-
-        });
-
-    });
-    document.querySelectorAll(".role-select").forEach(select => {
-
-            select.addEventListener(
-                "change",
-                () => {
-
-                    updateRole(
-                        select.dataset.id,
-                        select.value
-                    );
-
-                }
-            );
-
-    });
-
-    document.querySelectorAll(".status-select").forEach(select => {
-
-            select.addEventListener(
-                "change",
-                () => {
-
-                    updateStatus(
-                        select.dataset.id,
-                        select.value
-                    );
-
-                }
-            );
-
-    });
-
-}
-
+})();

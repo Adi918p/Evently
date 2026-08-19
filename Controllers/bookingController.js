@@ -24,7 +24,8 @@ exports.createBooking = async (req, res) => {
 
         if (
             !Number.isInteger(ticketCount) ||
-            ticketCount <= 0
+            ticketCount <= 0 ||
+            ticketCount > 10
         ) {
             return res.status(400).json({
                 success: false,
@@ -34,12 +35,14 @@ exports.createBooking = async (req, res) => {
 
         /* ---------------- AVAILABLE SEATS ---------------- */
 
-        const availableSeats =
-            event.seats - event.ticketsSold;
+        const availableSeats = Math.max(
+            Number(event.seats || 0) - Number(event.ticketsSold || 0),
+            0
+        );
 
         if (ticketCount > availableSeats) {
 
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
                 message: `Only ${availableSeats} seats left`
             });
@@ -90,14 +93,27 @@ exports.createBooking = async (req, res) => {
 
         /* ---------------- UPDATE SOLD TICKETS ---------------- */
 
-        await Event.findByIdAndUpdate(
-            eventId,
+        const updatedEvent = await Event.findOneAndUpdate(
             {
-                $inc: {
-                    ticketsSold: ticketCount
+                _id: eventId,
+                $expr: {
+                    $lte: [
+                        { $add: ["$ticketsSold", ticketCount] },
+                        "$seats"
+                    ]
                 }
-            }
+            },
+            { $inc: { ticketsSold: ticketCount } },
+            { new: true }
         );
+
+        if (!updatedEvent) {
+            await Booking.findByIdAndDelete(booking._id);
+            return res.status(409).json({
+                success: false,
+                message: "Those seats were just taken. Please try again."
+            });
+        }
 
         /* ---------------- RESPONSE ---------------- */
 
@@ -137,7 +153,7 @@ exports.getMyBookings = async (req, res) => {
             })
                 .populate(
                     "event",
-                    "title date image location"
+                    "title date banner location venue price"
                 );
 
         res.status(200).json({

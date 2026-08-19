@@ -1,0 +1,67 @@
+:root {
+    --org-bg: #070912;
+    --org-surface: #111827;
+    --org-border: rgba(255,255,255,.1);
+    --org-muted: #94a3b8;
+    --org-mint: #72e4c7;
+    --org-coral: #ff6b7d;
+    --org-yellow: #f4c95d;
+}
+
+body { background: var(--org-bg) !important; color: #f8fafc; }
+.dashboard { padding: 138px clamp(18px, 6vw, 86px) 80px !important; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 42px !important; }
+.dashboard-kicker { margin: 0 0 9px; color: var(--org-mint); font: 800 10px system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.dashboard-header h1 { margin: 0 0 10px !important; color: #f8fafc; font: 800 clamp(2rem, 4vw, 3.2rem)/1.05 "Roboto Slab", serif; letter-spacing: -.04em; }
+.dashboard-subtitle { max-width: 570px; margin: 0; color: var(--org-muted); font: 400 14px/1.6 system-ui, sans-serif; }
+.dashboard-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.primary-action, .secondary-action { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 999px; cursor: pointer; font: 800 12px system-ui, sans-serif; transition: .2s ease; }
+.primary-action { color: #081016; border: 1px solid var(--org-mint); background: var(--org-mint); box-shadow: 0 12px 28px rgba(114,228,199,.16); }
+.secondary-action { color: #f8fafc; border: 1px solid var(--org-border); background: rgba(255,255,255,.06); }
+.primary-action:hover, .secondary-action:hover { transform: translateY(-2px); }
+.stats-grid { grid-template-columns: repeat(3, minmax(0,1fr)) !important; gap: 14px !important; margin-bottom: 54px !important; }
+.stat-card { min-height: 150px; padding: 22px !important; border-radius: 16px !important; background: var(--org-surface) !important; border: 1px solid var(--org-border) !important; box-shadow: none !important; }
+.stat-card:hover { border-color: rgba(114,228,199,.38) !important; }
+.stat-card h2 { margin: 0 0 12px !important; color: #f8fafc !important; background: none !important; -webkit-text-fill-color: currentColor !important; font: 800 2.35rem/1 system-ui, sans-serif !important; }
+.stat-card p { color: var(--org-muted) !important; font: 700 12px system-ui, sans-serif; }
+.events-section { margin-top: 0 !important; }
+.section-top { align-items: flex-end !important; margin-bottom: 20px !important; }
+.section-top h2 { margin: 0; font: 700 21px "Roboto Slab", serif !important; }
+.event-list-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.event-list-tools label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+.event-list-tools input, .event-list-tools select { min-height: 38px; padding: 0 12px; border: 1px solid var(--org-border); border-radius: 9px; outline: none; background: var(--org-surface); color: #f8fafc; font: 500 12px system-ui, sans-serif; }
+.event-list-tools input { width: 190px; }
+.event-list-tools input:focus, .event-list-tools select:focus { border-color: rgba(114,228,199,.5); }
+#eventsContainer { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px,1fr)); gap: 14px; }
+.event-card { overflow: hidden; border-radius: 16px !important; background: var(--org-surface) !important; border: 1px solid var(--org-border) !important; box-shadow: none !important; }
+.event-card:hover { border-color: rgba(114,228,199,.38) !important; box-shadow: 0 18px 42px rgba(0,0,0,.24) !important; }
+.event-banner { height: 168px !important; }
+.event-content { padding: 18px !important; }
+.event-title { margin-bottom: 12px !important; font: 700 18px system-ui, sans-serif !important; }
+.event-info { gap: 7px !important; color: var(--org-muted) !important; font: 400 12px system-ui, sans-serif; }
+.event-info span { color: var(--org-muted); }
+.event-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px !important; }
+.edit-btn, .delete-btn, .booking-btn { min-height: 34px; padding: 0 11px !important; border-radius: 9px !important; font: 800 11px system-ui, sans-serif !important; }
+.edit-btn { color: var(--org-mint) !important; background: rgba(114,228,199,.12) !important; border: 1px solid rgba(114,228,199,.25) !important; }
+.delete-btn { color: var(--org-coral) !important; background: rgba(255,107,125,.1) !important; border: 1px solid rgba(255,107,125,.25) !important; }
+.booking-btn { color: var(--org-yellow) !important; background: rgba(244,201,93,.1) !important; border: 1px solid rgba(244,201,93,.25) !important; }
+.edit-btn:hover, .delete-btn:hover, .booking-btn:hover { transform: translateY(-1px) !important; }
+.event-status { display: inline-flex; margin-bottom: 9px; padding: 5px 8px; border-radius: 999px; font: 800 10px system-ui, sans-serif; letter-spacing: .08em; text-transform: uppercase; }
+.event-status.pending { color: var(--org-yellow); background: rgba(244,201,93,.13); }
+.event-status.approved { color: var(--org-mint); background: rgba(114,228,199,.13); }
+.event-status.rejected { color: var(--org-coral); background: rgba(255,107,125,.13); }
+.dashboard-empty { grid-column: 1 / -1; min-height: 230px; display: grid; place-items: center; align-content: center; gap: 8px; border: 1px dashed rgba(255,255,255,.15); border-radius: 16px; text-align: center; }
+.dashboard-empty h3 { margin: 0; font: 700 18px system-ui, sans-serif; }
+.dashboard-empty p { margin: 0 0 8px; color: var(--org-muted); font: 400 13px system-ui, sans-serif; }
+.dashboard-empty a { color: var(--org-mint); font: 800 12px system-ui, sans-serif; }
+.dashboard-retry { min-height: 34px; padding: 0 12px; border: 1px solid rgba(114,228,199,.3); border-radius: 9px; background: rgba(114,228,199,.1); color: var(--org-mint); cursor: pointer; font: 800 12px system-ui, sans-serif; }
+
+@media (max-width: 760px) {
+    .dashboard { padding-top: 112px !important; }
+    .dashboard-header { align-items: flex-start; flex-direction: column; }
+    .dashboard-actions, .primary-action, .secondary-action { width: 100%; }
+    .stats-grid { grid-template-columns: 1fr 1fr !important; }
+    .section-top { align-items: flex-start !important; flex-direction: column; }
+    .event-list-tools, .event-list-tools input, .event-list-tools select { width: 100%; }
+}
+@media (max-width: 430px) { .stats-grid { grid-template-columns: 1fr !important; } }

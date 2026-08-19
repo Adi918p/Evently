@@ -14,7 +14,7 @@ const generateTicketPdf = require("../utils/generateTicketPdf");
 const getValidTicketCount = (tickets) => {
     const ticketCount = Number(tickets);
 
-    if (!Number.isInteger(ticketCount) || ticketCount <= 0) {
+    if (!Number.isInteger(ticketCount) || ticketCount <= 0 || ticketCount > 10) {
         return null;
     }
 
@@ -53,17 +53,19 @@ exports.createOrder = async (req, res) => {
             });
         }
 
-        const availableSeats =
-            event.seats - event.ticketsSold;
+        const availableSeats = Math.max(
+            Number(event.seats || 0) - Number(event.ticketsSold || 0),
+            0
+        );
 
         if (ticketCount > availableSeats) {
-            return res.status(400).json({
+            return res.status(409).json({
                 success: false,
                 message: `Only ${availableSeats} seats left`
             });
         }
 
-        const totalPrice = event.price * ticketCount;
+        const totalPrice = Number(event.price || 0) * ticketCount;
 
         const options = {
             amount: totalPrice * 100, // Razorpay expects amount in paise
@@ -90,6 +92,9 @@ exports.createOrder = async (req, res) => {
 // Verify Payment & Create Booking
 // ==============================
 exports.verifyPayment = async (req, res) => {
+    let reservationMade = false;
+    let reservedEventId = null;
+    let reservedTickets = 0;
     try {
         const {
             eventId,
@@ -127,6 +132,16 @@ exports.verifyPayment = async (req, res) => {
             });
         }
 
+        const existingBooking = await Booking.findOne({
+            $or: [
+                { paymentId: razorpay_payment_id },
+                { orderId: razorpay_order_id }
+            ]
+        });
+        if (existingBooking) {
+            return res.status(200).json({ success: true, booking: existingBooking });
+        }
+
         // --------------------------
         // Fetch Event
         // --------------------------
@@ -142,18 +157,30 @@ exports.verifyPayment = async (req, res) => {
         // --------------------------
         // Update Event Stats
         // --------------------------
-        const availableSeats =
-            event.seats - event.ticketsSold;
+        const reservedEvent = await Event.findOneAndUpdate(
+            {
+                _id: eventId,
+                $expr: {
+                    $lte: [
+                        { $add: ["$ticketsSold", ticketCount] },
+                        "$seats"
+                    ]
+                }
+            },
+            { $inc: { ticketsSold: ticketCount } },
+            { new: true }
+        );
 
-        if (ticketCount > availableSeats) {
-
-            return res.status(400).json({
+        if (!reservedEvent) {
+            return res.status(409).json({
                 success: false,
                 message: "Event sold out"
             });
 
         }
-        event.ticketsSold += ticketCount;
+        reservationMade = true;
+        reservedEventId = eventId;
+        reservedTickets = ticketCount;
 
         // --------------------------
         // Generate Ticket ID
@@ -168,7 +195,7 @@ exports.verifyPayment = async (req, res) => {
         // --------------------------
         // Calculate Total Price
         // --------------------------
-        const totalPrice = event.price * ticketCount;
+        const totalPrice = Number(event.price || 0) * ticketCount;
 
         // --------------------------
         // Create Booking
@@ -202,7 +229,7 @@ exports.verifyPayment = async (req, res) => {
         // --------------------------
         
         await booking.save();
-        await event.save();
+        reservationMade = false;
 
         const pdfPath =
             await generateTicketPdf(
@@ -228,18 +255,22 @@ exports.verifyPayment = async (req, res) => {
                 ${booking.ticketId}
             </p>
             `;
-        await sendEmail(
-            user.email,
-            "Your Evently Ticket",
-            html,
-            pdfPath
-        );
+        try {
+            await sendEmail(user.email, "Your Evently Ticket", html, pdfPath);
+        } catch (emailError) {
+            console.error("Ticket email failed:", emailError.message);
+        }
 
         return res.status(200).json({
             success: true,
             booking
         });
     } catch (err) {
+        if (reservationMade && reservedEventId) {
+            await Event.findByIdAndUpdate(reservedEventId, {
+                $inc: { ticketsSold: -reservedTickets }
+            }).catch(() => {});
+        }
         return res.status(500).json({
             success: false,
             message: err.message

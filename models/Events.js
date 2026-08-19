@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+const localImagePath = (value) => !value || /^\/(?:uploads\/event-[a-z0-9-]+\.(?:jpg|jpeg|png|webp|gif)|Media\/[^?#\s]+)$/i.test(String(value));
+const imagePathMessage = "Images must be uploaded through Evently; external image URLs are not allowed";
 
 const lineupSchema = new mongoose.Schema({
     name: {
@@ -8,7 +10,8 @@ const lineupSchema = new mongoose.Schema({
     },
     image: {
         type: String,
-        required: true
+        default: "",
+        validate: { validator: localImagePath, message: imagePathMessage }
     }
 }, { _id: false });
 
@@ -54,6 +57,27 @@ const eventSchema = new mongoose.Schema({
         default: ""
     },
 
+    category: {
+        type: String,
+        enum: [
+            "networking",
+            "club",
+            "music",
+            "workshop",
+            "sports",
+            "arts",
+            "food",
+            "comedy",
+            "festival",
+            "tech",
+            "gaming",
+            "other"
+        ],
+        default: "other",
+        lowercase: true,
+        trim: true
+    },
+
     date: {
         type: Date,
         required: true
@@ -81,7 +105,9 @@ const eventSchema = new mongoose.Schema({
 
     banner: {
         type: String,
-        default: ""
+        default: "",
+        trim: true,
+        validate: { validator: localImagePath, message: imagePathMessage }
     },
 
     maploc: {
@@ -91,7 +117,8 @@ const eventSchema = new mongoose.Schema({
 
     gallery: {
         type: [String],
-        default: []
+        default: [],
+        validate: { validator: (images) => Array.isArray(images) && images.every(localImagePath), message: imagePathMessage }
     },
 
     lineup: {
@@ -123,7 +150,7 @@ const eventSchema = new mongoose.Schema({
         "approved",
         "rejected"
     ],
-    default: "pending"
+    default: "approved"
 }},
 
     {

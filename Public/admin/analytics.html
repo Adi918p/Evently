@@ -55,16 +55,17 @@
             <a href="events.html">Events</a>
             <a href="users.html">Users</a>
             <a href="inbox.html">Inbox</a>
-            <a href="analytics.html">Analytics</a>
+            <a class="active" href="analytics.html">Analytics</a>
 
         </div>
 
         <main class="analytics-container">
 
-            <div class="page-header">
-                <h1>Analytics Dashboard</h1>
-                <p>Monitor platform performance and event activity.</p>
+            <div class="page-header admin-page-header">
+                <div><span class="eyebrow">Platform pulse</span><h1>Analytics dashboard</h1><p>Monitor growth, event activity, and organizer momentum.</p></div>
+                <div class="admin-header-actions"><button id="refreshAnalytics" class="admin-button secondary" type="button">Refresh</button></div>
             </div>
+            <div class="admin-toolbar"><span id="analyticsFeedback" class="admin-feedback" role="status"></span></div>
 
             <!-- Stats Cards -->
             <div class="stats-grid">
@@ -226,10 +227,10 @@
                 username.innerText = user.name;
 
             } else {
-
+                const logBtn = document.getElementById("log");
+                const signBtn = document.getElementById("sup");
                 if (logBtn) logBtn.style.display = "block";
                 if (signBtn) signBtn.style.display = "block";
-
                 dropdown.classList.add("hidden");
             }
         }
@@ -250,22 +251,15 @@
             location.reload();
         });
         updateAuthUI();
-        const params = new URLSearchParams(window.location.search);
-        cid = params.get('id')
         const token = localStorage.getItem("token");
 
         if (!token) {
             window.location.href = "/login.html";
-        }
-
-        const person =
-            JSON.parse(
-                atob(token.split(".")[1])
-            );
-
-        if (person.role !== "admin") {
-            alert("Access Denied");
-            window.location.href = "/";
+        } else {
+            let person = null;
+            try { person = JSON.parse(atob(token.split(".")[1])); }
+            catch { localStorage.removeItem("token"); window.location.href = "/login.html?mode=login"; }
+            if (person && person.role !== "admin") { alert("Access Denied"); window.location.href = "/"; }
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

@@ -229,9 +229,7 @@
             </div>
             <div class="profile-actions">
 
-                <button>
-                    Edit Profile
-                </button>
+                <button type="button" id="editProfileBtn">Edit Profile</button>
 
                 <button onclick="window.location.href='/mybookings.html'">
                     My Bookings
@@ -274,8 +272,7 @@
             return;
         }
 
-        const res =
-            await fetch("/api/auth/me", {
+        const res = await fetch("/api/auth/me", {
 
                 headers: {
                     Authorization:
@@ -284,8 +281,8 @@
 
             });
 
-        const data =
-            await res.json();
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.user) throw new Error(data.message || "Profile could not be loaded");
             
 
         document.getElementById("name")
@@ -296,9 +293,11 @@
             .innerText =
             data.user.email;
 
-        document.getElementById("role")
-            .innerText =
-            data.user.role || "User";
+        document.getElementById("role").innerText = data.user.role || "User";
+
+        const bookings = await fetch("/api/bookings/my", { headers: { Authorization: `Bearer ${token}` } });
+        const bookingData = await bookings.json().catch(() => ({}));
+        if (bookings.ok && Array.isArray(bookingData.bookings)) document.getElementById("bookingsCount").innerText = bookingData.bookings.length;
 
         const avatar = document.getElementById("avatar");
 
@@ -310,6 +309,10 @@
         }
 
     }
+    loadProfile().catch((error) => {
+        document.getElementById("name").innerText = "Profile unavailable";
+        document.getElementById("email").innerText = error.message;
+    });
 function updateAuthUI() {
 
     const user = getUserFromToken();
@@ -331,7 +334,8 @@ function updateAuthUI() {
         username.innerText = user.name;
 
     } else {
-
+        const logBtn = document.getElementById("log");
+        const signBtn = document.getElementById("sup");
         if (logBtn) logBtn.style.display = "block";
         if (signBtn) signBtn.style.display = "block";
 
@@ -363,7 +367,9 @@ function updateAuthUI() {
         location.reload();
     });
     updateAuthUI();
-    loadProfile();
+    document.getElementById("editProfileBtn")?.addEventListener("click", () => {
+        document.getElementById("email").textContent = "Profile editing is coming soon. Your account is safe and active.";
+    });
 
 </script>
 

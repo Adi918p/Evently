@@ -157,6 +157,7 @@
         <div class="event-header">
             <h1 id="eventTitle">Loading...</h1>
             <p id="eventMeta"></p>
+            <button id="refreshBookings" type="button">Refresh bookings</button>
         </div>
 
         <!-- STATS -->
@@ -242,21 +243,10 @@
             location.reload();
         });
         updateAuthUI();
-        function getUserFromToken() {
-            const token = localStorage.getItem("token");
-            if (!token) return null;
-
-            try {
-                return JSON.parse(atob(token.split(".")[1]));
-            } catch {
-                return null;
-            }
-        }
-
         const user = getUserFromToken();
 
         if (!user) {
-            window.location.href = "/login.html";
+            window.location.href = "/login.html?mode=login&returnTo=/event-bookings.html";
         }
 
         /* ---------------- EVENT ID ---------------- */
@@ -266,13 +256,16 @@
 
         if (!eventId) {
             document.getElementById("bookingsContainer").innerHTML =
-                `<div class="empty">Invalid Event ID</div>`;
+                `<div class="empty">This booking list needs an event id.</div>`;
         }
+
+        const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
 
         /* ---------------- LOAD BOOKINGS ---------------- */
 
         async function loadBookings() {
 
+            if (!eventId || !user) return;
             try {
 
                 const token = localStorage.getItem("token");
@@ -287,12 +280,8 @@
                     }
                 );
 
-                const data = await res.json();
-                if (!data.success) {
-                    document.getElementById("bookingsContainer").innerHTML =
-                        `<div class="empty">No bookings found</div>`;
-                    return;
-                }
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || !data.success) throw new Error(data.message || "Bookings could not be loaded");
 
                 const { event, bookings } = data;
 
@@ -325,12 +314,12 @@
                     totalTickets += b.tickets || 0;
                     revenue += b.totalPrice || 0;
 
-                    container.innerHTML += `
+                    container.insertAdjacentHTML("beforeend", `
                 <div class="booking-card">
 
                     <div class="user-info">
-                        <h3>${b.user?.name || "Unknown User"}</h3>
-                        <p>${b.user?.email || ""}</p>
+                        <h3>${escapeHtml(b.user?.name || "Unknown User")}</h3>
+                        <p>${escapeHtml(b.user?.email || "")}</p>
                     </div>
 
                     <div>
@@ -339,7 +328,7 @@
                     </div>
 
                 </div>
-            `;
+            `);
                 });
 
                 /* ---------------- UPDATE STATS ---------------- */
@@ -348,7 +337,7 @@
                     totalTickets;
 
                 document.getElementById("totalRevenue").innerText =
-                    `₹${revenue}`;
+                    `₹${revenue.toLocaleString()}`;
 
                 document.getElementById("totalUsers").innerText =
                     bookings.length;
@@ -357,15 +346,12 @@
                 console.error(err);
 
                 document.getElementById("bookingsContainer").innerHTML =
-                    `<div class="empty">Error loading bookings</div>`;
+                    `<div class="empty">${escapeHtml(err.message || "Error loading bookings")}</div>`;
             }
         }
 
-        if (!user) {
-            window.location.href = "/login.html";
-        }
-
         loadBookings();
+        document.getElementById("refreshBookings")?.addEventListener("click", loadBookings);
 
     </script>
 

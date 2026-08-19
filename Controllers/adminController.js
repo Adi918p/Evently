@@ -13,6 +13,9 @@ exports.getDashboardStats = async (req, res) => {
 
         const ticketsResult = await Booking.aggregate([
             {
+                $match: { status: "confirmed" }
+            },
+            {
                 $group: {
                     _id: null,
                     totalTickets: {
@@ -23,6 +26,9 @@ exports.getDashboardStats = async (req, res) => {
         ]);
 
         const revenueResult = await Booking.aggregate([
+            {
+                $match: { status: "confirmed" }
+            },
             {
                 $group: {
                     _id: null,

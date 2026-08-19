@@ -36,12 +36,14 @@ const bookingSchema = new mongoose.Schema({
 
     paymentId: {
         type: String,
-        default: ""
+        unique: true,
+        sparse: true
     },
 
     orderId: {
         type: String,
-        default: ""
+        unique: true,
+        sparse: true
     },
 
     qrCode: {

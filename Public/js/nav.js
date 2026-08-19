@@ -1,4 +1,47 @@
 (function () {
+    // Keep legacy page scripts from referencing missing globals when signed out.
+    window.logBtn = document.getElementById("log");
+    window.signBtn = document.getElementById("sup");
+
+    const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    let transitionPending = false;
+    const canUseTransition = (url) => {
+        try {
+            const target = new URL(url, window.location.href);
+            return target.origin === window.location.origin && !prefersReducedMotion;
+        } catch {
+            return false;
+        }
+    };
+
+    const navigate = (url) => {
+        if (transitionPending) return;
+        if (!canUseTransition(url)) {
+            window.location.href = url;
+            return;
+        }
+        transitionPending = true;
+        document.body.classList.add("page-leaving");
+        window.setTimeout(() => { window.location.href = url; }, 180);
+    };
+
+    window.EventlyTransition = { navigate };
+
+    const initPageTransition = () => {
+        document.body.classList.add("page-transition");
+        window.requestAnimationFrame(() => document.body.classList.add("page-ready"));
+
+        document.addEventListener("click", (event) => {
+            const link = event.target.closest("a[href]");
+            if (!link || link.target === "_blank" || link.hasAttribute("download") || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+            const href = link.getAttribute("href");
+            if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("javascript:")) return;
+            if (!canUseTransition(link.href)) return;
+            event.preventDefault();
+            navigate(link.href);
+        });
+    };
+
     function initMobileNav() {
         const nav = document.getElementById("nav");
         if (!nav || nav.dataset.navReady === "true") return;
@@ -69,8 +112,12 @@
     }
 
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initMobileNav);
+        document.addEventListener("DOMContentLoaded", () => {
+            initMobileNav();
+            initPageTransition();
+        });
     } else {
         initMobileNav();
+        initPageTransition();
     }
 })();
