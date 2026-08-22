@@ -16,29 +16,8 @@
 
 const TOKEN_KEY = "token";
 
-<<<<<<< HEAD
-=======
-/**
- * Origin for navigations that must reach the API host directly, bypassing the
- * host's reverse proxy. Empty in development and under a same-origin deploy, so
- * paths stay relative and the Vite dev proxy keeps working.
- *
- * Only OAuth needs this. Every `fetch` below stays relative on purpose: the
- * frontend host rewrites /api, /Media and /uploads through to the API, so the
- * browser sees one origin and there is no CORS to configure, no preflight on
- * every request, and no `Content-Disposition` to expose for ticket downloads.
- *
- * OAuth is the exception because it is a full-page redirect chain, not a fetch.
- * Passport resolves its relative callbackURL against the host that receives the
- * request, so proxying the start of the flow makes the redirect_uri it sends to
- * Google depend on how the proxy rewrites Host - and it has to match Google's
- * allowlist exactly. Starting the flow on the API origin removes the guesswork:
- * the whole handshake happens on one host and ends with the server redirecting
- * back to FRONTEND_URL.
- */
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "";
 
->>>>>>> a43e91d9836b72b0bede07b575debbf262749211
+const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "";
 /* ==========================================================================
    Token handling
    ========================================================================== */
@@ -339,17 +318,14 @@ export const auth = {
 
   me: (signal) => request("/api/auth/me", { auth: true, signal }),
 
-<<<<<<< HEAD
   /** Full page redirect - Passport needs a real navigation, not fetch. */
   googleUrl: () => "/api/auth/google",
-=======
   /**
    * Full page redirect - Passport needs a real navigation, not fetch, so this
    * is a URL rather than a request. Absolute when VITE_API_ORIGIN is set; see
    * the note on API_ORIGIN for why this one call skips the proxy.
    */
-  googleUrl: () => `${API_ORIGIN}/api/auth/google`,
->>>>>>> a43e91d9836b72b0bede07b575debbf262749211
+  googleUrl: () => `${API_ORIGIN}/api/auth/google`
 };
 
 /* ==========================================================================

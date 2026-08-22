@@ -29,7 +29,10 @@ const fs = require("node:fs");
 const net = require("node:net");
 const path = require("node:path");
 
-require("dotenv").config();
+// quiet: dotenv otherwise prints a banner, and the child would print a second
+// one reporting "0 injected" (correct - the launcher already loaded them and the
+// children inherit them - but it reads like a failure).
+require("dotenv").config({ quiet: true });
 
 const ROOT = path.join(__dirname, "..");
 const CLIENT_DIR = path.join(ROOT, "client");
@@ -125,9 +128,9 @@ async function runDevPair() {
       [
         { port: API_PORT, who: "api" },
         { port: WEB_PORT, who: "web" },
-      ].map(async (entry) => ({ ...entry, code: await portInUse(entry.port) }))
+      ].map(async (entry) => ({ ...entry, taken: await portInUse(entry.port) }))
     )
-  ).filter((entry) => entry.code);
+  ).filter((entry) => entry.taken);
 
   if (busy.length) {
     for (const { port, who } of busy) {
@@ -174,7 +177,11 @@ async function runDevPair() {
   launch("api", [path.join(ROOT, "server.js")], ROOT);
   // --no-clearScreen: Vite wipes the terminal on boot and on every HMR error,
   // which would erase the API's startup output and anything it logged since.
-  launch("web", [VITE_ENTRY, "--no-clearScreen"], CLIENT_DIR);
+  //
+  // --strictPort: by default Vite quietly moves to the next free port, which
+  // makes the URL printed above a lie. Better to fail with the preflight's
+  // message than to serve the app somewhere the user was not told about.
+  launch("web", [VITE_ENTRY, "--no-clearScreen", "--strictPort", "--port", String(WEB_PORT)], CLIENT_DIR);
 
   for (const signal of ["SIGINT", "SIGTERM"]) {
     process.on(signal, () => {
