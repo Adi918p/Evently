@@ -1,0 +1,403 @@
+@import "./tokens.css";
+
+/* Outfit display + Rubik body + JetBrains Mono for figures. The <link> that
+   fetches them lives in index.html - an @import here would be inlined after
+   Tailwind's output, where PostCSS drops it for not coming first. */
+
+/* ==========================================================================
+   Everything below is inside a cascade layer, and that is load-bearing.
+
+   Unlayered CSS outranks every layer, so a plain `h1 { font-weight: 700 }`
+   here would beat `.font-extrabold` from Tailwind's utilities layer no matter
+   how specific the class is - the h1 on the home page really did render at 700
+   with `font-extrabold` on it. Layering restores the expected order:
+
+     base        element defaults; any utility can override them
+     components  reusable recipes (.glass, .shell, .kicker); utilities win
+     utilities   Tailwind's own output, highest priority
+
+   The layer names are declared by `@import "tailwindcss"` in tokens.css, so
+   these blocks slot into the existing order rather than appending new layers.
+   ========================================================================== */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+    /* Anchored sections must clear the fixed nav. */
+    scroll-padding-top: calc(var(--nav-h) + 1.5rem);
+    /* And a sticky action bar must never end up covering the control the browser
+       just scrolled a focus ring to (focus-not-obscured). */
+    scroll-padding-bottom: 7rem;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--color-void);
+    color: var(--color-fg);
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.022em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    cursor: pointer;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    display: block;
+    max-width: 100%;
+  }
+
+  ::selection {
+    background: var(--color-violet);
+    color: #fff;
+  }
+
+  /* ------------------------------------------------------------------------
+     Focus - visible, 3:1 against both the glass and the page (focus-appearance)
+     ------------------------------------------------------------------------ */
+  :focus {
+    outline: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-cyan);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* ------------------------------------------------------------------------
+     Scrollbar
+     ------------------------------------------------------------------------ */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.16) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.14);
+    border: 3px solid transparent;
+    border-radius: var(--radius-pill);
+    background-clip: content-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.26);
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  /* Prices, ticket ids, seat counts and countdowns must not jitter as digits
+     change (number-tabular rule). */
+  .tnum {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* Long ids, emails and user copy reflow instead of overflowing. */
+  .wrap-anywhere {
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  /* ------------------------------------------------------------------------
+     Glass surfaces
+     ------------------------------------------------------------------------
+     .glass is the shared recipe; .glass-1..4 pick the elevation. The gradient
+     overlay plus the brighter top border simulate a single light source from
+     above, which is what separates real glassmorphism from "blurry box".
+     ------------------------------------------------------------------------ */
+  .glass {
+    position: relative;
+    border: 1px solid var(--glass-edge);
+    border-top-color: var(--glass-edge-lit);
+    backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(160%);
+    background-image: linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0) 42%
+    );
+  }
+
+  .glass-1 {
+    background-color: var(--glass-1);
+    box-shadow: var(--shadow-1);
+  }
+  .glass-2 {
+    background-color: var(--glass-2);
+    box-shadow: var(--shadow-2);
+  }
+  .glass-3 {
+    background-color: var(--glass-3);
+    box-shadow: var(--shadow-3);
+  }
+  .glass-4 {
+    background-color: var(--glass-4);
+    box-shadow: var(--shadow-4);
+  }
+
+  /* Specular sweep along the top edge - the "light reflection" the style calls
+     for. Purely decorative, so it is hidden from assistive tech. */
+  .glass-specular::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--glass-edge-strong) 18%,
+      rgba(255, 255, 255, 0.55) 50%,
+      var(--glass-edge-strong) 82%,
+      transparent 100%
+    );
+    pointer-events: none;
+  }
+
+  /* Fallback for engines without backdrop-filter: fall back to an opaque
+     surface rather than unreadable transparent text. */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .glass {
+      background-color: color-mix(in srgb, var(--color-card) 88%, transparent);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     Layout helpers
+     ------------------------------------------------------------------------ */
+  .shell {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 2.5rem);
+  }
+
+  .section {
+    padding-block: clamp(3.5rem, 8vw, 7rem);
+  }
+
+  .stack-center {
+    display: grid;
+    place-items: center;
+  }
+
+  /* Gradient display type. Falls back to solid fg where the clip is
+     unsupported. */
+  .text-grad {
+    background: var(--grad-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .text-grad-brand {
+    background: var(--grad-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .kicker {
+    /* inline-flex so an optional leading icon aligns with the caps height
+       instead of sitting on the baseline. */
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    /* fg-muted rather than fg-subtle: 12px uppercase stretched to 0.22em
+       tracking is the least legible text on the site, so it gets the strongest
+       of the quiet tones (8.7:1) instead of the weakest. */
+    color: var(--color-fg-muted);
+  }
+
+  /* ------------------------------------------------------------------------
+     Ambient scene layers
+     ------------------------------------------------------------------------
+     Sits behind all content. The WebGL canvas mounts into .scene-layer; the
+     scrim, grain and vignette stack on top of it, all still below --z-content.
+     ------------------------------------------------------------------------ */
+  .scene-layer {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-scene);
+    pointer-events: none;
+  }
+
+  /* Legibility floor for the whole site.
+     The scene is decoration behind live text, so its peak brightness has to be
+     bounded rather than trusted. Dimming the particle field alone is not
+     enough: additive blending means the CSS wash, an orb and a mote can all
+     peak on one pixel, which lands around rgb(145 104 225) before any cover.
+
+     52% here takes that worst case to rgb(70 50 108), and that number is what
+     sets the rule the rest of the system follows:
+
+       over the bare scene   --color-fg 10.3:1, --color-fg-muted 5.1:1
+       --color-fg-subtle     3.3:1 - glass surfaces only, never the open scene
+
+     The two ends go heavier because the nav and the footer are the bands that
+     always carry 12-14px text. */
+  .scene-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      rgba(5, 5, 16, 0.72) 0%,
+      rgba(5, 5, 16, 0.52) 16%,
+      rgba(5, 5, 16, 0.52) 68%,
+      rgba(5, 5, 16, 0.8) 100%
+    );
+  }
+
+  /* Extra local cover for a block of copy that sits straight on the scene
+     instead of on a glass card, e.g. the home hero. Drop it as the first child
+     of a `position: relative; overflow: hidden` section - it is a sibling of
+     the copy rather than a wrapper, so it changes no layout.
+
+     Anchored left-of-centre because that is where the copy is, and it fades out
+     well before the far edge so the scene keeps its full brightness on the side
+     with nothing to read. That asymmetry is the point: a uniform overlay heavy
+     enough to matter would flatten the whole composition. */
+  .copy-scrim {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      64% 72% at 26% 52%,
+      rgba(5, 5, 16, 0.55) 0%,
+      rgba(5, 5, 16, 0.35) 44%,
+      transparent 76%
+    );
+  }
+
+  /* Same idea for routes whose copy is centred. */
+  .copy-scrim-center {
+    background: radial-gradient(
+      70% 66% at 50% 46%,
+      rgba(5, 5, 16, 0.55) 0%,
+      rgba(5, 5, 16, 0.35) 46%,
+      transparent 78%
+    );
+  }
+
+  .scene-grain {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.035;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .scene-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: radial-gradient(
+      120% 90% at 50% 0%,
+      transparent 40%,
+      rgba(5, 5, 16, 0.55) 100%
+    );
+  }
+
+  /* Soft colour blooms for pages that do not carry the full 3D scene. */
+  .bloom {
+    position: absolute;
+    border-radius: 999px;
+    filter: blur(80px);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+}
+
+/* ==========================================================================
+   Reduced motion
+   --------------------------------------------------------------------------
+   Deliberately left unlayered. For !important declarations the cascade
+   inverts - the implicit outer layer becomes the weakest - but that only
+   matters against other !important rules, and nothing here emits any. What
+   does matter is that an unlayered !important still beats the inline styles
+   Motion writes during an animation, which a layered rule of any specificity
+   would not.
+
+   Blanket kill-switch. Component-level Motion animations additionally check
+   the live media query so mid-session OS changes are honoured.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

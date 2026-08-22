@@ -5,17 +5,25 @@
   "license": "ISC",
   "author": "",
   "type": "commonjs",
-  "main": "script.js",
+  "main": "server.js",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "test": "node scripts/check-js.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "//build": "--include=dev is required: the host sets NODE_ENV=production, and vite/tailwind are devDependencies of client, so a plain `npm ci` installs nothing that can run the build.",
+    "build": "npm --prefix client ci --include=dev && npm --prefix client run build",
+    "dev": "nodemon server.js",
+    "dev:client": "npm --prefix client run dev",
+    "client": "npm --prefix client run"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
-    "crypto": "^1.0.1",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.3",
     "nodemailer": "^9.0.0",

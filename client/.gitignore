@@ -1,0 +1,9 @@
+# The repository root already ignores these for git's sake. This file exists
+# because Tailwind v4 decides what to scan for class names by walking the Vite
+# root (this folder) and honouring the .gitignore files it finds *inside* it -
+# it never sees the one a level up. Without this, Tailwind scans its own
+# client/dist output, so a class deleted from src/ keeps being generated from
+# the last bundle and a fixed mistake looks unfixed.
+node_modules/
+dist/
+*.local
