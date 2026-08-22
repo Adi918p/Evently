@@ -359,6 +359,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/detail-pages.css">
 </head>
 
 <body>
@@ -479,7 +480,8 @@
             username.innerText = user.name;
 
         } else {
-
+            const logBtn = document.getElementById("log");
+            const signBtn = document.getElementById("sup");
             if (logBtn) logBtn.style.display = "block";
             if (signBtn) signBtn.style.display = "block";
 
@@ -513,7 +515,7 @@
     });
     updateAuthUI();
     const params = new URLSearchParams(window.location.search);
-    cid = params.get('id')
+    const cid = params.get('id')
 
 
     const clubs = {
@@ -646,48 +648,54 @@
 
     if (club) {
         document.getElementById("clubsec").innerHTML = `
-    <section class="hero" style="background:
+    <section class="detail-hero" style="background-image:
     url(${club.banner})
-    center/cover;
-">
+     ;">
         <div class="hero-overlay"></div>
 
-        <div class="hero-content">
+        <div class="detail-hero-content">
+
+            <span class="detail-kicker">Evently venue guide</span>
 
             <h1>${club.title}</h1>
 
-            <p class="hero-desc">
+            <p class="detail-hero-copy">
                 ${club.description}
             </p>
 
-            <div class="hero-meta">
+            <div class="detail-meta">
                 <span><i class="fa-solid fa-location-dot"></i> ${club.location}</span>
+                <span><i class="fa-solid fa-clock"></i> ${club.time}</span>
+            </div>
+            <div class="detail-actions">
+                <a class="primary-btn" href="#club-location">View location</a>
+                <a class="secondary-btn" href="/index.html#trending">Browse events</a>
             </div>
         </div>
     </section>
 
     <!-- QUICK INFO -->
-    <section class="info-cards container">
+    <section class="detail-info-grid">
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-building"></i>
             <h3>Address</h3>
             <p>${club.address}</p>
         </div>
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-ticket"></i>
             <h3>Starting</h3>
             <p>${club.price}</p>
         </div>
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-user-check"></i>
             <h3>Age</h3>
             <p>${club.agelim}</p>
         </div>
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-users"></i>
             <h3>Seats Left</h3>
             <p>${club.seats}</p>
@@ -695,13 +703,13 @@
 
     </section>
 
-    <main class="container page-layout">
+    <main class="detail-layout">
 
         <!-- LEFT CONTENT -->
-        <div class="main-content">
+        <div class="detail-main">
 
             <!-- ABOUT -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>About The Club</h2>
 
                 <p>
@@ -715,24 +723,23 @@
             </section>
 
             <!-- GALLERY -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Gallery</h2>
 
-                <div class="gallery">
-                    <img src="${club.gallery[0]}">
-                    <img src="${club.gallery[1]}">
-                    <img src="${club.gallery[2]}">
-                    <img src="${club.gallery[3]}">
+                <div class="detail-gallery">
+                    ${club.gallery.map((image, index) => `<img src="${image}" alt="${club.title} gallery image ${index + 1}" loading="lazy">`).join("")}
                 </div>
             </section>
 
             <!-- Address -->
-            <section class="sbox">
+            <section class="detail-section" id="club-location">
                 <h2>Address</h2>
 
-                <div class="venue-box">
+                <div class="detail-venue">
+                    <div class="detail-venue-copy">
                     <h3>${club.address}</h3>
                     <p>${club.location}</p>
+                    </div>
 
                     <iframe
                         src="${club.maploc}">
@@ -741,7 +748,7 @@
             </section>
 
             <!-- REVIEWS -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Attendee Reviews</h2>
 
                 <div class="reviews">
@@ -768,11 +775,7 @@
     }
 
     else {
-        if (document.getElementById("eventsec")) {
-            document.getElementById("eventsec").style.display = 'none';
-            document.getElementById("err").innerHTML =
-                "<h1>Event Not Found</h1>";
-        }
+        document.getElementById("err").innerHTML = `<div class="detail-empty"><h1>Venue not found</h1><p>Choose a venue from the Evently experience page.</p><a class="primary-btn" href="/Exp.html">Browse venues</a></div>`;
     }
 </script>
 

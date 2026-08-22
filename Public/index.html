@@ -14,7 +14,14 @@
 <body>
     <div id="searchover">
         <div id="sbox">
+            <button type="button" id="searchClose" class="search-close" aria-label="Close search">×</button>
+            <form id="searchForm">
 
+            <div class="ssec">
+                <h2>Search</h2>
+                <input type="search" id="query" placeholder="Event name, venue, or keyword..." autocomplete="off">
+            </div>
+            <hr class="bar">
             <div class="ssec">
                 <h2>Location</h2>
 
@@ -45,16 +52,18 @@
 
                 <select id="category">
                     <option value="">All Categories</option>
-                    <option value="concert">Concerts</option>
-                    <option value="festival">Festivals</option>
-                    <option value="comedy">Comedy Shows</option>
-                    <option value="sports">Sports Events</option>
-                    <option value="tech">Tech Events</option>
-                    <option value="gaming">Gaming</option>
+                    <option value="networking">Networking</option>
+                    <option value="club">Club</option>
                     <option value="music">Music</option>
                     <option value="workshop">Workshops</option>
-                    <option value="nightlife">Nightlife</option>
-                    <option value="food">Food & Drinks</option>
+                    <option value="sports">Sports Events</option>
+                    <option value="arts">Arts</option>
+                    <option value="festival">Festivals</option>
+                    <option value="tech">Tech Events</option>
+                    <option value="gaming">Gaming</option>
+                    <option value="food">Food &amp; drinks</option>
+                    <option value="comedy">Comedy Shows</option>
+                    <option value="other">Other</option>
                 </select>
             </div>
             <hr class="bar">
@@ -65,10 +74,11 @@
             </div>
             <hr class="bar">
             <div>
-                <button class="btn searchbtn" onclick="process()">
+                <button type="submit" class="btn searchbtn">
                     Search
                 </button>
             </div>
+            </form>
 
         </div>
     </div>
@@ -106,6 +116,7 @@
             </div>
         </div>
         <div class="section" id="hero">
+            <p class="hero-kicker">YOUR CITY, YOUR NEXT STORY</p>
             <h1 class="white">Discover.</h1>
             <h1 class="pink">Book.</h1>
             <h1 class="red">Experience.</h1>
@@ -137,13 +148,14 @@
                         <p id="sdate">--Select Date--</p>
                     </div>
                 </div>
-                <button id="bsearch" class="btn" onclick="search()">
+                <button id="bsearch" class="btn" type="button">
                     <img class="pic" src="/Media/Png/search.png" alt="s"></img>
                 </button>
             </div>
         </div>
         <div class="section" id="trending">
             <h1 class="heading" id="htrending">Trending Events⚡</h1>
+            <span id="eventCount" class="event-count" aria-live="polite">Loading events</span>
             <div class="cardsec" id="trendsec">
             </div>
             <h1 id="hcat">Browse by Category</h1>
@@ -154,21 +166,21 @@
                             <img src="/Media/Png/music-cat.png" alt="">
                         </div>
                         <h4>Music</h4>
-                        <p></p>
+                        <p>Live sets & concerts</p>
                     </div>
                     <div class="catblocks" onclick="cat(2)">
                         <div class="catpic">
                             <img src="/Media/Png/club-cat.png" alt="">
                         </div>
                         <h4>Club</h4>
-                        <p></p>
+                        <p>Late-night energy</p>
                     </div>
                     <div class="catblocks" onclick="cat(3)">
                         <div class="catpic">
                             <img src="/Media/Png/networking-cat.png" alt="">
                         </div>
                         <h4>Networking</h4>
-                        <p></p>
+                        <p>Meet your people</p>
                     </div>
                 </div>
                 <div class="cardsec catsec">

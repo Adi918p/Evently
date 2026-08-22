@@ -1,44 +1,22 @@
-const nodemailer = require("nodemailer");
+/**
+ * Backwards-compatible wrapper around utils/mailer.js.
+ *
+ * The old signature was sendEmail(to, subject, html, attachmentPath) and it
+ * spoke directly to Gmail SMTP. Callers keep that signature; the transport
+ * choice now lives in mailer.js, so this file is only an adapter.
+ *
+ * New code should require ./mailer and call sendMail({ ... }) instead - it takes
+ * a plain-text alternative, a reply-to and more than one attachment.
+ */
 
-const transporter = nodemailer.createTransport({
+const { sendMail } = require("./mailer");
 
-    service: "gmail",
+const sendEmail = async (to, subject, html, attachment) => {
+  const attachments = attachment
+    ? [{ filename: "ticket.pdf", path: attachment }]
+    : [];
 
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-
-});
-
-const sendEmail = async (
-    to,
-    subject,
-    html,
-    attachment
-) => {
-    const mailOptions = {
-
-        from:
-            `"Evently" <${process.env.EMAIL_USER}>`,
-
-        to,
-
-        subject,
-
-        html,
-    };
-
-    if (attachment) {
-        mailOptions.attachments = [
-            {
-                filename: "ticket.pdf",
-                path: attachment
-            }
-        ];
-    }
-
-    await transporter.sendMail(mailOptions);
+  return sendMail({ to, subject, html, attachments });
 };
 
 module.exports = sendEmail;

@@ -58,6 +58,32 @@ body.nav-lock {
     overflow: hidden;
 }
 
+body.page-transition {
+    opacity: 0;
+    transform: translateY(5px);
+    transition: opacity .22s ease, transform .22s ease;
+}
+
+body.page-transition.page-ready {
+    opacity: 1;
+    transform: none;
+}
+
+body.page-transition.page-leaving {
+    opacity: 0;
+    transform: translateY(-5px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.page-transition,
+    body.page-transition.page-ready,
+    body.page-transition.page-leaving {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+}
+
 .contact,
 .dashboard,
 .scan-page,

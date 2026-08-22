@@ -1,0 +1,185 @@
+@import "tailwindcss";
+
+/* Tailwind v4 discovers class names by scanning every file under the Vite root,
+   which is wider than "the code that renders". Two folders have to be carved
+   out or they feed the build class names that no component uses:
+
+     dist/     the previous bundle. A class deleted from src/ keeps being
+               generated from it, so the build never shrinks and a fixed
+               mistake looks unfixed.
+     scripts/  build-time Node tooling. audit-tw.mjs quotes broken class names
+               in its own documentation, which Tailwind reads as real usage. */
+@source not "../../dist";
+@source not "../../scripts";
+
+/* ==========================================================================
+   Evently design tokens
+   --------------------------------------------------------------------------
+   Art direction resolved from ui-ux-pro-max:
+     style      glassmorphism  - backdrop blur 10-20px, translucent layers,
+                                 1px light border, simulated light source,
+                                 explicit Z-depth scale
+     palette    dark entertainment / music profile - #0F0F23 base, #7C3AED
+                                 violet, rose accent, available-green,
+                                 sold-out-red
+     type       "Startup Bold" - Outfit display + Rubik body, plus JetBrains
+                                 Mono for prices, ticket ids and countdowns
+                                 (tabular figures rule)
+   ========================================================================== */
+
+@theme {
+  /* ---- base surfaces ---------------------------------------------------- */
+  --color-void: #050510;
+  --color-bg: #08081a;
+  --color-bg-raised: #0f0f23;
+  --color-card: #1b1b30;
+  --color-muted: #27273b;
+
+  /* ---- foreground ------------------------------------------------------- */
+  /* Measured against the darkest page surface (#08081a) and against glass
+     elevations 1-3, because these three tokens carry every word on the site:
+       fg        #f8fafc  18.9:1 on the page,  16.6:1 on glass-3
+       fg-muted  #a9b3c6   8.7:1 on the page,   7.6:1 on glass-3
+       fg-subtle #838ea0   5.5:1 on the page,   4.8:1 on glass-3
+     fg-subtle used to be #6f7a90, which is 4.19:1 on the page - under the 4.5:1
+     floor for normal text before a single particle lit the pixel behind it
+     (color-contrast).
+
+     Those numbers are for a *static* surface. Over the open WebGL scene the
+     backdrop can reach rgb(70 50 108) at its worst even under .scene-scrim, and
+     there only two of the three survive:
+       fg 10.3:1, fg-muted 5.1:1, fg-subtle 3.3:1
+     So fg-subtle is a glass-surface token. Quiet text that sits straight on the
+     scene uses fg-muted, or the block gets a .copy-scrim. Same for small text
+     on glass-4, the one elevation light enough to put fg-subtle under 4.5:1. */
+  --color-fg: #f8fafc;
+  --color-fg-muted: #a9b3c6;
+  --color-fg-subtle: #838ea0;
+
+  /* ---- brand spectrum --------------------------------------------------- */
+  --color-violet: #7c3aed;
+  --color-violet-bright: #a855f7;
+  --color-magenta: #e11d48;
+  --color-magenta-bright: #fb3b73;
+  --color-cyan: #22d3ee;
+  --color-indigo: #4338ca;
+
+  /* ---- semantic --------------------------------------------------------- */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+  --color-info: #38bdf8;
+
+  /* ---- typography ------------------------------------------------------- */
+  --font-display: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Rubik", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Fluid scale. Body stays >=16px on mobile so iOS never auto-zooms. */
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  /* Lead paragraphs: one notch above body, below a heading. */
+  --text-md: 1.0625rem;
+  --text-xl: clamp(1.25rem, 1.1rem + 0.6vw, 1.5rem);
+  --text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --text-3xl: clamp(1.875rem, 1.5rem + 1.8vw, 2.75rem);
+  --text-4xl: clamp(2.25rem, 1.6rem + 3vw, 3.75rem);
+  --text-5xl: clamp(2.75rem, 1.7rem + 4.6vw, 5rem);
+  --text-6xl: clamp(3.25rem, 1.6rem + 7vw, 7rem);
+
+  /* ---- radii ------------------------------------------------------------ */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-2xl: 2.25rem;
+  --radius-pill: 999px;
+
+  /* ---- motion tokens ---------------------------------------------------- */
+  /* Enter durations. Exit is ~65% of enter per the exit-faster-than-enter
+     rule; the paired --dur-*-out values encode that so nothing guesses. */
+  --dur-instant: 120ms;
+  --dur-fast: 180ms;
+  --dur-base: 260ms;
+  --dur-slow: 400ms;
+  --dur-slower: 640ms;
+  --dur-fast-out: 120ms;
+  --dur-base-out: 170ms;
+  --dur-slow-out: 260ms;
+
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ==========================================================================
+   Glass depth scale
+   --------------------------------------------------------------------------
+   Four fixed elevations instead of ad-hoc rgba values, so surfaces stay
+   consistent (elevation-consistent rule). Each level pairs a fill, a
+   top-lit border to fake a light source, and a shadow.
+   ========================================================================== */
+:root {
+  --glass-blur: 16px;
+  --glass-blur-heavy: 28px;
+
+  --glass-1: rgba(255, 255, 255, 0.035);
+  --glass-2: rgba(255, 255, 255, 0.065);
+  --glass-3: rgba(255, 255, 255, 0.105);
+  --glass-4: rgba(255, 255, 255, 0.16);
+
+  --glass-edge: rgba(255, 255, 255, 0.1);
+  --glass-edge-lit: rgba(255, 255, 255, 0.24);
+  --glass-edge-strong: rgba(255, 255, 255, 0.32);
+
+  --shadow-1: 0 1px 2px rgba(2, 2, 12, 0.4);
+  --shadow-2: 0 8px 24px -8px rgba(2, 2, 12, 0.6);
+  --shadow-3: 0 24px 56px -16px rgba(2, 2, 12, 0.72);
+  --shadow-4: 0 40px 96px -24px rgba(2, 2, 12, 0.85);
+  --shadow-glow-violet: 0 0 48px -12px rgba(124, 58, 237, 0.55);
+  --shadow-glow-magenta: 0 0 48px -12px rgba(225, 29, 72, 0.5);
+  /* Default brand glow. Aliased so buttons and cards can ask for "the glow"
+     without picking a hue. */
+  --shadow-glow: var(--shadow-glow-violet);
+
+  /* Layered z-index scale (z-index-management rule) */
+  --z-scene: 0;
+  --z-content: 10;
+  --z-sticky: 20;
+  --z-nav: 40;
+  --z-overlay: 100;
+  --z-modal: 200;
+  --z-toast: 300;
+
+  --nav-h: 4.5rem;
+  --container: 80rem;
+}
+
+/* Signature gradients, kept as tokens so the accent story stays one system. */
+:root {
+  --grad-brand: linear-gradient(
+    120deg,
+    var(--color-violet) 0%,
+    var(--color-magenta-bright) 55%,
+    var(--color-warning) 100%
+  );
+  --grad-brand-soft: linear-gradient(
+    120deg,
+    rgba(124, 58, 237, 0.9) 0%,
+    rgba(251, 59, 115, 0.85) 100%
+  );
+  --grad-cool: linear-gradient(
+    120deg,
+    var(--color-indigo) 0%,
+    var(--color-cyan) 100%
+  );
+  --grad-text: linear-gradient(
+    100deg,
+    #ffffff 0%,
+    #f2d8ff 40%,
+    var(--color-magenta-bright) 100%
+  );
+}

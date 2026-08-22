@@ -51,7 +51,7 @@
             <h2>EVENTLY</h2>
 
             <a href="dashboard.html">Dashboard</a>
-            <a href="events.html">Events</a>
+            <a class="active" href="events.html">Events</a>
             <a href="users.html">Users</a>
             <a href="inbox.html">Inbox</a>
             <a href="analytics.html">Analytics</a>
@@ -59,9 +59,25 @@
         </div>
         <div class="main">
 
-            <h1>Manage Events</h1>
+            <div class="admin-page-header">
+                <div>
+                    <p class="eyebrow">CATALOG / MODERATION</p>
+                    <h1>Manage events</h1>
+                    <p class="page-subtitle">Keep listings accurate, approved, and ready for attendees.</p>
+                </div>
+                <a class="admin-primary" href="/create-event.html?from=admin">Create event <span aria-hidden="true">↗</span></a>
+            </div>
 
-            <input type="text" id="search" placeholder="Search events...">
+            <div class="event-toolbar">
+                <label class="search-field" for="search"><span aria-hidden="true">⌕</span><input type="search" id="search" placeholder="Search title, venue, organizer..." autocomplete="off"></label>
+                <div class="status-filters" role="group" aria-label="Filter events by status">
+                    <button class="status-filter active" type="button" data-status="all" aria-pressed="true">All <span id="allCount">0</span></button>
+                    <button class="status-filter" type="button" data-status="pending" aria-pressed="false">Pending <span id="pendingCount">0</span></button>
+                    <button class="status-filter" type="button" data-status="approved" aria-pressed="false">Approved <span id="approvedCount">0</span></button>
+                    <button class="status-filter" type="button" data-status="rejected" aria-pressed="false">Rejected <span id="rejectedCount">0</span></button>
+                </div>
+            </div>
+            <div class="list-summary"><span id="eventCount">Loading events…</span><button id="refreshEvents" class="quiet-action" type="button">Refresh <span aria-hidden="true">↻</span></button></div>
 
             <div id="eventsContainer">
 
@@ -160,7 +176,8 @@
                 username.innerText = user.name;
 
             } else {
-
+                const logBtn = document.getElementById("log");
+                const signBtn = document.getElementById("sup");
                 if (logBtn) logBtn.style.display = "block";
                 if (signBtn) signBtn.style.display = "block";
 
@@ -184,22 +201,23 @@
             location.reload();
         });
         updateAuthUI();
-        const params = new URLSearchParams(window.location.search);
-        cid = params.get('id')
         const token = localStorage.getItem("token");
 
         if (!token) {
             window.location.href = "/login.html";
-        }
+        } else {
+            let person = null;
+            try {
+                person = JSON.parse(atob(token.split(".")[1]));
+            } catch {
+                localStorage.removeItem("token");
+                window.location.href = "/login.html?mode=login";
+            }
 
-        const person =
-            JSON.parse(
-                atob(token.split(".")[1])
-            );
-
-        if (person.role !== "admin") {
-            alert("Access Denied");
-            window.location.href = "/";
+            if (person && person.role !== "admin") {
+                alert("Access Denied");
+                window.location.href = "/";
+            }
         }
     </script>
     <script src="./js/admin-events.js"></script>

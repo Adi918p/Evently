@@ -1,0 +1,53 @@
+:root { --form-bg: #070912; --form-surface: #111827; --form-border: rgba(255,255,255,.11); --form-muted: #94a3b8; --form-mint: #72e4c7; --form-coral: #ff6b7d; }
+body { min-height: 100vh; padding: 1px 0 60px; background: var(--form-bg) !important; color: #f8fafc; }
+.container { width: min(94%, 960px) !important; margin: 112px auto 0 !important; padding: clamp(22px, 4vw, 42px) !important; border: 1px solid var(--form-border); border-radius: 20px !important; background: rgba(17,24,39,.92) !important; box-shadow: 0 24px 70px rgba(0,0,0,.26); }
+.container h1 { margin: 9px 0 7px !important; text-align: left !important; font: 800 clamp(2rem, 4vw, 3rem)/1.1 "Roboto Slab", serif; letter-spacing: -.04em; }
+.form-intro { margin: 0 0 28px; color: var(--form-muted); font: 400 14px/1.6 system-ui, sans-serif; }
+.back-link { display: inline-flex; color: var(--form-mint); text-decoration: none; font: 800 12px system-ui, sans-serif; }
+#eventForm { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+#eventForm input, #eventForm textarea, #eventForm select, #eventForm button { width: 100%; min-height: 46px; margin: 0; padding: 12px 14px; border: 1px solid var(--form-border); border-radius: 10px; outline: none; background: rgba(255,255,255,.045); color: #f8fafc; font: 500 13px system-ui, sans-serif; }
+#eventForm textarea { min-height: 112px; resize: vertical; line-height: 1.5; }
+#eventForm input::placeholder, #eventForm textarea::placeholder { color: #64748b; }
+#eventForm input:focus, #eventForm textarea:focus, #eventForm select:focus { border-color: rgba(114,228,199,.6); box-shadow: 0 0 0 3px rgba(114,228,199,.08); }
+#eventForm select { color-scheme: dark; }
+#eventForm input[type="date"], #eventForm input[type="time"] { color-scheme: dark; }
+#eventForm #description, #eventForm #about, #eventForm #gallery, #eventForm #lineup, #eventForm button { grid-column: 1 / -1; }
+#eventForm .upload-field { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 12px; min-height: 78px; padding: 14px; border: 1px dashed rgba(114,228,199,.35); border-radius: 12px; background: rgba(114,228,199,.05); cursor: pointer; }
+#eventForm .upload-field:hover { border-color: rgba(114,228,199,.7); background: rgba(114,228,199,.08); }
+#eventForm .upload-field input[type="file"] { min-height: 0; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.upload-copy { display: grid; gap: 4px; }
+.upload-copy strong { color: #f8fafc; font: 800 13px system-ui, sans-serif; }
+.upload-copy small, .upload-file-names { color: var(--form-muted); font: 400 11px/1.45 system-ui, sans-serif; }
+.upload-preview { width: 74px; height: 54px; object-fit: cover; border-radius: 8px; border: 1px solid var(--form-border); }
+.upload-file-names { grid-column: 1 / -1; padding-top: 2px; overflow-wrap: anywhere; }
+#eventForm button { min-height: 48px; margin-top: 6px; border-color: var(--form-mint); background: var(--form-mint); color: #081016; cursor: pointer; font-weight: 800; }
+#eventForm button:hover { filter: brightness(1.06); transform: translateY(-1px); }
+#eventForm button:disabled { opacity: .55; cursor: wait; }
+.form-hint { grid-column: 1 / -1; margin: -4px 0 0; color: #64748b; font: 400 11px/1.5 system-ui, sans-serif; }
+.form-error { grid-column: 1 / -1; margin: 0; color: var(--form-coral); font: 600 12px system-ui, sans-serif; }
+.form-heading { margin-bottom: 28px; }
+.form-eyebrow { color: var(--form-mint); font: 900 11px system-ui, sans-serif; letter-spacing: .14em; text-transform: uppercase; }
+.form-section { display: grid; gap: 18px; grid-column: 1 / -1; padding: 22px 0 8px; border-top: 1px solid rgba(255,255,255,.09); }
+.form-section-heading { display: flex; gap: 13px; align-items: flex-start; }
+.form-section-heading > span { display: grid; place-items: center; flex: 0 0 28px; width: 28px; height: 28px; border-radius: 50%; color: #071015; background: var(--form-mint); font: 900 11px system-ui, sans-serif; }
+.form-section-heading h2 { margin: 0 0 3px; color: #f8fafc; font: 800 17px/1.2 "Roboto Slab", Georgia, serif; }
+.form-section-heading p { margin: 0; color: var(--form-muted); font: 400 12px/1.5 system-ui, sans-serif; }
+.form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+#eventForm label { display: grid; gap: 7px; color: #dbe4f1; font: 750 12px system-ui, sans-serif; }
+#eventForm label input, #eventForm label textarea { margin-top: 0; }
+.field-wide { grid-column: 1 / -1; }
+.label-muted, #eventForm label em { color: var(--form-muted); font-size: 10px; font-style: normal; font-weight: 500; }
+#eventForm .upload-field { align-content: center; }
+#eventForm .form-feedback { grid-column: 1 / -1; min-height: 1.3em; margin: -4px 0 0; color: var(--form-muted); font: 600 12px/1.5 system-ui, sans-serif; }
+#eventForm .form-feedback.error { color: var(--form-coral); }
+#eventForm .form-feedback.success { color: var(--form-mint); }
+#eventForm .form-submit { grid-column: 1 / -1; }
+.current-media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: 10px; grid-column: 1 / -1; }
+.current-media-label, .current-media-empty { grid-column: 1 / -1; margin: 0; color: var(--form-muted); font: 600 11px system-ui, sans-serif; }
+.current-media-item { position: relative; min-height: 100px !important; padding: 0 !important; overflow: hidden; border: 1px solid var(--form-border) !important; border-radius: 9px !important; background: rgba(255,255,255,.05) !important; cursor: pointer !important; }
+.current-media-item img { display: block; width: 100%; height: 100px; object-fit: cover; opacity: .9; }
+.current-media-item span { position: absolute; inset: auto 5px 5px; padding: 4px; color: #fff; background: rgba(5,8,15,.78); border-radius: 5px; font: 700 10px system-ui, sans-serif; }
+.current-media-item:hover { border-color: var(--form-coral) !important; }
+.remove-media-button { grid-column: 1 / -1; width: auto !important; justify-self: start; min-height: 34px !important; padding: 8px 11px !important; color: #ffabb5 !important; background: transparent !important; border: 1px solid rgba(255,107,125,.35) !important; font-size: 11px !important; }
+@media (max-width: 640px) { .container { margin-top: 84px !important; } #eventForm { grid-template-columns: 1fr; } #eventForm #description, #eventForm #about, #eventForm #gallery, #eventForm #lineup, #eventForm button, #eventForm .upload-field { grid-column: auto; } #eventForm .upload-field { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .form-grid { grid-template-columns: 1fr; } .field-wide { grid-column: auto; } .form-section { padding-top: 18px; } }

@@ -56,112 +56,129 @@
         }
     </style>
 <link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/event-form.css">
 </head>
 
 <body>
 
     <div class="container">
 
-        <h1>Create Event</h1>
+        <a class="back-link" id="backLink" href="/dashboard.html">← Back to organizer studio</a>
+        <div class="form-heading"><span class="form-eyebrow">Organizer studio</span><h1>Create an event</h1><p class="form-intro">Build a clear, bookable event listing with the details attendees need.</p></div>
 
         <form id="eventForm">
 
-            <input type="text" id="title" placeholder="Event Title" required>
+            <section class="form-section"><div class="form-section-heading"><span>01</span><div><h2>Event basics</h2><p>Give your event a strong, searchable identity.</p></div></div><div class="form-grid">
+            <label>Event title<input type="text" id="title" placeholder="e.g. Sunset Sessions" required></label>
 
-            <textarea id="description" placeholder="Description"></textarea>
+            <label class="field-wide">Short description<textarea id="description" placeholder="What should attendees know first?" required></textarea></label>
 
-            <textarea id="about" placeholder="About Event"></textarea>
+            <label class="field-wide">About this event<textarea id="about" placeholder="Add the fuller story, highlights, and what to expect."></textarea></label>
 
-            <input type="text" id="venue" placeholder="Venue">
+            <label>Venue<input type="text" id="venue" placeholder="Venue name" required></label>
 
-            <input type="text" id="location" placeholder="Location">
+            <label>City or area<input type="text" id="location" placeholder="Ludhiana, Punjab" required></label>
 
-            <input type="date" id="date">
+            <label>Event category<select id="category" required>
+                <option value="other">Other</option>
+                <option value="networking">Networking</option>
+                <option value="club">Club</option>
+                <option value="music">Music</option>
+                <option value="workshop">Workshop</option>
+                <option value="sports">Sports</option>
+                <option value="arts">Arts</option>
+                <option value="food">Food &amp; drinks</option>
+                <option value="comedy">Comedy</option>
+                <option value="festival">Festival</option>
+                <option value="tech">Tech</option>
+                <option value="gaming">Gaming</option>
+            </select></label>
 
-            <input type="time" id="time">
+            <label>Date<input type="date" id="date" required></label>
 
-            <input type="number" id="price" placeholder="Price">
+            <label>Start time<input type="time" id="time"></label>
 
-            <input type="text" id="agelim" placeholder="Age Limit">
+            <label>Ticket price (INR)<input type="number" id="price" placeholder="499" min="0" required></label>
 
-            <input type="number" id="seats" placeholder="Total Seats">
+            <label>Age guidance<input type="text" id="agelim" placeholder="All Ages"></label>
 
-            <input type="text" id="banner" placeholder="Banner URL">
+            <label>Total seats<input type="number" id="seats" placeholder="100" min="1" required></label>
+            </div></section>
 
-            <input type="text" id="maploc" placeholder="Google Map Link">
+            <section class="form-section"><div class="form-section-heading"><span>02</span><div><h2>Event media</h2><p>Upload the visuals attendees will see on the event page.</p></div></div><div class="form-grid">
 
-            <textarea id="gallery" placeholder="Gallery (comma separated URLs)"></textarea>
+            <label class="upload-field" for="bannerFile">
+                <span class="upload-copy"><strong>Upload a banner <em>Optional</em></strong><small>One wide JPG, PNG, WEBP, or GIF. Maximum 4 MB.</small></span>
+                <input type="file" id="bannerFile" accept="image/jpeg,image/png,image/webp,image/gif">
+                <img id="bannerPreview" class="upload-preview" alt="Banner preview" hidden>
+            </label>
 
-            <textarea id="lineup" placeholder="Lineup (name:image,url format)"></textarea>
+            <label class="upload-field" for="galleryFiles">
+                <span class="upload-copy"><strong>Upload gallery images <em>Optional</em></strong><small>Select up to 8 JPG, PNG, WEBP, or GIF images. Maximum 8 MB total.</small></span>
+                <input type="file" id="galleryFiles" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+                <span id="galleryFileNames" class="upload-file-names">No gallery images selected</span>
+            </label>
+            </div></section>
 
-            <button type="submit">Create Event</button>
+            <section class="form-section"><div class="form-section-heading"><span>03</span><div><h2>Practical details</h2><p>Help people arrive prepared and discover the venue.</p></div></div><div class="form-grid">
+            <label>Map link <span class="label-muted">Optional</span><input type="url" id="maploc" placeholder="Google Maps link"></label>
+            <label class="field-wide">Lineup <span class="label-muted">Optional · one name per line</span><textarea id="lineup" placeholder="DJ Aanya&#10;The Midnight Club"></textarea></label>
+            </div></section>
+
+            <p id="formFeedback" class="form-feedback" role="status"></p>
+
+            <button class="form-submit" type="submit">Create event</button>
 
         </form>
 
     </div>
 
+    <script src="/js/nav.js"></script>
+    <script src="/js/event-form.js"></script>
     <script>
-        document
-            .getElementById("eventForm")
-            .addEventListener("submit", async (e) => {
+        const returnTo = new URLSearchParams(window.location.search).get("from") === "admin" ? "/admin/events.html" : "/dashboard.html";
+        const backLink = document.getElementById("backLink");
+        backLink.href = returnTo;
+        backLink.textContent = returnTo.includes("/admin/") ? "← Back to event queue" : "← Back to organizer studio";
+        const form = document.getElementById("eventForm");
+        const button = form.querySelector("button[type=submit]");
+        const bannerFile = document.getElementById("bannerFile");
+        const galleryFiles = document.getElementById("galleryFiles");
+        EventlyEventForm.bindPreview(bannerFile, document.getElementById("bannerPreview"));
+        EventlyEventForm.bindFileNames(galleryFiles, document.getElementById("galleryFileNames"));
+        const parseLineup = (value) => value.split(/\r?\n|,/).map(item => item.trim()).filter(Boolean).map(name => ({ name, image: "" }));
+        const feedback = document.getElementById("formFeedback");
+        const setFeedback = (message, type = "") => { feedback.textContent = message; feedback.className = `form-feedback ${type}`.trim(); };
 
-                e.preventDefault();
-
-                const token = localStorage.getItem("token");
-
-                const gallery =
-                    document.getElementById("gallery")
-                        .value
-                        .split(",")
-                        .map(img => img.trim());
-
-                const lineupRaw =
-                    document.getElementById("lineup").value;
-
-                const lineup = lineupRaw
-                    .split(",")
-                    .map(item => {
-                        const [name, image] = item.split(":");
-                        return { name, image };
-                    });
-
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const token = localStorage.getItem("token");
+            if (!token) { window.location.href = "/login.html?mode=login"; return; }
+            button.disabled = true;
+            button.textContent = "Uploading and creating...";
+            const value = (id) => document.getElementById(id).value.trim();
+            try {
+                const [bannerUploads, galleryUploads] = await Promise.all([
+                    EventlyEventForm.uploadFiles(bannerFile.files),
+                    EventlyEventForm.uploadFiles(galleryFiles.files)
+                ]);
                 const data = {
-                    title: document.getElementById("title").value,
-                    description: document.getElementById("description").value,
-                    about: document.getElementById("about").value,
-                    venue: document.getElementById("venue").value,
-                    location: document.getElementById("location").value,
-                    date: document.getElementById("date").value,
-                    time: document.getElementById("time").value,
-                    price: document.getElementById("price").value,
-                    agelim: document.getElementById("agelim").value,
-                    seats: document.getElementById("seats").value,
-                    banner: document.getElementById("banner").value,
-                    maploc: document.getElementById("maploc").value,
-                    gallery,
-                    lineup
+                    title: value("title"), description: value("description"), about: value("about"), venue: value("venue"),
+                    location: value("location"), category: value("category"), date: value("date"), time: value("time"), price: Number(value("price") || 0),
+                    agelim: value("agelim") || "All Ages", seats: Number(value("seats") || 0), banner: bannerUploads[0] || "",
+                    maploc: value("maploc"), gallery: galleryUploads, lineup: parseLineup(value("lineup"))
                 };
-
-                const res = await fetch("/api/events", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${token}`
-                    },
-                    body: JSON.stringify(data)
-                });
-
+                const res = await fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(data) });
                 const result = await res.json();
-
-                if (result.success) {
-                    alert("Event Created Successfully");
-                    window.location.href = "/dashboard.html";
-                }
-                else {
-                    alert(result.message);
-                }
-
-            });
+                if (!res.ok || !result.success) throw new Error(result.message || "Could not create event");
+                if (window.EventlyTransition?.navigate) window.EventlyTransition.navigate(returnTo);
+                else window.location.href = returnTo;
+            } catch (error) {
+                setFeedback(error.message, "error");
+                button.disabled = false;
+                button.textContent = "Create event";
+            }
+        });
     </script>
 
 </body>

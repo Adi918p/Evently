@@ -150,6 +150,10 @@
             message: document.getElementById("message").value.trim()
         };
 
+        const submit = form.querySelector("button[type=submit]");
+        submit.disabled = true;
+        successMessage.textContent = "Sending...";
+        successMessage.style.color = "";
         try {
             const response = await fetch(
                 "/api/contact",
@@ -162,9 +166,9 @@
                 }
             );
 
-            const result = await response.json();
+            const result = await response.json().catch(() => ({}));
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 successMessage.textContent =
                     "Message sent successfully!";
 
@@ -185,6 +189,8 @@
                 "Server error. Please try again later.";
 
             successMessage.style.color = "red";
+        } finally {
+            submit.disabled = false;
         }
     });
 </script>

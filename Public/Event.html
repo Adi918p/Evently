@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eventify-Enjoy Events Near You</title>
+    <title>Evently | Event details</title>
     <style>
         html {
             scroll-behavior: smooth;
@@ -487,6 +487,7 @@
     <link rel="stylesheet" href="./css/style.css">
     <link rel="stylesheet" href="/css/responsive.css">
     <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/detail-pages.css">
 </head>
 
 <body>
@@ -573,6 +574,7 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
     let count = 1;
+    let currentEvent = null;
 
     function attachBookingListeners() {
 
@@ -587,14 +589,24 @@
 
         const bookBtn =
             document.getElementById("bookBtn");
+        const feedback = document.getElementById("bookingFeedback");
+
+        const setFeedback = (message, type = "") => {
+            if (!feedback) return;
+            feedback.textContent = message;
+            feedback.className = `booking-feedback ${type}`.trim();
+        };
 
         if (!ticketCount || !minusBtn || !plusBtn || !bookBtn) {
             console.log("Booking elements not found");
             return;
         }
 
+        const maxTickets = Math.max(1, Math.min(10, Number(currentEvent?.seatsLeft || 10)));
         const updateUI = () => {
             ticketCount.innerText = count;
+            minusBtn.disabled = count <= 1;
+            plusBtn.disabled = count >= maxTickets;
         };
 
         minusBtn.addEventListener("click", () => {
@@ -605,7 +617,7 @@
         });
 
         plusBtn.addEventListener("click", () => {
-            count++;
+            if (count < maxTickets) count++;
             updateUI();
         });
 
@@ -614,13 +626,14 @@
             try {
 
                 const token = localStorage.getItem("token");
+                const bookingUser = getUserFromToken();
 
                 if (!token) {
 
-                    alert("Login required");
+                    setFeedback("Please log in to continue.", "error");
 
                     setTimeout(() => {
-                        window.location.href = "/login.html";
+                        window.location.href = `/login.html?mode=login&returnTo=${encodeURIComponent(window.location.pathname + window.location.search)}`;
                     }, 1000);
 
                     return;
@@ -649,15 +662,11 @@
                     }
                 );
 
-                const orderData =
-                    await orderRes.json();
+                const orderData = await orderRes.json().catch(() => ({}));
 
-                if (!orderData.success) {
-
-                    alert(orderData.message);
-
-                    return;
-                }
+                if (!orderRes.ok || !orderData.success) throw new Error(orderData.message || "Tickets could not be reserved");
+                if (!window.Razorpay) throw new Error("Payment checkout is unavailable right now");
+                setFeedback("Checkout opened. Complete payment in the secure window.", "info");
 
                 /* RAZORPAY OPTIONS */
 
@@ -713,23 +722,19 @@
                                     }
                                 );
 
-                            const verifyData =
-                                await verifyRes.json();
+                            const verifyData = await verifyRes.json().catch(() => ({}));
 
-                            if (verifyData.success) {
-
-                                alert("Payment Successful!");
-
-                                window.location.href =
-                                    "/mybookings.html";
+                            if (verifyRes.ok && verifyData.success) {
+                                setFeedback("Payment successful. Opening your bookings...", "success");
+                                const next = "/mybookings.html";
+                                setTimeout(() => window.EventlyTransition?.navigate(next) || (window.location.href = next), 700);
 
                             }
                             else {
 
-                                alert(
-                                    verifyData.message ||
-                                    "Payment verification failed"
-                                );
+                                setFeedback(verifyData.message || "Payment verification failed", "error");
+                                bookBtn.disabled = false;
+                                bookBtn.textContent = "Book now";
 
                             }
 
@@ -738,17 +743,17 @@
 
                             console.error(err);
 
-                            alert(
-                                "Verification failed"
-                            );
+                            setFeedback("Verification failed. Please contact support if you were charged.", "error");
+                            bookBtn.disabled = false;
+                            bookBtn.textContent = "Book now";
 
                         }
 
                     },
 
                     prefill: {
-                        name: user?.name || "",
-                        email: user?.email || ""
+                        name: bookingUser?.name || "",
+                        email: bookingUser?.email || ""
                     },
 
                     theme: {
@@ -762,6 +767,13 @@
                 const rzp =
                     new Razorpay(options);
 
+                rzp.on("payment.failed", () => {
+                    setFeedback("Payment was not completed. You can try again.", "error");
+                    bookBtn.disabled = false;
+                    bookBtn.textContent = "Book now";
+                });
+                bookBtn.disabled = true;
+                bookBtn.textContent = "Opening checkout...";
                 rzp.open();
 
             }
@@ -769,102 +781,130 @@
 
                 console.error(err);
 
-                alert(
-                    "Something went wrong"
-                );
+                setFeedback(err.message || "Something went wrong. Please try again.", "error");
+                bookBtn.disabled = false;
+                bookBtn.textContent = "Book now";
 
             }
 
         });
     }
     const params = new URLSearchParams(window.location.search);
-    const eid = params.get('id')
+    const eid = params.get('id');
+    const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" })[char]);
+    const safeUrl = (value, fallback = "/Media/Png/Background.png") => {
+        const url = String(value || "").trim();
+        return /^(https?:\/\/|\/)/i.test(url) ? url.replace(/"/g, "%22").replace(/'/g, "%27") : fallback;
+    };
+    const categoryLabels = { networking: "Networking", club: "Club", music: "Music", workshop: "Workshop", sports: "Sports", arts: "Arts", food: "Food & drinks", comedy: "Comedy", festival: "Festival", tech: "Tech", gaming: "Gaming", other: "Other" };
+    const formatDate = (value) => value ? new Date(value).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "Date to be announced";
+    const setEventError = (title, message = "") => {
+        const error = document.getElementById("err");
+        if (!error) return;
+        error.innerHTML = `<div class="detail-empty"><h1>${escapeHtml(title)}</h1><p>${escapeHtml(message)}</p><a class="primary-btn" href="/index.html#trending">Browse events</a></div>`;
+        error.style.display = "flex";
+    };
 
     async function loadEvent() {
+        if (!eid) {
+            setEventError("Event link is incomplete", "Choose an event from the Evently explore page.");
+            return;
+        }
         try {
 
             const response =
                 await fetch(`/api/events/${eid}`);
 
             const data = await response.json();
-            const event = data.event;
 
-            if (!data.success || !data.event) {
-                document.getElementById("err").innerHTML =
-                    "<h1>Event Not Found</h1>";
+            if (!response.ok || !data.success || !data.event) {
+                setEventError("Event not found", "This event may have been removed or the link is incomplete.");
                 return;
             }
 
+            const event = data.event;
+            currentEvent = { ...event, seatsLeft: Math.max(0, Number(data.seatsLeft ?? event.seats ?? 0)) };
+
             if (event) {
+                const eventBanner = safeUrl(event.banner);
+                const eventGallery = (Array.isArray(event.gallery) ? event.gallery : []).filter(Boolean);
+                const eventLineup = Array.isArray(event.lineup) ? event.lineup.filter((artist) => artist?.name) : [];
+                const eventTitle = escapeHtml(event.title || "Untitled event");
+                const eventDescription = escapeHtml(event.description || "Join us for an unforgettable Evently experience.");
+                const eventLocation = escapeHtml(event.location || "Location to be announced");
+                const eventVenue = escapeHtml(event.venue || event.location || "Venue to be announced");
+                const eventTime = escapeHtml(event.time || "Time to be announced");
+                const eventAge = escapeHtml(event.agelim || "All ages");
+                const eventCategory = escapeHtml(categoryLabels[String(event.category || "other").toLowerCase()] || "Other");
+                const eventAbout = escapeHtml(event.about || event.description || "Event details will be shared by the organizer.");
+                const eventPrice = Number(event.price || 0).toLocaleString("en-IN");
+                const eventMap = safeUrl(event.maploc, "");
                 document.getElementById("eventsec").innerHTML = `
-    <section class="hero" style="background:
-    url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f')
-    center/cover;
-">
-        <div class="hero-overlay"></div>
+    <section class="detail-hero" style="background-image:
+    url('${eventBanner}')
+    ;">
+        <div class="detail-hero-content">
+            <span class="detail-kicker">${eventCategory} / live event</span>
 
-        <div class="hero-content">
-            <span class="event-tag">LIVE EVENT</span>
+            <h1>${eventTitle}</h1>
 
-            <h1>${event.title}</h1>
-
-            <p class="hero-desc">
-                ${event.description}
+            <p class="detail-hero-copy">
+                ${eventDescription}
             </p>
 
-            <div class="hero-meta">
-                <span><i class="fa-solid fa-location-dot"></i> ${event.location}</span>
-                <span><i class="fa-solid fa-calendar"></i> ${new Date(event.date).toLocaleDateString()}</span>
-                <span><i class="fa-solid fa-clock"></i> ${event.time}</span>
+            <div class="detail-meta">
+                <span><i class="fa-solid fa-location-dot"></i> ${eventLocation}</span>
+                <span><i class="fa-solid fa-calendar"></i> ${formatDate(event.date)}</span>
+                <span><i class="fa-solid fa-clock"></i> ${eventTime}</span>
             </div>
 
-            <div class="hero-buttons">
-                <a href="#bookcard"><button class="primary-btn" >Book Tickets</button></a>
-                <button class="secondary-btn">Share Event</button>
+            <div class="detail-actions">
+                <a href="#bookcard" class="primary-btn">Book tickets</a>
+                <button class="secondary-btn" id="shareEventBtn" type="button">Share event</button>
             </div>
         </div>
     </section>
 
     <!-- QUICK INFO -->
-    <section class="info-cards container">
+    <section class="detail-info-grid">
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-building"></i>
             <h3>Venue</h3>
-            <p>${event.venue}</p>
+            <p>${eventVenue}</p>
         </div>
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-ticket"></i>
             <h3>Starting</h3>
-            <p>${event.price}</p>
+            <p>₹${eventPrice}</p>
         </div>
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-user-check"></i>
             <h3>Age</h3>
-            <p>${event.agelim}</p>
+            <p>${eventAge}</p>
         </div>
 
-        <div class="info-card">
+        <div class="detail-info-card">
             <i class="fa-solid fa-users"></i>
             <h3>Seats Left</h3>
-            <p>${event.seats}</p>
+            <p>${currentEvent.seatsLeft} of ${Number(event.seats || 0)} available</p>
         </div>
 
     </section>
 
-    <main class="container page-layout">
+    <main class="detail-layout">
 
         <!-- LEFT CONTENT -->
-        <div class="main-content">
+        <div class="detail-main">
 
             <!-- ABOUT -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>About The Event</h2>
 
                 <p>
-                    ${event.about}
+                    ${eventAbout}
                 </p>
 
                 <p>
@@ -874,63 +914,45 @@
             </section>
 
             <!-- GALLERY -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Gallery</h2>
 
-                <div class="gallery">
-                    <img src="${event.gallery?.[0] || '/default.jpg'}">
-                    <img src="${event.gallery?.[1] || '/default.jpg'}">
-                    <img src="${event.gallery?.[2] || '/default.jpg'}">
-                    <img src="${event.gallery?.[3] || '/default.jpg'}">
+                <div class="detail-gallery">
+                    ${(eventGallery.length ? eventGallery : [eventBanner]).slice(0, 4).map(image => `<img src="${safeUrl(image)}" alt="${eventTitle}">`).join('')}
                 </div>
             </section>
 
             <!-- LINEUP -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Artist Lineup</h2>
 
-                <div class="artists">
-
-                    <div class="artist-card">
-                        <img src="${event.lineup?.[0]?.image || '/default.jpg'}">
-                        <h3>${event.lineup?.[0]?.name || 'Artist'}</h3>
-                    </div>
-
-                    <div class="artist-card">
-                        <img src="${event.lineup?.[0]?.image || '/default.jpg'}">
-                        <h3>${event.lineup?.[0]?.name || 'Artist'}</h3>
-                    </div>
-
-                    <div class="artist-card">
-                        <img src="${event.lineup?.[0]?.image || '/default.jpg'}">
-                        <h3>${event.lineup?.[0]?.name || 'Artist'}</h3>
-                    </div>
-
+                <div class="detail-artists">
+                    ${(eventLineup.length ? eventLineup : [{ name: 'Your hosts', image: eventBanner }]).map(artist => `<div class="detail-artist"><img src="${safeUrl(artist.image, eventBanner)}" alt="${escapeHtml(artist.name)}"><h3>${escapeHtml(artist.name)}</h3></div>`).join('')}
                 </div>
             </section>
 
             <!-- TIMELINE -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Event Timeline</h2>
 
-                <div class="timeline">
+                <div class="detail-timeline">
 
-                    <div class="timeline-item">
+                    <div class="detail-timeline-item">
                         <span>7:00 PM</span>
                         <p>Gates Open</p>
                     </div>
 
-                    <div class="timeline-item">
+                    <div class="detail-timeline-item">
                         <span>8:00 PM</span>
                         <p>Opening Show</p>
                     </div>
 
-                    <div class="timeline-item">
+                    <div class="detail-timeline-item">
                         <span>9:30 PM</span>
                         <p>Main Performance</p>
                     </div>
 
-                    <div class="timeline-item">
+                    <div class="detail-timeline-item">
                         <span>11:00 PM</span>
                         <p>DJ Set</p>
                     </div>
@@ -939,21 +961,19 @@
             </section>
 
             <!-- VENUE -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Venue</h2>
 
-                <div class="venue-box">
-                    <h3>${event.venue}</h3>
-                    <p>${event.location}</p>
+                <div class="detail-venue">
+                    <div class="detail-venue-copy"><h3>${eventVenue}</h3>
+                    <p>${eventLocation}</p></div>
 
-                    <iframe
-                        src="${event.maploc}">
-                    </iframe>
+                    ${eventMap ? `<iframe title="${eventVenue} map" loading="lazy" src="${eventMap}"></iframe>` : '<p class="map-placeholder">Map details will be shared by the organizer.</p>'}
                 </div>
             </section>
 
             <!-- REVIEWS -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>Attendee Reviews</h2>
 
                 <div class="reviews">
@@ -972,7 +992,7 @@
             </section>
 
             <!-- SIMILAR EVENTS -->
-            <section class="sbox">
+            <section class="detail-section">
                 <h2>You May Also Like</h2>
 
                 <div class="similar-events">
@@ -993,29 +1013,29 @@
         </div>
 
         <!-- STICKY TICKET PANEL -->
-        <aside class="ticket-panel">
+        <aside class="detail-ticket-panel">
 
-            <div class="ticket-card">
+            <div class="detail-ticket-card">
 
                 <h2>Tickets</h2>
 
-                <div class="ticket-option">
+                <div class="detail-ticket-option">
                     <span>General</span>
-                    <strong>₹499</strong>
+                    <strong>₹${eventPrice}</strong>
                 </div>
 
-                <div class="ticket-option">
+                <div class="detail-ticket-option">
                     <span>VIP</span>
-                    <strong>₹999</strong>
+                    <strong>₹${eventPrice}</strong>
                 </div>
 
-                <div class="ticket-option">
+                <div class="detail-ticket-option">
                     <span>VVIP</span>
-                    <strong>₹1999</strong>
+                    <strong>₹${eventPrice}</strong>
                 </div>
 
             </div>
-            <div class="booking-card ticket-card" id="bookcard">
+            <div class="detail-booking-card" id="bookcard">
 
                 <h3>Book Your Tickets</h3>
 
@@ -1023,7 +1043,7 @@
 
                     <label>No. of Tickets</label>
 
-                    <div class="counter">
+                    <div class="detail-counter">
 
                         <button id="minusBtn">−</button>
 
@@ -1035,9 +1055,10 @@
 
                 </div>
 
-                <button id="bookBtn">
+                <button id="bookBtn" class="detail-book-btn">
                     Book Now
                 </button>
+                <p id="bookingFeedback" class="booking-feedback" role="status"></p>
             </div>
 
         </aside>
@@ -1046,7 +1067,7 @@
 `;
                 const bookBtn = document.getElementById("bookBtn");
 
-                const seatsLeft = event.seats - event.ticketsSold;
+                const seatsLeft = currentEvent.seatsLeft;
 
                 if (seatsLeft <= 0) {
                     bookBtn.innerText = "Sold Out";
@@ -1055,19 +1076,25 @@
                     bookBtn.style.cursor = "not-allowed";
                 }
                 document.getElementById("err").style.display = 'none';
+                document.getElementById("shareEventBtn")?.addEventListener("click", async () => {
+                    const shareData = { title: event.title || "Evently event", text: event.description || "Join me at this Evently event", url: window.location.href };
+                    try {
+                        if (navigator.share) await navigator.share(shareData);
+                        else if (navigator.clipboard) { await navigator.clipboard.writeText(window.location.href); document.getElementById("shareEventBtn").textContent = "Link copied"; }
+                    } catch (shareError) {
+                        if (shareError.name !== "AbortError") console.error(shareError);
+                    }
+                });
             }
 
             else {
-                if (document.getElementById("clubsec")) {
-                    document.getElementById("clubsec").style.display = 'none';
-                    document.getElementById("err").innerHTML =
-                        "<h1>Club Not Found</h1>";
-                }
+                setEventError("Event not found", "This event may have been removed or the link is incomplete.");
             }
             attachBookingListeners();
 
         } catch (err) {
-            console.log(err);
+            console.error(err);
+            setEventError("We couldn't load this event", "Please try again in a moment.");
         }
     }
 

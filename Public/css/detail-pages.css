@@ -1,0 +1,73 @@
+:root {
+    --detail-bg: #080b14;
+    --detail-surface: rgba(17, 24, 39, .82);
+    --detail-line: rgba(255,255,255,.1);
+    --detail-muted: #aeb8cb;
+    --detail-coral: #ef5d6f;
+    --detail-mint: #72e4c7;
+}
+
+#eventsec, #clubsec { background: var(--detail-bg); color: #f8fafc; }
+.detail-hero { min-height: min(720px, 82vh); position: relative; display: flex; align-items: flex-end; overflow: hidden; background-position: center; background-size: cover; }
+.detail-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(5,7,15,.94), rgba(5,7,15,.48) 52%, rgba(5,7,15,.18)), linear-gradient(0deg, rgba(5,7,15,.96), transparent 68%); }
+.detail-hero-content { position: relative; z-index: 1; width: min(1180px, 90%); margin: 0 auto; padding: 0 0 84px; }
+.detail-kicker { display: inline-flex; align-items: center; gap: 8px; color: var(--detail-mint); font-size: .73rem; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.detail-kicker::before { content: ""; width: 26px; height: 2px; background: var(--detail-coral); }
+.detail-hero h1 { max-width: 880px; margin: 16px 0 14px; color: #fff; font-family: "Roboto Slab", Georgia, serif; font-size: clamp(2.7rem, 7vw, 5.9rem); line-height: .98; letter-spacing: -.045em; }
+.detail-hero-copy { max-width: 680px; color: #d0d8e7; font-size: clamp(1rem, 1.6vw, 1.18rem); line-height: 1.65; }
+.detail-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+.detail-meta span { display: inline-flex; align-items: center; gap: 8px; padding: 9px 12px; color: #eff4fb; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.13); border-radius: 8px; font-size: .84rem; }
+.detail-meta i { color: var(--detail-mint); }
+.detail-actions { display: flex; flex-wrap: wrap; gap: 11px; margin-top: 28px; }
+.detail-actions a, .detail-actions button { display: inline-flex; align-items: center; justify-content: center; min-height: 46px; padding: 0 18px; border-radius: 9px; font: inherit; font-weight: 850; cursor: pointer; text-decoration: none; transition: transform .2s ease, background .2s ease, border-color .2s ease; }
+.detail-actions a:hover, .detail-actions button:hover { transform: translateY(-2px); }
+.detail-actions .primary-btn { color: #fff; background: var(--detail-coral); border: 1px solid var(--detail-coral); }
+.detail-actions .secondary-btn { color: #f8fafc; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.17); }
+.detail-info-grid { position: relative; z-index: 2; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: min(1180px, 90%); margin: -38px auto 0; }
+.detail-info-card { min-height: 128px; padding: 18px; background: var(--detail-surface); border: 1px solid var(--detail-line); border-radius: 12px; box-shadow: 0 18px 45px rgba(0,0,0,.2); }
+.detail-info-card i { color: var(--detail-mint); font-size: 1.1rem; }
+.detail-info-card h3 { margin: 18px 0 5px; color: #f8fafc; font-size: .77rem; letter-spacing: .08em; text-transform: uppercase; }
+.detail-info-card p { margin: 0; color: var(--detail-muted); line-height: 1.45; }
+.detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 52px; width: min(1180px, 90%); margin: 72px auto 0; }
+.detail-main { min-width: 0; }
+.detail-section { margin-bottom: 70px; }
+.detail-section h2 { margin-bottom: 18px; color: #fff; font-family: "Roboto Slab", Georgia, serif; font-size: clamp(1.55rem, 3vw, 2.15rem); letter-spacing: -.025em; }
+.detail-section > p { max-width: 72ch; color: var(--detail-muted); line-height: 1.8; }
+.detail-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.detail-gallery img { width: 100%; aspect-ratio: 16/10; display: block; object-fit: cover; border-radius: 10px; border: 1px solid var(--detail-line); transition: transform .25s ease, filter .25s ease; }
+.detail-gallery img:hover { transform: translateY(-3px); filter: saturate(1.08); }
+.detail-artists { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+.detail-artist { overflow: hidden; background: rgba(255,255,255,.045); border: 1px solid var(--detail-line); border-radius: 11px; }
+.detail-artist img { display: block; width: 100%; aspect-ratio: 4/3; object-fit: cover; }
+.detail-artist h3 { padding: 13px 14px 15px; color: #f8fafc; font-size: .98rem; }
+.detail-timeline { display: grid; gap: 0; border-left: 1px solid rgba(239,93,111,.55); }
+.detail-timeline-item { position: relative; padding: 0 0 24px 24px; }
+.detail-timeline-item::before { content: ""; position: absolute; top: 4px; left: -5px; width: 9px; height: 9px; border-radius: 50%; background: var(--detail-coral); box-shadow: 0 0 0 4px var(--detail-bg); }
+.detail-timeline-item span { color: var(--detail-coral); font-size: .78rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.detail-timeline-item p { margin-top: 5px; color: #e3e9f3; }
+.detail-venue { overflow: hidden; background: rgba(255,255,255,.04); border: 1px solid var(--detail-line); border-radius: 11px; }
+.detail-venue-copy { padding: 18px; }
+.detail-venue h3 { margin-bottom: 5px; color: #fff; }
+.detail-venue p { color: var(--detail-muted); }
+.detail-venue iframe { display: block; width: 100%; min-height: 280px; border: 0; }
+.detail-ticket-panel { position: relative; }
+.detail-ticket-card { position: sticky; top: 104px; padding: 22px; background: var(--detail-surface); border: 1px solid var(--detail-line); border-radius: 13px; box-shadow: 0 22px 55px rgba(0,0,0,.25); }
+.detail-ticket-card h2 { margin: 0 0 16px; color: #fff; font-family: "Roboto Slab", Georgia, serif; font-size: 1.45rem; }
+.detail-ticket-option { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; color: var(--detail-muted); border-bottom: 1px solid rgba(255,255,255,.09); }
+.detail-ticket-option strong { color: var(--detail-mint); }
+.detail-booking-card { margin-top: 12px; padding: 22px; background: rgba(239,93,111,.09); border: 1px solid rgba(239,93,111,.3); border-radius: 13px; }
+.detail-booking-card h3 { margin-bottom: 18px; color: #fff; }
+.detail-booking-card label { display: block; color: var(--detail-muted); font-size: .82rem; font-weight: 700; }
+.detail-counter { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 10px 0 18px; padding: 5px; background: rgba(0,0,0,.2); border: 1px solid rgba(255,255,255,.1); border-radius: 9px; }
+.detail-counter button { width: 36px; height: 36px; color: #fff; background: rgba(255,255,255,.1); border: 0; border-radius: 7px; cursor: pointer; font-size: 1.2rem; }
+.detail-counter span { color: #fff; font-weight: 900; }
+.detail-book-btn { width: 100%; min-height: 46px; color: #fff; background: var(--detail-coral); border: 0; border-radius: 9px; cursor: pointer; font: inherit; font-weight: 900; }
+.detail-book-btn:disabled { opacity: .48; cursor: not-allowed; }
+.booking-feedback { min-height: 1.25em; margin: 11px 0 0; color: var(--detail-muted); font-size: .82rem; line-height: 1.45; }
+.booking-feedback.error { color: #ffacb5; }
+.booking-feedback.success { color: var(--detail-mint); }
+.booking-feedback.info { color: #c6d3ee; }
+.detail-empty { display: grid; place-items: center; min-height: 360px; gap: 9px; padding: 30px; text-align: center; color: var(--detail-muted); }
+.detail-empty h1 { color: #fff; }
+@media (max-width: 950px) { .detail-info-grid { grid-template-columns: repeat(2, 1fr); } .detail-layout { grid-template-columns: 1fr; gap: 10px; } .detail-ticket-card { position: static; } }
+@media (max-width: 600px) { .detail-hero { min-height: 680px; } .detail-hero-content { width: calc(100% - 32px); padding-bottom: 52px; } .detail-info-grid { grid-template-columns: 1fr; width: calc(100% - 32px); margin-top: -24px; } .detail-layout { width: calc(100% - 32px); margin-top: 48px; } .detail-gallery { grid-template-columns: 1fr; } .detail-actions { flex-direction: column; align-items: stretch; } .detail-actions a, .detail-actions button { width: 100%; } }

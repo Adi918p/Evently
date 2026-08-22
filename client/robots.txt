@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /organizer/
+Disallow: /login
+Disallow: /register
+Disallow: /payment/
+
+Sitemap: https://event-ly.in/sitemap.xml

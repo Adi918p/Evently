@@ -426,6 +426,7 @@
     </style>
     <link rel="stylesheet" href="/css/responsive.css">
     <link rel="stylesheet" href="/css/nav.css">
+    <link rel="stylesheet" href="/css/organizer.css">
 </head>
 
 <body>
@@ -465,11 +466,12 @@
     <section class="dashboard">
 
         <div class="dashboard-header">
-
-            <h1 id="welcomeText">
-                Welcome Organizer
-            </h1>
-
+            <div>
+                <p class="dashboard-kicker">ORGANIZER STUDIO / OVERVIEW</p>
+                <h1 id="welcomeText">Welcome back</h1>
+                <p class="dashboard-subtitle">Keep your listings fresh, track demand, and make every event easy to book.</p>
+            </div>
+            <div class="dashboard-actions"><button id="createBtn" class="primary-action" type="button">Create event <span aria-hidden="true">＋</span></button><button id="scan-btn" class="secondary-action" type="button"><i class="fa-solid fa-qrcode"></i> Scan tickets</button></div>
         </div>
 
         <div class="stats-grid">
@@ -495,30 +497,12 @@
 
             <div class="section-top">
 
-                <h2>Your Events</h2>
-
-                <button id="createBtn">
-                    Create Event
-                </button>
-                <button id="scan-btn" onclick="window.location.href='/scanner.html'">
-                    <i class="fa-solid fa-qrcode"></i>
-                    Scan Tickets
-                </button>
-                <div class="event-actions">
-
-                    <button class="edit-btn" onclick="editEvent('${event._id}')">
-                        Edit
-                    </button>
-
-                    <button class="delete-btn" onclick="deleteEvent('${event._id}')">
-                        Delete
-                    </button>
-
-                </div>
+                <div><p class="dashboard-kicker">YOUR PROGRAMME</p><h2>Your events</h2></div>
+                <div class="event-list-tools"><label for="eventSearch">Search your events</label><input id="eventSearch" type="search" placeholder="Title or venue..." autocomplete="off"><select id="eventStatusFilter" aria-label="Filter events by status"><option value="all">All statuses</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div>
 
             </div>
 
-            <div id="eventsContainer"></div>
+            <div id="eventsContainer" aria-live="polite"></div>
 
         </div>
 
@@ -529,8 +513,9 @@
 <script>
 
     function viewBookings(id) {
-        window.location.href =
-            `/event-bookings.html?id=${id}`;
+        const destination = `/event-bookings.html?id=${encodeURIComponent(id)}`;
+        if (window.EventlyTransition?.navigate) window.EventlyTransition.navigate(destination);
+        else window.location.href = destination;
 
     }
     function updateAuthUI() {
@@ -554,7 +539,8 @@
             username.innerText = user.name;
 
         } else {
-
+            const logBtn = document.getElementById("log");
+            const signBtn = document.getElementById("sup");
             if (logBtn) logBtn.style.display = "block";
             if (signBtn) signBtn.style.display = "block";
 
@@ -592,9 +578,9 @@
     updateAuthUI();
 
     function editEvent(id) {
-
-        window.location.href =
-            `/edit-event.html?id=${id}`;
+        const destination = `/edit-event.html?id=${encodeURIComponent(id)}`;
+        if (window.EventlyTransition?.navigate) window.EventlyTransition.navigate(destination);
+        else window.location.href = destination;
 
     }
 
@@ -628,6 +614,10 @@
 
             const data =
                 await res.json();
+
+            if (!res.ok || data.success === false) {
+                throw new Error(data.message || "Unable to load dashboard stats");
+            }
 
             if (data.success) {
 
@@ -740,7 +730,7 @@
             document.getElementById(
                 "revenue"
             ).innerText =
-                `₹${data.revenue || 0}`;
+                `₹${Number(data.revenue || 0).toLocaleString("en-IN")}`;
 
         }
         catch (err) {
@@ -755,132 +745,68 @@
     }
 
 
-    async function loadMyEvents() {
+    let organizerEvents = [];
+    const escapeDashboardHtml = (value = "") => String(value)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/\"/g, "&quot;").replace(/'/g, "&#039;");
 
-        try {
-
-            const token =
-                localStorage.getItem("token");
-
-            const res =
-                await fetch(
-                    "/api/events/my",
-                    {
-                        headers: {
-                            Authorization:
-                                `Bearer ${token}`
-                        }
-                    }
-                );
-
-            const data =
-                await res.json();
-
-            const container =
-                document.getElementById(
-                    "eventsContainer"
-                );
-
-            container.innerHTML = "";
-
-            if (
-                !data.events ||
-                data.events.length === 0
-            ) {
-
-                container.innerHTML = `
-                    <h2>
-                        No Events Found
-                    </h2>
-                `;
-
-                return;
-            }
-
-            data.events.forEach(event => {
-
-                container.innerHTML += `
-                <div class="event-card">
-
-                    <img
-                        class="event-banner"
-                        src="${event.banner}"
-                        alt="${event.title}"
-                    >
-
-                    <div class="event-content">
-
-                        <h3 class="event-title">
-                            ${event.title}
-                        </h3>
-
-                        <div class="event-info">
-
-                            <span>
-                                📍 ${event.location}
-                            </span>
-
-                            <span>
-                                📅 ${new Date(event.date).toLocaleDateString()}
-                            </span>
-
-                            <span>
-                                💰 ₹${event.price}
-                            </span>
-
-                            <span>
-                                🎫 ${event.seats} seats
-                            </span>
-
-                        </div>
-
-                        <div class="event-actions">
-
-                            <button
-                                class="edit-btn"
-                                onclick="editEvent('${event._id}')"
-                            >
-                                Edit
-                            </button>
-
-                            <button
-                                class="delete-btn"
-                                onclick="deleteEvent('${event._id}')"
-                            >
-                                Delete
-                            </button>
-                            <button class="booking-btn" onclick="viewBookings('${event._id}')">
-                                <i class="fa-solid fa-users" ></i> Bookings
-                            </button>
-
-                        </div>
-
-                    </div>
-
+    const renderOrganizerEvents = (events) => {
+        const container = document.getElementById("eventsContainer");
+        if (!container) return;
+        if (!events.length) {
+            container.innerHTML = `<div class="dashboard-empty"><h3>No events match this view</h3><p>Create a listing or adjust your filters.</p><a href="/create-event.html">Create your first event →</a></div>`;
+            return;
+        }
+        container.innerHTML = events.map(event => `
+            <article class="event-card">
+                <img class="event-banner" src="${escapeDashboardHtml(event.banner || '/Media/Png/no-event.jpg')}" alt="${escapeDashboardHtml(event.title)}" loading="lazy">
+                <div class="event-content">
+                    <span class="event-status ${escapeDashboardHtml(event.status || 'pending')}">${escapeDashboardHtml(event.status || 'pending')}</span>
+                    <h3 class="event-title">${escapeDashboardHtml(event.title)}</h3>
+                    <div class="event-info"><span>⌖ ${escapeDashboardHtml(event.location || event.venue || 'Venue TBA')}</span><span>◷ ${event.date ? new Date(event.date).toLocaleDateString() : 'Date TBA'}</span><span>₹${Number(event.price || 0).toLocaleString('en-IN')} · ${Number(event.ticketsSold || 0)} sold</span></div>
+                    <div class="event-actions"><button class="edit-btn" type="button" onclick="editEvent('${event._id}')">Edit</button><button class="delete-btn" type="button" onclick="deleteEvent('${event._id}')">Delete</button><button class="booking-btn" type="button" onclick="viewBookings('${event._id}')"><i class="fa-solid fa-users"></i> Bookings</button></div>
                 </div>
-                `;
+            </article>`).join("");
+    };
 
-            });
-
+    async function loadMyEvents() {
+        const container = document.getElementById("eventsContainer");
+        try {
+            const res = await fetch("/api/events/my", { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+            const data = await res.json();
+            if (!res.ok || !data.success) throw new Error(data.message || "Unable to load events");
+            organizerEvents = Array.isArray(data.events) ? data.events : [];
+            applyOrganizerFilters();
+        } catch (error) {
+            if (container) {
+                container.innerHTML = `<div class="dashboard-empty"><h3>We couldn't load your events</h3><p>${escapeDashboardHtml(error.message)}</p><button class="dashboard-retry" type="button">Try again →</button></div>`;
+                container.querySelector(".dashboard-retry")?.addEventListener("click", loadMyEvents);
+            }
         }
-        catch (err) {
-
-            console.error(
-                "Events Error:",
-                err
-            );
-
-        }
-
     }
 
+    const applyOrganizerFilters = () => {
+        const query = (document.getElementById("eventSearch")?.value || "").trim().toLowerCase();
+        const status = document.getElementById("eventStatusFilter")?.value || "all";
+        renderOrganizerEvents(organizerEvents.filter(event => {
+            const haystack = `${event.title || ""} ${event.venue || ""} ${event.location || ""}`.toLowerCase();
+            return (!query || haystack.includes(query)) && (status === "all" || event.status === status);
+        }));
+    };
+
+    document.getElementById("eventSearch")?.addEventListener("input", applyOrganizerFilters);
+    document.getElementById("eventStatusFilter")?.addEventListener("change", applyOrganizerFilters);
+    document.getElementById("scan-btn")?.addEventListener("click", () => {
+        if (window.EventlyTransition?.navigate) window.EventlyTransition.navigate("/scanner.html");
+        else window.location.href = "/scanner.html";
+    });
 
     document.getElementById("createBtn").addEventListener(
         "click",
         () => {
 
-            window.location.href =
-                "/create-event.html";
+            if (window.EventlyTransition?.navigate) window.EventlyTransition.navigate("/create-event.html");
+            else window.location.href = "/create-event.html";
 
         }
     );

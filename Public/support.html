@@ -117,7 +117,8 @@
         username.innerText = user.name;
 
     } else {
-
+        const logBtn = document.getElementById("log");
+        const signBtn = document.getElementById("sup");
         if (logBtn) logBtn.style.display = "block";
         if (signBtn) signBtn.style.display = "block";
 
@@ -149,17 +150,25 @@
         location.reload();
     });
     updateAuthUI();
-    document
-.getElementById("supportForm")
-.addEventListener("submit", (e) => {
-
-    e.preventDefault();
-
-    alert(
-        "Thank you! Your support request has been received."
-    );
-
-});
+    const supportForm = document.getElementById("supportForm");
+    const supportFeedback = document.createElement("p");
+    supportFeedback.className = "form-feedback";
+    supportForm?.append(supportFeedback);
+    supportForm?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const fields = supportForm.querySelectorAll("input, textarea");
+        const [name, email, subject, message] = Array.from(fields).map((field) => field.value.trim());
+        const submit = supportForm.querySelector("button[type=submit]");
+        submit.disabled = true;
+        supportFeedback.textContent = "Sending...";
+        try {
+            const response = await fetch("/api/contact", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, subject, message }) });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.success) throw new Error(data.message || "Message could not be sent");
+            supportForm.reset(); supportFeedback.textContent = "Thanks. Your support request has been received."; supportFeedback.className = "form-feedback success";
+        } catch (error) { supportFeedback.textContent = error.message; supportFeedback.className = "form-feedback error"; }
+        finally { submit.disabled = false; }
+    });
 </script>
 <script src="/js/nav.js"></script>
 </body>

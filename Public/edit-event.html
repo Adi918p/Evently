@@ -56,59 +56,137 @@
         }
     </style>
 <link rel="stylesheet" href="/css/responsive.css">
+<link rel="stylesheet" href="/css/event-form.css">
 </head>
 
 <body>
 
     <div class="container">
 
-        <h1>Edit Event</h1>
+        <a class="back-link" id="backLink" href="/dashboard.html">← Back to organizer studio</a>
+        <div class="form-heading"><span class="form-eyebrow">Organizer studio</span><h1>Edit event</h1><p class="form-intro">Keep the listing accurate so attendees always know what they are booking.</p></div>
 
         <form id="eventForm">
 
-            <input type="text" id="title" placeholder="Event Title">
+            <section class="form-section"><div class="form-section-heading"><span>01</span><div><h2>Event basics</h2><p>Keep the public event information current.</p></div></div><div class="form-grid">
+            <label>Event title<input type="text" id="title" placeholder="Event title" required></label>
 
-            <textarea id="description" placeholder="Description"></textarea>
+            <label class="field-wide">Short description<textarea id="description" placeholder="What should attendees know first?" required></textarea></label>
 
-            <textarea id="about" placeholder="About Event"></textarea>
+            <label class="field-wide">About this event<textarea id="about" placeholder="Add the fuller story, highlights, and what to expect."></textarea></label>
 
-            <input type="text" id="venue" placeholder="Venue">
+            <label>Venue<input type="text" id="venue" placeholder="Venue name" required></label>
 
-            <input type="text" id="location" placeholder="Location">
+            <label>City or area<input type="text" id="location" placeholder="City or area" required></label>
 
-            <input type="date" id="date">
+            <label>Event category<select id="category" required>
+                <option value="other">Other</option>
+                <option value="networking">Networking</option>
+                <option value="club">Club</option>
+                <option value="music">Music</option>
+                <option value="workshop">Workshop</option>
+                <option value="sports">Sports</option>
+                <option value="arts">Arts</option>
+                <option value="food">Food &amp; drinks</option>
+                <option value="comedy">Comedy</option>
+                <option value="festival">Festival</option>
+                <option value="tech">Tech</option>
+                <option value="gaming">Gaming</option>
+            </select></label>
 
-            <input type="time" id="time">
+            <label>Date<input type="date" id="date" required></label>
 
-            <input type="number" id="price" placeholder="Price">
+            <label>Start time<input type="time" id="time"></label>
 
-            <input type="text" id="agelim" placeholder="Age Limit">
+            <label>Ticket price (INR)<input type="number" id="price" placeholder="499" min="0" required></label>
 
-            <input type="number" id="seats" placeholder="Seats">
+            <label>Age guidance<input type="text" id="agelim" placeholder="All Ages"></label>
 
-            <input type="text" id="banner" placeholder="Banner URL">
+            <label>Total seats<input type="number" id="seats" placeholder="100" min="1" required></label>
+            </div></section>
 
-            <input type="text" id="maploc" placeholder="Map Link">
+            <section class="form-section"><div class="form-section-heading"><span>02</span><div><h2>Event media</h2><p>Keep the current images or replace them with new uploads.</p></div></div><div class="form-grid">
 
-            <textarea id="gallery" placeholder="Gallery (comma separated)"></textarea>
+            <label class="upload-field" for="bannerFile">
+                <span class="upload-copy"><strong>Replace banner image <em>Optional</em></strong><small>Leave empty to keep the current banner. JPG, PNG, WEBP, or GIF up to 4 MB.</small></span>
+                <input type="file" id="bannerFile" accept="image/jpeg,image/png,image/webp,image/gif">
+                <img id="bannerPreview" class="upload-preview" alt="Banner preview" hidden>
+            </label>
+            <button class="remove-media-button" id="removeBanner" type="button">Remove current banner</button>
 
-            <textarea id="lineup" placeholder="Lineup (name:image,name:image)"></textarea>
+            <label class="upload-field" for="galleryFiles">
+                <span class="upload-copy"><strong>Add gallery images <em>Optional</em></strong><small>New uploads are added to the current gallery. Maximum 8 MB total.</small></span>
+                <input type="file" id="galleryFiles" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+                <span id="galleryFileNames" class="upload-file-names">No gallery images selected</span>
+            </label>
+            <div id="currentGallery" class="current-media-grid" aria-live="polite"></div>
+            </div></section>
 
-            <button type="submit">Update Event</button>
+            <section class="form-section"><div class="form-section-heading"><span>03</span><div><h2>Practical details</h2><p>Help people arrive prepared and discover the venue.</p></div></div><div class="form-grid">
+            <label>Map link <span class="label-muted">Optional</span><input type="url" id="maploc" placeholder="Google Maps link"></label>
+            <label class="field-wide">Lineup <span class="label-muted">Optional - one name per line</span><textarea id="lineup" placeholder="DJ Aanya&#10;The Midnight Club"></textarea></label>
+            </div></section>
+
+            <p id="formFeedback" class="form-feedback" role="status"></p>
+
+            <button class="form-submit" type="submit">Save changes</button>
 
         </form>
 
     </div>
 
+    <script src="/js/nav.js"></script>
+    <script src="/js/event-form.js"></script>
     <script>
         const params = new URLSearchParams(window.location.search);
         const eventId = params.get("id");
+        const returnTo = params.get("from") === "admin" ? "/admin/events.html" : "/dashboard.html";
+        const backLink = document.getElementById("backLink");
+        backLink.href = returnTo;
+        backLink.textContent = returnTo.includes("/admin/") ? "← Back to event queue" : "← Back to organizer studio";
 
         const token = localStorage.getItem("token");
+        if (!token || !eventId) window.location.href = "/login.html?mode=login";
+        const form = document.getElementById("eventForm");
+        const submitButton = form.querySelector("button[type=submit]");
+        const bannerFile = document.getElementById("bannerFile");
+        const galleryFiles = document.getElementById("galleryFiles");
+        EventlyEventForm.bindPreview(bannerFile, document.getElementById("bannerPreview"));
+        EventlyEventForm.bindFileNames(galleryFiles, document.getElementById("galleryFileNames"));
+        let currentBanner = "";
+        let currentGallery = [];
+        let currentLineup = [];
+        const isStoredImage = (value) => /^\/(?:uploads\/event-[a-z0-9-]+\.(?:jpg|jpeg|png|webp|gif)|Media\/[^?#\s]+)$/i.test(String(value || ""));
+        const parseLineup = (value) => value.split(/\r?\n|,/).map(item => item.trim()).filter(Boolean).map(name => {
+            const existing = currentLineup.find(artist => artist?.name?.toLowerCase() === name.toLowerCase());
+            return { name, image: existing?.image || "" };
+        });
+        const feedback = document.getElementById("formFeedback");
+        const setFeedback = (message, type = "") => { feedback.textContent = message; feedback.className = `form-feedback ${type}`.trim(); };
+        const renderCurrentGallery = () => {
+            const container = document.getElementById("currentGallery");
+            container.innerHTML = currentGallery.length ? `<p class="current-media-label">Current gallery · select images to remove</p>${currentGallery.map((image, index) => `<button class="current-media-item" type="button" data-index="${index}" title="Remove image"><img src="${image}" alt="Current gallery image ${index + 1}"><span>Remove</span></button>`).join("")}` : '<p class="current-media-empty">No gallery images saved yet.</p>';
+        };
+        document.getElementById("currentGallery").addEventListener("click", (event) => {
+            const button = event.target.closest("[data-index]");
+            if (!button) return;
+            currentGallery.splice(Number(button.dataset.index), 1);
+            renderCurrentGallery();
+        });
+        document.getElementById("removeBanner").addEventListener("click", () => {
+            currentBanner = "";
+            bannerFile.value = "";
+            const preview = document.getElementById("bannerPreview");
+            preview.hidden = true;
+            preview.removeAttribute("src");
+            setFeedback("The current banner will be removed when you save.", "info");
+        });
 
         /* ---------------- GET EVENT DATA ---------------- */
 
         async function loadEvent() {
+
+            if (!token || !eventId) return;
 
             try {
 
@@ -120,8 +198,8 @@
 
                 const data = await res.json();
 
-                if (!data.success) {
-                    alert("Failed to load event");
+                if (!res.ok || !data.success || !data.event) {
+                    setFeedback(data.message || "Failed to load event", "error");
                     return;
                 }
 
@@ -133,63 +211,54 @@
                 document.getElementById("about").value = event.about || "";
                 document.getElementById("venue").value = event.venue || "";
                 document.getElementById("location").value = event.location || "";
-                document.getElementById("date").value = new Date(event.date).toLocaleDateString()?.split("T")[0] || "";
+                document.getElementById("category").value = event.category || "other";
+                document.getElementById("date").value = event.date ? new Date(event.date).toISOString().slice(0, 10) : "";
                 document.getElementById("time").value = event.time || "";
                 document.getElementById("price").value = event.price || "";
                 document.getElementById("agelim").value = event.agelim || "";
                 document.getElementById("seats").value = event.seats || "";
-                document.getElementById("banner").value = event.banner || "";
                 document.getElementById("maploc").value = event.maploc || "";
-
-                document.getElementById("gallery").value =
-                    (event.gallery || []).join(",");
-
-                document.getElementById("lineup").value =
-                    (event.lineup || [])
-                        .map(l => `${l.name}:${l.image}`)
-                        .join(",");
+                currentBanner = isStoredImage(event.banner) ? event.banner : "";
+                currentGallery = Array.isArray(event.gallery) ? event.gallery.filter(isStoredImage) : [];
+                currentLineup = Array.isArray(event.lineup) ? event.lineup : [];
+                if (currentBanner) {
+                    const preview = document.getElementById("bannerPreview");
+                    preview.src = currentBanner;
+                    preview.hidden = false;
+                }
+                document.getElementById("lineup").value = currentLineup.map(artist => artist.name).join("\n");
+                renderCurrentGallery();
+                setFeedback("");
 
             } catch (err) {
                 console.log(err);
-                alert("Error loading event");
+                setFeedback(err.message || "Error loading event", "error");
             }
         }
 
         /* ---------------- UPDATE EVENT ---------------- */
 
-        document.getElementById("eventForm")
-            .addEventListener("submit", async (e) => {
+        form.addEventListener("submit", async (e) => {
 
                 e.preventDefault();
+                if (!token || !eventId) return;
 
-                const gallery = document.getElementById("gallery")
-                    .value.split(",").map(i => i.trim());
-
-                const lineup = document.getElementById("lineup")
-                    .value.split(",").map(item => {
-                        const [name, image] = item.split(":");
-                        return { name, image };
-                    });
-
-                const updatedEvent = {
-
-                    title: document.getElementById("title").value,
-                    description: document.getElementById("description").value,
-                    about: document.getElementById("about").value,
-                    venue: document.getElementById("venue").value,
-                    location: document.getElementById("location").value,
-                    date: document.getElementById("date").value,
-                    time: document.getElementById("time").value,
-                    price: document.getElementById("price").value,
-                    agelim: document.getElementById("agelim").value,
-                    seats: document.getElementById("seats").value,
-                    banner: document.getElementById("banner").value,
-                    maploc: document.getElementById("maploc").value,
-                    gallery,
-                    lineup
-                };
+                submitButton.disabled = true;
+                submitButton.textContent = "Uploading and saving...";
+                const value = (id) => document.getElementById(id).value.trim();
 
                 try {
+                    const [bannerUploads, galleryUploads] = await Promise.all([
+                        EventlyEventForm.uploadFiles(bannerFile.files),
+                        EventlyEventForm.uploadFiles(galleryFiles.files)
+                    ]);
+                    const updatedEvent = {
+                        title: value("title"), description: value("description"), about: value("about"), venue: value("venue"),
+                        location: value("location"), category: value("category"), date: value("date"), time: value("time"), price: Number(value("price") || 0),
+                        agelim: value("agelim") || "All Ages", seats: Number(value("seats") || 0), banner: bannerUploads[0] || currentBanner, maploc: value("maploc"),
+                        gallery: [...currentGallery, ...galleryUploads],
+                        lineup: parseLineup(value("lineup"))
+                    };
 
                     const res = await fetch(`/api/events/${eventId}`, {
                         method: "PUT",
@@ -200,18 +269,22 @@
                         body: JSON.stringify(updatedEvent)
                     });
 
-                    const data = await res.json();
+                    const data = await res.json().catch(() => ({}));
 
-                    if (data.success) {
-                        alert("Event updated successfully");
-                        window.location.href = "/dashboard.html";
+                    if (res.ok && data.success) {
+                        if (window.EventlyTransition?.navigate) window.EventlyTransition.navigate(returnTo);
+                        else window.location.href = returnTo;
                     } else {
-                        alert(data.message);
+                        setFeedback(data.message || "Could not save changes", "error");
+                        submitButton.disabled = false;
+                        submitButton.textContent = "Save changes";
                     }
 
                 } catch (err) {
                     console.log(err);
-                    alert("Update failed");
+                    setFeedback(err.message || "Update failed", "error");
+                    submitButton.disabled = false;
+                    submitButton.textContent = "Save changes";
                 }
 
             });

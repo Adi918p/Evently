@@ -510,8 +510,7 @@
 
         try {
 
-            const res =
-                await fetch(
+            const res = await fetch(
                     "/api/bookings/my",
                     {
                         headers: {
@@ -521,17 +520,24 @@
                     }
                 );
 
-            const data =
-                await res.json();
-            allbookings = data.bookings;
+            if (res.status === 401) {
+                window.location.href = "/login.html";
+                return;
+            }
+            if (!res.ok) {
+                throw new Error("Unable to load bookings");
+            }
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.success) throw new Error(data.message || "Bookings could not be loaded");
+            allbookings = (data.bookings || []).filter(booking => booking.event);
             const container =
                 document.getElementById(
                     "bookingsContainer"
                 );
 
             if (
-                !data.bookings ||
-                data.bookings.length === 0
+                allbookings.length === 0
             ) {
 
                 container.innerHTML = `
@@ -543,7 +549,7 @@
 
             container.innerHTML = "";
 
-            data.bookings.forEach(
+            allbookings.forEach(
                 booking => {
 
                     container.innerHTML += `
@@ -650,7 +656,8 @@
             username.innerText = user.name;
 
         } else {
-
+            const logBtn = document.getElementById("log");
+            const signBtn = document.getElementById("sup");
             if (logBtn) logBtn.style.display = "block";
             if (signBtn) signBtn.style.display = "block";
 
@@ -672,6 +679,7 @@
             allbookings.find(
                 b => b._id === id
             );
+        if (!booking || !booking.event) return;
 
         document.getElementById("ticketContent").innerHTML = `
         <div id="ticketDownloadArea">

@@ -94,12 +94,20 @@ const sendVerificationOtpEmail = async (email, otpCode, userName) => {
 router.post("/register", async (req, res) => {
     try {
         const { name, email, password } = req.body;
+        const normalizedName = String(name || "").trim();
         const normalizedEmail = normalizeEmail(email);
 
-        if (!name || !email || !password) {
+        if (!normalizedName || !email || !password) {
             return res.status(400).json({
                 success: false,
                 message: "Name, email and password are required"
+            });
+        }
+
+        if (normalizedName.length < 2 || normalizedName.length > 80) {
+            return res.status(400).json({
+                success: false,
+                message: "Name must be between 2 and 80 characters"
             });
         }
 
@@ -140,7 +148,7 @@ router.post("/register", async (req, res) => {
         const hashedPassword = await hash.hash(password, 10);
 
         const user = new User({
-            name,
+            name: normalizedName,
             email: normalizedEmail,
             password: hashedPassword,
             isEmailVerified: false,
@@ -149,7 +157,12 @@ router.post("/register", async (req, res) => {
         });
 
         await user.save();
-        await sendVerificationOtpEmail(normalizedEmail, otpCode, name);
+        try {
+            await sendVerificationOtpEmail(normalizedEmail, otpCode, normalizedName);
+        } catch (emailError) {
+            await User.findByIdAndDelete(user._id);
+            throw new Error("We could not send the verification email. Please try again.");
+        }
 
         res.json({
             success: true,
@@ -158,6 +171,12 @@ router.post("/register", async (req, res) => {
         });
         return;
     } catch (err) {
+        if (err?.code === 11000) {
+            return res.status(409).json({
+                success: false,
+                message: "Email is already registered. Please log in instead."
+            });
+        }
         res.status(500).json({
             success: false,
             message: err.message
@@ -176,12 +195,20 @@ router.post("/check-email", async (req, res) => {
             });
         }
 
+        if (!EMAIL_FORMAT_REGEX.test(normalizedEmail)) {
+            return res.status(400).json({
+                success: false,
+                message: "Enter a valid email address"
+            });
+        }
+
         const existingUser = await User.findOne({ email: normalizedEmail });
         const deliverable = await isValidEmailDomain(normalizedEmail);
 
         return res.json({
             success: true,
             registered: Boolean(existingUser),
+            pendingVerification: Boolean(existingUser && existingUser.isEmailVerified === false),
             deliverable,
             message: existingUser
                 ? "Email is already registered"
@@ -199,7 +226,7 @@ router.post("/verify-email-otp", async (req, res) => {
         const { email, otp } = req.body;
         const normalizedEmail = normalizeEmail(email);
 
-        if (!normalizedEmail || !otp) {
+        if (!normalizedEmail || !/^\d{6}$/.test(String(otp))) {
             return res.status(400).json({
                 success: false,
                 message: "Email and OTP are required"
@@ -326,7 +353,7 @@ router.post('/login', async (req, res) => {
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: "User not Found"
+                message: "Email or password is incorrect"
             });
         }
 
@@ -354,7 +381,7 @@ router.post('/login', async (req, res) => {
         if (!match) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid Password"
+                message: "Email or password is incorrect"
             });
         }
         const token = jwt.sign(
