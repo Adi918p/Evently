@@ -1,18 +1,8 @@
-# Evently — https://event-ly.in
-#
-# Served by Vercel straight out of client/public. The API host has its own,
-# stricter robots.txt (see routes/seo.js) so api.event-ly.in never competes
-# with this domain in search results.
+
 
 User-agent: *
 Allow: /
 
-# Account, organiser and operator areas.
-#
-# None of these are useful in a search result, and a crawler cannot see them
-# anyway: every one is behind RequireAuth/RequireRole, so an anonymous request
-# renders the login redirect. Left crawlable they would burn crawl budget
-# producing near-identical "please sign in" pages.
 Disallow: /login
 Disallow: /profile
 Disallow: /my-bookings
@@ -21,15 +11,9 @@ Disallow: /create-event
 Disallow: /dashboard
 Disallow: /scanner
 Disallow: /admin
-
-# Organiser tools hanging off an event URL. The public /events/<id> page above
-# them stays crawlable — only these two sub-paths are blocked.
 Disallow: /*/edit
 Disallow: /*/bookings
 
-# Filtered listings (/events?city=...&category=...) are deliberately NOT blocked.
-# They are real, useful landing pages, and each one declares a canonical back to
-# /events, which consolidates ranking signals without hiding the pages. Blocking
-# here would stop crawlers reading that canonical at all.
 
 Sitemap: https://event-ly.in/sitemap.xml
+

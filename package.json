@@ -11,8 +11,8 @@
   },
   "scripts": {
     "test": "node scripts/check-js.js",
-    "start": "node server.js",
-    "//build": "--include=dev is required: the host sets NODE_ENV=production, and vite/tailwind are devDependencies of client, so a plain `npm ci` installs nothing that can run the build.",
+    "start": "node scripts/start.js",
+    "serve": "node server.js",
     "build": "npm --prefix client ci --include=dev && npm --prefix client run build",
     "dev": "nodemon server.js",
     "dev:client": "npm --prefix client run dev",
