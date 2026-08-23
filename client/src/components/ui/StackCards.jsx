@@ -22,6 +22,12 @@ import { useMediaQuery } from "../../lib/useMediaQuery";
  * depth, but the fade and the covering run over the same scroll range: a card
  * would be visibly half-transparent while still fully on screen, which looks
  * broken rather than deep (opacity-threshold, excessive-motion).
+ *
+ * Cards passed in here must have an opaque background - `<GlassCard solid>` or
+ * equivalent. For most of the run a card is directly over the text of the card
+ * below it, and a translucent fill leaves both sets of words in the same pixels;
+ * backdrop-filter does not rescue it, since blurring text only smears it. The
+ * deck cannot enforce this on arbitrary children, so it is a contract.
  */
 
 /**
@@ -63,10 +69,23 @@ function StackCard({ index, count, progress, children }) {
       // The slot is what sticks; the card inside it is what moves. Centring the
       // card in a slot that is shorter than the viewport keeps it clear of the
       // fixed nav without having to know the nav's height here.
-      className="sticky top-0 flex h-[70svh] min-h-[28rem] items-center justify-center"
+      //
+      // The slot is taller than the card it holds, and every slot is pinned to
+      // the same place, so a later slot's empty margin sits over the card the
+      // reader is looking at. Empty is not the same as absent: the slot still
+      // hit-tests, so it was swallowing selections and clicks aimed at the card
+      // showing through it. Only the card itself takes pointer events.
+      className="pointer-events-none sticky top-0 flex h-[70svh] min-h-[28rem] items-center justify-center"
+      // Later cards must paint over earlier ones - that is the whole effect.
+      // Source order already gives that, since a sticky element is its own
+      // stacking context, but stating it means a wrapper or a transform added
+      // later cannot silently reorder the deck and put a card's text behind the
+      // one covering it. The values stay tiny so they never reach the nav
+      // (--z-nav 40) or an overlay.
+      style={{ zIndex: index + 1 }}
     >
       <motion.div
-        className="relative w-full"
+        className="pointer-events-auto relative w-full"
         style={{
           scale,
           // Each card rests a little lower than the one before it, so the ones

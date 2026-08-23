@@ -6,13 +6,24 @@
          (viewport-meta). -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Evently — Events, clubs and nights out near you</title>
+    <title>Evently — Book Events, Club Nights &amp; Concerts</title>
     <meta
       name="description"
-      content="Find events, club nights, concerts and parties near you. Book tickets in seconds and walk straight in with a QR pass."
+      content="Discover club nights, concerts, comedy, workshops and festivals near you. Book tickets in seconds and walk in with a QR pass on your phone."
     />
     <meta name="theme-color" content="#050510" />
     <meta name="color-scheme" content="dark" />
+
+    <!-- Defaults only. components/seo/Seo.jsx rewrites the tags below per route
+         once React runs, updating these nodes in place rather than appending, so
+         there is never a second description or og:title with a different value.
+
+         They still matter on their own: a request that never executes the bundle
+         gets these rather than nothing. Known crawlers and social scrapers do
+         not land here at all - Vercel routes them to routes/seo.js, which
+         renders the real per-page values (see client/vercel.json). -->
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+    <link rel="canonical" href="https://event-ly.in/" />
 
     <link rel="icon" href="/Media/Png/logo.jpg" />
     <link rel="apple-touch-icon" href="/Media/Png/logo.jpg" />
@@ -30,6 +41,9 @@
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..900&family=Rubik:wght@300..700&family=JetBrains+Mono:wght@400;500;700&display=swap"
     />
 
+    <!-- og:image must be an absolute URL. A scraper resolves it against nothing
+         - there is no document base for it to use - so the previous "/Media/..."
+         produced a card with no image at all on every platform. -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Evently" />
     <meta property="og:title" content="Evently — your city, your next story" />
@@ -37,8 +51,21 @@
       property="og:description"
       content="Discover. Book. Experience. Events, clubs and concerts near you."
     />
-    <meta property="og:image" content="/Media/Png/logo.jpg" />
-    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="og:url" content="https://event-ly.in/" />
+    <meta property="og:image" content="https://event-ly.in/Media/Png/logo.jpg" />
+    <meta property="og:image:alt" content="Evently" />
+    <meta property="og:locale" content="en_IN" />
+
+    <!-- summary, not summary_large_image: the only brand image in the repo is
+         the square logo, and asking for the wide card crops it badly. Add a
+         1200x630 image at public/og-default.jpg and this can go wide. -->
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Evently — your city, your next story" />
+    <meta
+      name="twitter:description"
+      content="Discover. Book. Experience. Events, clubs and concerts near you."
+    />
+    <meta name="twitter:image" content="https://event-ly.in/Media/Png/logo.jpg" />
   </head>
 
   <body>

@@ -27,6 +27,7 @@ import {
   Loader,
 } from "../../components/ui/Feedback";
 import { Reveal, RevealGroup } from "../../components/ui/Reveal";
+import Seo from "../../components/seo/Seo";
 import { useApi, useAction } from "../../lib/useApi";
 import {
   events as eventsApi,
@@ -340,6 +341,7 @@ export default function EventBookings() {
   if (loading) {
     return (
       <div className="grid min-h-[60dvh] place-items-center">
+        <Seo title="Event Bookings" noindex />
         <Loader label="Loading guest list" />
       </div>
     );
@@ -348,6 +350,7 @@ export default function EventBookings() {
   if (error) {
     return (
       <div className="shell section">
+        <Seo title="Event Bookings" noindex />
         <ErrorState
           title="Couldn't load the guest list"
           message={error.message}
@@ -361,6 +364,8 @@ export default function EventBookings() {
 
   return (
     <div className="shell section">
+      <Seo title="Event Bookings" noindex />
+
       <Reveal>
         <Link
           to="/dashboard"

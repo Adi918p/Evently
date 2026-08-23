@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import GlassCard from "../components/ui/GlassCard";
 import ContactForm from "../components/forms/ContactForm";
 import { Reveal } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { SUPPORT_EMAIL } from "../lib/constants";
 import { inView, respectMotion, riseIn, stagger } from "../motion/presets";
 
@@ -49,6 +50,8 @@ export default function Support() {
 
   return (
     <div className="shell section">
+      <Seo />
+
       <header className="max-w-2xl space-y-3">
         <p className="kicker">
           <Lifebuoy size={14} aria-hidden="true" />

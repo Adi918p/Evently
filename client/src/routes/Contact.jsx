@@ -9,6 +9,7 @@ import GlassCard from "../components/ui/GlassCard";
 import Button from "../components/ui/Button";
 import ContactForm from "../components/forms/ContactForm";
 import { Reveal } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import {
   SUPPORT_ADDRESS,
   SUPPORT_EMAIL,
@@ -61,6 +62,8 @@ export default function Contact() {
 
   return (
     <div className="shell section">
+      <Seo />
+
       <header className="max-w-2xl space-y-3">
         <p className="kicker">Contact us</p>
         <h1 className="text-4xl">

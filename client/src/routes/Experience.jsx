@@ -6,6 +6,7 @@ import Button from "../components/ui/Button";
 import EventCard from "../components/events/EventCard";
 import { Reveal, RevealGroup, SectionHeading } from "../components/ui/Reveal";
 import { ErrorState, SkeletonGrid } from "../components/ui/Feedback";
+import Seo from "../components/seo/Seo";
 import { useApi } from "../lib/useApi";
 import { events as eventsApi } from "../lib/api";
 import { eventDate, isPastEvent } from "../lib/constants";
@@ -212,6 +213,8 @@ function PastEvents() {
 export default function Experience() {
   return (
     <div className="shell section">
+      <Seo />
+
       <header className="max-w-2xl space-y-3">
         <p className="kicker">
           <Sparkle size={14} aria-hidden="true" />

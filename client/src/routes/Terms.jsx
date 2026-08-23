@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import DocPage from "../components/layout/DocPage";
+import Seo from "../components/seo/Seo";
 
 /**
  * Terms and conditions. Wording carried over from the legacy page unchanged.
@@ -34,23 +35,27 @@ const SECTIONS = [
 
 export default function Terms() {
   return (
-    <DocPage
-      kicker="Legal"
-      title="Terms & Conditions"
-      intro="The rules of the road for attendees and organizers alike."
-      sections={SECTIONS}
-      footer={
-        <p className="text-sm text-[var(--color-fg-subtle)]">
-          Also worth reading:{" "}
-          <Link
-            to="/privacy"
-            className="font-semibold text-[var(--color-violet-bright)] underline decoration-1 underline-offset-4"
-          >
-            our Privacy Policy
-          </Link>
-          .
-        </p>
-      }
-    />
+    <>
+      <Seo />
+
+      <DocPage
+        kicker="Legal"
+        title="Terms & Conditions"
+        intro="The rules of the road for attendees and organizers alike."
+        sections={SECTIONS}
+        footer={
+          <p className="text-sm text-[var(--color-fg-subtle)]">
+            Also worth reading:{" "}
+            <Link
+              to="/privacy"
+              className="font-semibold text-[var(--color-violet-bright)] underline decoration-1 underline-offset-4"
+            >
+              our Privacy Policy
+            </Link>
+            .
+          </p>
+        }
+      />
+    </>
   );
 }

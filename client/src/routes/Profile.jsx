@@ -18,6 +18,7 @@ import Button from "../components/ui/Button";
 import Badge, { StatusBadge } from "../components/ui/Badge";
 import { ErrorState, Loader } from "../components/ui/Feedback";
 import { Reveal, RevealGroup } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { useApi } from "../lib/useApi";
 import { auth as authApi, bookings as bookingsApi } from "../lib/api";
 import { useAuth } from "../lib/auth";
@@ -97,6 +98,7 @@ export default function Profile() {
   if (meLoading && !tokenUser) {
     return (
       <div className="grid min-h-[60dvh] place-items-center">
+        <Seo title="Your Profile" noindex />
         <Loader label="Loading your profile" />
       </div>
     );
@@ -105,6 +107,7 @@ export default function Profile() {
   if (meError && !user) {
     return (
       <div className="shell section">
+        <Seo title="Your Profile" noindex />
         <ErrorState
           title="Profile unavailable"
           message={meError.data?.message || meError.message}
@@ -119,6 +122,8 @@ export default function Profile() {
 
   return (
     <div className="shell section">
+      <Seo title="Your Profile" noindex />
+
       <header className="max-w-2xl space-y-3">
         <p className="kicker">Your account</p>
         <h1 className="text-4xl">Profile</h1>

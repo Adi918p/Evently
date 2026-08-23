@@ -1,0 +1,55 @@
+{
+  "//": "Titles and descriptions for the app's fixed routes. Read by BOTH client/src/lib/seo.js (for real visitors) and routes/seo.js on the Express side (for crawlers and social scrapers, which never run the bundle). JSON rather than JS because ESM client code and CommonJS server code can both consume it, so there is exactly one copy of this text and it cannot drift. Titles are stored bare and get ' | Evently' appended, except where `bareTitle` is true. Keep titles under ~60 characters and descriptions between 120 and 160 so neither is truncated in a result snippet.",
+
+  "/": {
+    "title": "Evently — Book Events, Club Nights & Concerts",
+    "bareTitle": true,
+    "description": "Discover club nights, concerts, comedy, workshops and festivals near you. Book tickets in seconds and walk in with a QR pass on your phone."
+  },
+
+  "/events": {
+    "title": "All Events",
+    "description": "Browse every event on Evently — club nights, live music, comedy, workshops and festivals. Filter by city, category and date, then book in seconds."
+  },
+
+  "/clubs": {
+    "title": "Clubs & Venues",
+    "description": "A guide to the clubs and venues on Evently, with timings, ticket tiers, age limits, galleries and directions for each one."
+  },
+
+  "/experience": {
+    "title": "The Evently Experience",
+    "description": "How a night with Evently actually works, from finding an event to scanning your QR pass at the door in under a second."
+  },
+
+  "/faq": {
+    "title": "Frequently Asked Questions",
+    "description": "Answers on booking tickets, ticket limits, QR check-in, refunds when an event sells out mid-checkout, and creating events as an organiser."
+  },
+
+  "/contact": {
+    "title": "Contact Us",
+    "description": "Get in touch with the Evently team about a booking, an event listing, or organising with us. We answer email and phone during working hours."
+  },
+
+  "/support": {
+    "title": "Support",
+    "description": "Something wrong with a booking, a ticket or an event listing? Send us the details and the Evently support team will sort it out."
+  },
+
+  "/privacy": {
+    "title": "Privacy Policy",
+    "description": "What data Evently collects when you book a ticket, why we need it, how long we keep it, and how to ask us to delete it."
+  },
+
+  "/terms": {
+    "title": "Terms & Conditions",
+    "description": "The terms you agree to when you book a ticket or list an event on Evently, including payment, entry and cancellation rules."
+  },
+
+  "/login": {
+    "title": "Sign In",
+    "description": "Sign in to Evently to book tickets, see your bookings and download your QR passes.",
+    "noindex": true
+  }
+}

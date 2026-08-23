@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import DocPage from "../components/layout/DocPage";
+import Seo from "../components/seo/Seo";
 
 /**
  * Privacy policy. The four sections and their wording are carried over from the
@@ -37,23 +38,27 @@ const SECTIONS = [
 
 export default function Privacy() {
   return (
-    <DocPage
-      kicker="Legal"
-      title="Privacy Policy"
-      intro="What we collect, why we collect it, and who else is involved."
-      sections={SECTIONS}
-      footer={
-        <p className="text-sm text-[var(--color-fg-subtle)]">
-          Questions about your data?{" "}
-          <Link
-            to="/contact"
-            className="font-semibold text-[var(--color-violet-bright)] underline decoration-1 underline-offset-4"
-          >
-            Get in touch
-          </Link>{" "}
-          and we'll answer.
-        </p>
-      }
-    />
+    <>
+      <Seo />
+
+      <DocPage
+        kicker="Legal"
+        title="Privacy Policy"
+        intro="What we collect, why we collect it, and who else is involved."
+        sections={SECTIONS}
+        footer={
+          <p className="text-sm text-[var(--color-fg-subtle)]">
+            Questions about your data?{" "}
+            <Link
+              to="/contact"
+              className="font-semibold text-[var(--color-violet-bright)] underline decoration-1 underline-offset-4"
+            >
+              Get in touch
+            </Link>{" "}
+            and we'll answer.
+          </p>
+        }
+      />
+    </>
   );
 }

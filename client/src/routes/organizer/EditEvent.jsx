@@ -7,6 +7,7 @@ import Badge, { StatusBadge } from "../../components/ui/Badge";
 import { ErrorState, Loader } from "../../components/ui/Feedback";
 import { Reveal } from "../../components/ui/Reveal";
 import EventForm, { eventToForm } from "../../components/forms/EventForm";
+import Seo from "../../components/seo/Seo";
 import { useApi, useAction } from "../../lib/useApi";
 import { events as eventsApi } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
@@ -71,6 +72,7 @@ export default function EditEvent() {
   if (loading) {
     return (
       <div className="grid min-h-[60dvh] place-items-center">
+        <Seo title="Edit Event" noindex />
         <Loader label="Loading event" />
       </div>
     );
@@ -79,6 +81,7 @@ export default function EditEvent() {
   if (error || !event) {
     return (
       <div className="shell section">
+        <Seo title="Edit Event" noindex />
         <ErrorState
           title="Couldn't open that event"
           message={
@@ -95,6 +98,8 @@ export default function EditEvent() {
   if (!canEdit) {
     return (
       <div className="shell section">
+        <Seo title="Edit Event" noindex />
+
         <Reveal className="mx-auto max-w-xl">
           <GlassCard elevation={3} radius="2xl" className="p-8 text-center">
             <span
@@ -129,6 +134,8 @@ export default function EditEvent() {
 
   return (
     <div className="shell section">
+      <Seo title="Edit Event" noindex />
+
       <Reveal className="max-w-3xl">
         <Link
           to="/dashboard"

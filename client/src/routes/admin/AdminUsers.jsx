@@ -26,6 +26,7 @@ import {
   SkeletonRows,
 } from "../../components/ui/Feedback";
 import { Reveal, RevealGroup } from "../../components/ui/Reveal";
+import Seo from "../../components/seo/Seo";
 import AdminNav from "./AdminNav";
 import { useApi, useAction } from "../../lib/useApi";
 import { admin as adminApi } from "../../lib/api";
@@ -326,6 +327,8 @@ export default function AdminUsers() {
 
   return (
     <div className="shell section">
+      <Seo title="Admin · Users" noindex />
+
       <Reveal>
         <p className="kicker">Admin</p>
         <h1 className="mt-3 text-4xl">

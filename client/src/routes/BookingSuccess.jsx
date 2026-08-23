@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, useReducedMotion } from "motion/react";
 import {
@@ -14,6 +14,7 @@ import Button from "../components/ui/Button";
 import { ErrorState, Loader } from "../components/ui/Feedback";
 import { QrPanel } from "../components/bookings/BookingTicket";
 import { Reveal } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { useApi } from "../lib/useApi";
 import { bookings as bookingsApi } from "../lib/api";
 import { eventDate } from "../lib/constants";
@@ -106,17 +107,10 @@ export default function BookingSuccess() {
 
   const date = eventDate(event);
 
-  // Nothing should be scrolled past on arrival.
-  useEffect(() => {
-    document.title = "Booking confirmed · Evently";
-    return () => {
-      document.title = "Evently";
-    };
-  }, []);
-
   if (!passed && loading) {
     return (
       <div className="grid min-h-[60dvh] place-items-center">
+        <Seo title="Booking Confirmed" noindex />
         <Loader label="Fetching your booking" />
       </div>
     );
@@ -125,6 +119,7 @@ export default function BookingSuccess() {
   if (!passed && error) {
     return (
       <div className="shell section">
+        <Seo title="Booking Confirmed" noindex />
         <ErrorState
           title="Couldn't load your booking"
           message="Your payment may still have gone through — check My bookings before paying again."
@@ -142,6 +137,7 @@ export default function BookingSuccess() {
   if (!booking) {
     return (
       <div className="shell section">
+        <Seo title="Booking Confirmed" noindex />
         <ErrorState
           title="No booking to show"
           message="We couldn't find a recent booking on this account. If you've just paid, give it a moment and check My bookings."
@@ -154,6 +150,8 @@ export default function BookingSuccess() {
 
   return (
     <div className="shell section">
+      <Seo title="Booking Confirmed" noindex />
+
       <div className="relative mx-auto max-w-3xl">
         <Burst />
 

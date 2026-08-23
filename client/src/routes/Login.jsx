@@ -12,6 +12,7 @@ import {
 import Button from "../components/ui/Button";
 import GlassCard from "../components/ui/GlassCard";
 import { Input } from "../components/ui/Field";
+import Seo from "../components/seo/Seo";
 import { auth as authApi } from "../lib/api";
 import { destinationForRole, useAuth } from "../lib/auth";
 import { useToast } from "../lib/toast";
@@ -524,6 +525,8 @@ export default function Login() {
 
   return (
     <div className="shell section">
+      <Seo />
+
       <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
         {/* Brand panel. Decorative support for the form, so it drops out
             entirely on small screens rather than pushing the form below the

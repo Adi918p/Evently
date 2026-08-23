@@ -17,6 +17,7 @@ import Button from "../../components/ui/Button";
 import Badge from "../../components/ui/Badge";
 import { ErrorState, Skeleton } from "../../components/ui/Feedback";
 import { Reveal, RevealGroup, SectionHeading } from "../../components/ui/Reveal";
+import Seo from "../../components/seo/Seo";
 import AdminNav from "./AdminNav";
 import { useApi } from "../../lib/useApi";
 import { admin as adminApi } from "../../lib/api";
@@ -328,6 +329,8 @@ export default function AdminAnalytics() {
 
   return (
     <div className="shell section">
+      <Seo title="Admin · Analytics" noindex />
+
       <Reveal>
         <p className="kicker">Admin</p>
         <h1 className="mt-3 text-4xl">

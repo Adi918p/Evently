@@ -32,6 +32,7 @@ import { AccordionItem } from "../components/ui/Accordion";
 import EventCard from "../components/events/EventCard";
 import { Reveal, RevealGroup, SectionHeading } from "../components/ui/Reveal";
 import { EmptyState, ErrorState, SkeletonGrid } from "../components/ui/Feedback";
+import Seo from "../components/seo/Seo";
 import { events as eventsApi } from "../lib/api";
 import { useApi } from "../lib/useApi";
 import {
@@ -43,6 +44,7 @@ import {
 } from "../lib/constants";
 import { CLUB_LIST } from "../data/clubs";
 import { FEATURED_FAQS } from "../data/faqs";
+import { graph, organizationSchema, websiteSchema } from "../lib/seo";
 import {
   duration as dur,
   ease,
@@ -839,6 +841,10 @@ function ToolkitCard({ icon: Icon, kicker, title, body, chips, index }) {
     <GlassCard
       elevation={3}
       radius="2xl"
+      // These cards spend most of the section covering each other, so the fill
+      // has to be opaque - see the contract in StackCards. The border, gradient
+      // and glow still carry the glass look.
+      solid
       glow
       className="relative overflow-hidden p-8 sm:p-10"
     >
@@ -967,6 +973,12 @@ function FaqPreview() {
    Page
    ========================================================================== */
 
+/* The site's identity graph. Declared once at module scope because it never
+   varies: the Organization node is what every other page's JSON-LD points at by
+   @id, and the WebSite node carries the sitelinks search box. Both belong on the
+   home page rather than being repeated site-wide. */
+const HOME_SCHEMA = graph(organizationSchema(), websiteSchema());
+
 export default function Home() {
   const { data, loading, error, reload } = useApi(
     (signal) => eventsApi.list(undefined, signal),
@@ -1006,6 +1018,9 @@ export default function Home() {
 
   return (
     <>
+      {/* Title and description come from data/seo-pages.json keyed on "/", the
+          same file routes/seo.js reads, so the two can't drift. */}
+      <Seo schema={HOME_SCHEMA} />
       <Hero stats={stats} liveCount={stats ? upcoming.length : 0} />
       <MarqueeBand />
       <div id="trending" style={{ scrollMarginTop: "calc(var(--nav-h) + 2rem)" }}>

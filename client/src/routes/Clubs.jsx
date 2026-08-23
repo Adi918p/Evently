@@ -5,6 +5,7 @@ import GlassCard from "../components/ui/GlassCard";
 import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 import { RevealGroup } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { CLUB_LIST } from "../data/clubs";
 import { respectMotion, riseIn } from "../motion/presets";
 
@@ -21,6 +22,8 @@ export default function Clubs() {
 
   return (
     <div className="shell section">
+      <Seo />
+
       <header className="max-w-2xl space-y-3">
         <p className="kicker">Venue guide</p>
         <h1 className="text-4xl">

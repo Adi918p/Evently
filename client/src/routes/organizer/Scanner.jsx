@@ -22,6 +22,7 @@ import Badge from "../../components/ui/Badge";
 import { Input, Select } from "../../components/ui/Field";
 import { EmptyState, ErrorState, Loader } from "../../components/ui/Feedback";
 import { Reveal } from "../../components/ui/Reveal";
+import Seo from "../../components/seo/Seo";
 import { useApi } from "../../lib/useApi";
 import {
   events as eventsApi,
@@ -495,6 +496,7 @@ export default function Scanner() {
   if (mine.loading) {
     return (
       <div className="grid min-h-[60dvh] place-items-center">
+        <Seo title="Ticket Scanner" noindex />
         <Loader label="Loading your events" />
       </div>
     );
@@ -503,6 +505,7 @@ export default function Scanner() {
   if (mine.error) {
     return (
       <div className="shell section">
+        <Seo title="Ticket Scanner" noindex />
         <ErrorState
           title="Couldn't load your events"
           message={mine.error.message}
@@ -515,6 +518,7 @@ export default function Scanner() {
   if (!myEvents.length) {
     return (
       <div className="shell section">
+        <Seo title="Ticket Scanner" noindex />
         <EmptyState
           icon={Ticket}
           title="Nothing to scan yet"
@@ -534,6 +538,8 @@ export default function Scanner() {
 
   return (
     <div className="shell section">
+      <Seo title="Ticket Scanner" noindex />
+
       <Reveal>
         <Link
           to="/dashboard"

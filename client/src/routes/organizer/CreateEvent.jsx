@@ -4,6 +4,7 @@ import GlassCard from "../../components/ui/GlassCard";
 import Button from "../../components/ui/Button";
 import { Reveal } from "../../components/ui/Reveal";
 import EventForm from "../../components/forms/EventForm";
+import Seo from "../../components/seo/Seo";
 import { useAction } from "../../lib/useApi";
 import { events as eventsApi } from "../../lib/api";
 import { useAuth } from "../../lib/auth";
@@ -34,6 +35,8 @@ export default function CreateEvent() {
   if (!isOrganizer) {
     return (
       <div className="shell section">
+        <Seo title="Create an Event" noindex />
+
         <Reveal className="mx-auto max-w-2xl">
           <GlassCard elevation={3} radius="2xl" specular className="p-8 sm:p-10">
             <span
@@ -95,6 +98,8 @@ export default function CreateEvent() {
 
   return (
     <div className="shell section">
+      <Seo title="Create an Event" noindex />
+
       <Reveal className="max-w-3xl">
         <p className="kicker">Organizer</p>
         <h1 className="mt-3 text-4xl">

@@ -16,6 +16,7 @@ const passport = require("passport");
 const contactRoute = require("./routes/contact");
 const adminRoutes = require("./routes/admin");
 const imageRoutes = require("./routes/images");
+const seo = require("./routes/seo");
 
 
 connectDB();
@@ -60,6 +61,31 @@ app.get("/api/profile", authMiddleware.authM, (req, res) => {
         user: req.user
     });
 });
+
+
+/* ==========================================================================
+   Crawlers
+   ==========================================================================
+   Registered before the static mounts and the SPA fallback, and outside /api so
+   the database-ready gate above does not turn a transient Mongo blip into a 503
+   for Googlebot. Each handler degrades on its own instead - see routes/seo.js.
+
+     /sitemap.xml     real event URLs from the database. Reached on the public
+                      domain through a rewrite in client/vercel.json, because
+                      only this process can see what events exist.
+
+     /robots.txt      answers on the API host only, to keep a second copy of the
+                      site out of the index. Falls through to client/dist on the
+                      canonical domain.
+
+     /seo/render/*    server-rendered head + content for crawlers and social
+                      scrapers, which never run the bundle. Vercel routes only
+                      known bot user agents here.
+   ========================================================================== */
+
+app.get("/sitemap.xml", seo.sitemap);
+app.get("/robots.txt", seo.robots);
+app.use("/seo/render", seo.render);
 
 
 /* ==========================================================================

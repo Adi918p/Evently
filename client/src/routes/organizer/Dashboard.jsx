@@ -26,6 +26,7 @@ import {
   SkeletonRows,
 } from "../../components/ui/Feedback";
 import { Reveal, RevealGroup } from "../../components/ui/Reveal";
+import Seo from "../../components/seo/Seo";
 import { useApi, useAction } from "../../lib/useApi";
 import { events as eventsApi } from "../../lib/api";
 import { useToast } from "../../lib/toast";
@@ -305,6 +306,8 @@ export default function Dashboard() {
 
   return (
     <div className="shell section">
+      <Seo title="Organizer Dashboard" noindex />
+
       <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-xl space-y-3">
           <p className="kicker">Organizer</p>

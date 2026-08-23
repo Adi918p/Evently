@@ -14,6 +14,12 @@ import { spring } from "../../motion/presets";
  * Elevation is a 4-step scale (glass-1 recessed .. glass-4 floating) so blur,
  * fill and shadow always change together (elevation-consistent).
  *
+ * `solid` keeps everything about the recipe except the translucency. Use it
+ * wherever a card can end up over another card - the scroll deck is the case
+ * that forced it - because a blurred backdrop still shows the text behind it,
+ * and two paragraphs sharing the same pixels is not a contrast problem you can
+ * solve with a lighter fill.
+ *
  * `tilt` adds pointer-tracked rotation on top. It is opt-in and off by default,
  * because a tilting card is a flourish that suits a short marketing grid and
  * actively hurts a dense list - and because rotating a card creates a stacking
@@ -45,6 +51,7 @@ const GlassCard = forwardRef(function GlassCard(
   {
     elevation = 2,
     radius = "xl",
+    solid = false,
     interactive = false,
     glow = false,
     specular = true,
@@ -125,6 +132,9 @@ const GlassCard = forwardRef(function GlassCard(
       className={[
         "glass",
         ELEVATION[elevation] ?? ELEVATION[2],
+        // After the elevation class for readability only - .glass-solid wins on
+        // source order in the stylesheet, not on the order of this list.
+        solid ? "glass-solid" : "",
         RADII[radius] ?? RADII.xl,
         specular ? "glass-specular" : "",
         interactive ? "cursor-pointer" : "",

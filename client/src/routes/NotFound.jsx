@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from "motion/react";
 import { ArrowLeft, Compass, MagnifyingGlass } from "@phosphor-icons/react";
 import GlassCard from "../components/ui/GlassCard";
 import Button from "../components/ui/Button";
+import Seo from "../components/seo/Seo";
 import { spring } from "../motion/presets";
 
 /**
@@ -28,6 +29,12 @@ export default function NotFound() {
 
   return (
     <div className="shell grid min-h-[70dvh] place-items-center py-20">
+      <Seo
+        title="Page not found"
+        description="That page doesn't exist. Browse events instead."
+        noindex
+      />
+
       <GlassCard
         elevation={3}
         radius="2xl"

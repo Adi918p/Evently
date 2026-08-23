@@ -15,10 +15,18 @@ import GlassCard from "../components/ui/GlassCard";
 import Badge from "../components/ui/Badge";
 import { EmptyState } from "../components/ui/Feedback";
 import { Reveal, RevealGroup } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { getClub } from "../data/clubs";
 import { events as eventsApi } from "../lib/api";
 import { useApi } from "../lib/useApi";
 import EventCard from "../components/events/EventCard";
+import {
+  breadcrumbSchema,
+  graph,
+  nightClubSchema,
+  organizationSchema,
+  truncate,
+} from "../lib/seo";
 import { isPastEvent } from "../lib/constants";
 
 const TIERS = [
@@ -69,6 +77,13 @@ export default function ClubDetail() {
   if (!club) {
     return (
       <div className="shell section">
+        {/* getClub is synchronous over a hardcoded object, so a miss here is a
+            bad id rather than a page still loading — safe to noindex. */}
+        <Seo
+          title="Venue not found"
+          description="We don't have that venue in the guide. Browse the clubs we cover instead."
+          noindex
+        />
         <EmptyState
           icon={MapPin}
           title="We don't have that venue"
@@ -82,6 +97,27 @@ export default function ClubDetail() {
 
   return (
     <article>
+      {/* Built inline rather than memoised: the early return above means a hook
+          here would run on some renders and not others. Four venues, static
+          data — there is nothing to optimise. */}
+      <Seo
+        title={`${club.title} — ${club.location}`}
+        description={truncate(club.description || club.about || "")}
+        path={`/clubs/${club.id}`}
+        image={club.banner}
+        imageAlt={club.title}
+        ogType="article"
+        schema={graph(
+          organizationSchema(),
+          nightClubSchema(club),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Clubs", path: "/clubs" },
+            { name: club.title, path: `/clubs/${club.id}` },
+          ])
+        )}
+      />
+
       <header className="relative isolate overflow-hidden">
         <motion.div style={{ y: bannerY }} className="absolute inset-0 -z-10">
           <img

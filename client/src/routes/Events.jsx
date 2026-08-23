@@ -8,8 +8,15 @@ import { Input, Select } from "../components/ui/Field";
 import EventCard from "../components/events/EventCard";
 import { RevealGroup } from "../components/ui/Reveal";
 import { EmptyState, ErrorState, SkeletonGrid } from "../components/ui/Feedback";
+import Seo from "../components/seo/Seo";
 import { events as eventsApi } from "../lib/api";
 import { useApi } from "../lib/useApi";
+import {
+  breadcrumbSchema,
+  graph,
+  itemListSchema,
+  truncate,
+} from "../lib/seo";
 import {
   CATEGORIES,
   CITIES,
@@ -251,8 +258,54 @@ export default function Events() {
 
   const hiddenPast = all.length - all.filter((e) => !isPastEvent(e)).length;
 
+  /* ---------- Search and share ----------
+     Every filter combination is a distinct URL, and <Seo> canonicalises all of
+     them back to /events (lib/seo.js drops the query string), so the dozens of
+     near-identical listing URLs consolidate into one ranking signal instead of
+     competing with each other. robots.txt deliberately leaves them crawlable —
+     a blocked page is a page whose canonical tag nobody ever reads.
+
+     The title still describes the filtered view, because that is what shows in
+     the tab and in a bookmark. */
+  const filterLabel = [
+    CATEGORIES.find((c) => c.value === params.category)?.label,
+    params.city && `in ${params.city}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  const listingTitle = params.q
+    ? `“${params.q}” — event search`
+    : filterLabel
+      ? `${filterLabel} — events`
+      : null; // null falls back to the copy in data/seo-pages.json
+
+  const listingSchema = graph(
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Events", path: "/events" },
+    ]),
+    // Only the first 20: an ItemList is a summary of the page, and a crawler
+    // gains nothing from a hundred URLs it will reach through the links anyway.
+    visible.length ? itemListSchema(visible.slice(0, 20)) : null
+  );
+
   return (
     <div className="shell section">
+      <Seo
+        title={listingTitle}
+        description={
+          listingTitle
+            ? truncate(
+                `${visible.length ? formatNumber(visible.length) : "No"} ${
+                  visible.length === 1 ? "event" : "events"
+                } matching your search on Evently. Filter by city, category or date and book in seconds.`
+              )
+            : undefined
+        }
+        path="/events"
+        schema={listingSchema}
+      />
       <header className="max-w-2xl space-y-3">
         <p className="kicker">Browse</p>
         <h1 className="text-4xl">

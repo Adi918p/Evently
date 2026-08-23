@@ -15,6 +15,7 @@ import Badge, { Chip, StatusBadge } from "../components/ui/Badge";
 import { EmptyState, ErrorState, SkeletonRows } from "../components/ui/Feedback";
 import { TicketModal } from "../components/bookings/BookingTicket";
 import { RevealGroup } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { useApi } from "../lib/useApi";
 import { bookings as bookingsApi } from "../lib/api";
 import { eventDate, formatPrice, isPastEvent } from "../lib/constants";
@@ -201,6 +202,8 @@ export default function MyBookings() {
 
   return (
     <div className="shell section">
+      <Seo title="My Bookings" noindex />
+
       <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-xl space-y-3">
           <p className="kicker">Your account</p>

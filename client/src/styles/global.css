@@ -217,6 +217,38 @@
   }
 
   /* ------------------------------------------------------------------------
+     Opaque glass
+     ------------------------------------------------------------------------
+     For glass that sits on top of other glass - the scroll-driven card deck,
+     where two cards share the same pixels for the whole of a transition.
+
+     Translucency cannot survive that. The covered card is still painted, and
+     backdrop-filter blurs its text rather than removing it, so a headline
+     lands on a smear of the body copy underneath and neither one is legible.
+     Raising the elevation does not fix it either: 16% white over a blurred
+     paragraph is still a blurred paragraph. The fill is the only thing
+     standing between two sets of words, so here it has to be opaque - which
+     also means the contrast the fg tokens promise actually holds
+     (color-contrast: fg 16.3:1, fg-muted 8.0:1 on --color-card).
+
+     Only the fill changes. The lit border, the top-down gradient and the
+     specular sweep all stay, so the surface still reads as the same material
+     as the translucent cards elsewhere - lit from a solid backing rather than
+     from whatever it happens to be over. The blur goes because nothing behind
+     an opaque fill can show through, and a backdrop-filter that changes no
+     pixels is pure compositor cost on every frame of a scroll-driven section.
+
+     Declared last in this block so it wins over both the .glass-1..4 fills and
+     the no-backdrop-filter fallback above, which set background-color at the
+     same specificity.
+     ------------------------------------------------------------------------ */
+  .glass-solid {
+    background-color: var(--color-card);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  /* ------------------------------------------------------------------------
      Layout helpers
      ------------------------------------------------------------------------ */
   .shell {

@@ -4,6 +4,8 @@ import GlassCard from "../components/ui/GlassCard";
 import Button from "../components/ui/Button";
 import { AccordionItem } from "../components/ui/Accordion";
 import { Reveal, RevealGroup } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
+import { breadcrumbSchema, faqSchema, graph } from "../lib/seo";
 import { FAQS } from "../data/faqs";
 
 /**
@@ -14,9 +16,22 @@ import { FAQS } from "../data/faqs";
  * components/ui/Accordion - this route is now just the page around them.
  */
 
+/* FAQPage markup, built from the same FAQS array the accordion renders.
+   Generating it from the data rather than restating the questions is the point:
+   Google withholds the rich result when the structured data and the visible
+   answers disagree, and hand-maintained copies always drift eventually. */
+const FAQ_SCHEMA = graph(
+  faqSchema(FAQS),
+  breadcrumbSchema([
+    { name: "Home", path: "/" },
+    { name: "FAQ", path: "/faq" },
+  ])
+);
+
 export default function Faq() {
   return (
     <div className="shell section">
+      <Seo schema={FAQ_SCHEMA} />
       <header className="max-w-2xl space-y-3">
         <p className="kicker">Help</p>
         <h1 className="text-4xl">

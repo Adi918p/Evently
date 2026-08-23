@@ -20,11 +20,19 @@ import GlassCard from "../components/ui/GlassCard";
 import Badge from "../components/ui/Badge";
 import { ErrorState, Loader } from "../components/ui/Feedback";
 import { Reveal } from "../components/ui/Reveal";
+import Seo from "../components/seo/Seo";
 import { events as eventsApi, payments } from "../lib/api";
 import { useApi } from "../lib/useApi";
 import { useAuth } from "../lib/auth";
 import { useToast } from "../lib/toast";
 import { loadRazorpay, RAZORPAY_THEME } from "../lib/razorpay";
+import {
+  breadcrumbSchema,
+  eventSchema,
+  graph,
+  organizationSchema,
+  truncate,
+} from "../lib/seo";
 import {
   categoryIcon,
   categoryLabel,
@@ -324,6 +332,14 @@ export default function EventDetail() {
   if (error || !event) {
     return (
       <div className="shell section">
+        {/* noindex, and safe to do so: the fetch has already resolved, so this
+            is a genuinely missing event rather than a page mid-load. Leaving it
+            indexable is how a deleted event keeps a dead result in Google. */}
+        <Seo
+          title="Event not found"
+          description="This event is no longer listed on Evently. Browse what else is coming up."
+          noindex
+        />
         <ErrorState
           title="We couldn't open that event"
           message={
@@ -373,8 +389,50 @@ export default function EventDetail() {
     },
   ].filter(Boolean);
 
+  /* ---------- Search and share ----------
+     Built inline rather than in a useMemo: this sits below the early returns
+     above, so a hook here would change the hook order between the loading and
+     loaded renders. Rebuilding the object per render costs nothing — <Seo>
+     compares the serialised schema before it touches the DOM.
+
+     The title and description are composed exactly the way routes/seo.js
+     composes them for crawlers, so the card a scraper caches and the page a
+     visitor lands on cannot describe the event differently. */
+  const where = [event.venue, event.location].filter(Boolean).join(", ");
+
+  // Organisers sometimes leave the description empty. The facts someone
+  // actually decides on beat an empty share card.
+  const shareDescription =
+    truncate(event.description || event.about || "", 160) ||
+    truncate(
+      [date ? format(date, "EEEE d MMMM yyyy") : null, where, formatPrice(event.price)]
+        .filter(Boolean)
+        .join(" · "),
+      160
+    );
+
+  const schema = graph(
+    organizationSchema(),
+    eventSchema(event, { seatsLeft }),
+    breadcrumbSchema([
+      { name: "Home", path: "/" },
+      { name: "Events", path: "/events" },
+      { name: event.title, path: `/events/${event._id}` },
+    ])
+  );
+
   return (
     <article>
+      <Seo
+        title={where ? `${event.title} — ${where}` : event.title}
+        description={shareDescription}
+        path={`/events/${event._id}`}
+        image={event.banner || undefined}
+        imageAlt={event.title}
+        ogType="article"
+        schema={schema}
+      />
+
       {/* ---------- Banner ---------- */}
       <header className="relative isolate overflow-hidden">
         <motion.div style={{ y: bannerY }} className="absolute inset-0 -z-10">
