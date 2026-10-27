@@ -116,6 +116,10 @@ test('city search waits for submission instead of fetching on every keystroke', 
     await page.getByLabel('City', { exact: true }).pressSequentially('Ludhiana', { delay: 30 });
     await page.waitForTimeout(250);
     assert.equal(requests.length, 1);
+    await expect(page.locator('canvas')).toHaveCount(0);
+    assert.equal(await page.evaluate(() => performance.getEntriesByType('resource')
+      .some(resource => /\/(?:three|Canvas3D)-[^/]+\.js/.test(resource.name))), false,
+    'Operational pages must not download the decorative renderer');
     const response = page.waitForResponse(response => {
       const url = new URL(response.url());
       return url.pathname === '/api/events' && url.searchParams.get('city') === 'Ludhiana';

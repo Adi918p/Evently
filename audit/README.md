@@ -22,3 +22,10 @@ records the newly reproduced refund/check-in race before its fix; the passing
 regression is included in the backend results. Provider account evidence
 (`brevo-smoke`, `google-live-status`, `local-*`, `razorpay-*`) and the local
 integration setup notes are intentionally kept out of version control.
+
+The performance/cash/email publication adds `performance-*-results.txt`,
+`performance-before.json` and `performance-after.json`. The comparison uses a
+built frontend with fixed local API data and cold headless Chrome contexts;
+timings are not a production or physical-phone benchmark. Current suites pass
+72 backend/API and 10 browser scenarios. `cash-*` screenshots use fixture guests.
+Private email preflight/delivery evidence remains excluded from version control.

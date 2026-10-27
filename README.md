@@ -44,8 +44,20 @@ and pull requests.
 
 Coverage includes bound purchases, concurrent seat allocation, refunds,
 authorization, Google state handling, ticket PDFs, scanner admission persistence,
-OK-only scan results, supplied sounds and mobile navigation. Physical phone
+OK-only scan results, supplied sounds, mobile navigation, event cash sales,
+ticket/receipt delivery, summary APIs and stale authentication responses. Physical phone
 camera/speaker testing and deployed integration smoke tests remain separate.
 
 Read [WORK_LOG.md](WORK_LOG.md) and [AUDIT.md](AUDIT.md) before changing the project.
 Local account-specific integration evidence is excluded from version control.
+
+Organizers can open an event's **Cash desk** from the dashboard or bookings page
+to register 1–10 tickets after collecting cash. Ticket emails include an admission
+pass and an itemized receipt. `npm run check:email` checks Brevo access and sender
+configuration without sending a message.
+
+For a controlled frontend performance comparison after a build, run
+`node tests/performance-smoke.cjs audit/performance-latest.json`. It uses fixed
+local event data and cold desktop/mobile Chrome contexts; it does not measure
+the live network or a physical phone. The renderer loads only on eligible desktop
+showcase pages. Production routing remains at `event-ly.in` and `api.event-ly.in`.

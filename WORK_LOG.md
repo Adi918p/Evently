@@ -34,10 +34,37 @@ Last updated: 2026-10-27 (Asia/Calcutta)
   race fix and historical logs during integration. Owner completed Git Credential
   Manager device authorization; repository-scoped credentials now select the
   account with write access. No token/password was printed or committed.
-- Verification/publication in progress. Initial build passed, but the first
-  production comparison exposed shared-chunk hoisting that eagerly loaded Three
-  even without a canvas. Correcting that before final tests/push. Final results
-  and any remaining limits will be recorded here when complete.
+- The first production comparison exposed shared-chunk hoisting that eagerly
+  loaded Three even without a canvas. Removed manual chunk groups so Canvas3D
+  owns its dynamic dependencies; verified no renderer request on mobile/events/
+  login. Added a browser regression protecting this alongside city submission.
+- Review reproduced a delayed old-session 401 clearing a newer login. JSON/PDF
+  failures now invalidate only their own token, and account refresh results must
+  still match the current token/account before merging. Five deferred-response
+  regressions pass; current-session rejection still signs out normally.
+- Merged origin/main 30fc60e into this checkout without rewriting history. Kept
+  its README, GitHub workflow, published history and refund/check-in race guard
+  and regression. Added current cash/email/performance documentation. Staged
+  privacy scan found no local secrets or excluded account evidence; .env stays
+  ignored, with production URLs/proxies/OAuth configuration unchanged.
+- Final verification: 72/72 backend/API tests, 10/10 browser scenarios, production
+  build (5,390 modules) and syntax checks pass. An additional focused listing
+  regression passes after adding its no-renderer assertion. Evidence:
+  audit/performance-{backend,browser,build,syntax,listing}-results.txt. Fixtures
+  use isolated databases and mocked providers; no new real email/payment sent.
+- Final controlled comparison: mobile home JavaScript 1,519,701 -> 628,681 bytes
+  (-59%); events 1,479,534 -> 588,396 (-60%); login 1,454,815 -> 563,513 (-61%).
+  Home-to-events navigation 304 -> 57 ms desktop / 309 -> 43 ms mobile. All six
+  samples had zero page errors. Evidence: audit/performance-after.json. These are
+  local single-run measurements, not guaranteed production/physical-phone times.
+  Desktop home still loads about 1.51 MB once decoration starts; main/3D chunk
+  warnings remain. Homepage idle CPU did not improve in this headless sample;
+  no general CPU/FPS or provider-latency improvement is claimed.
+- Local Vite :5173 and API :8000 are healthy. Before publication event-ly.in,
+  its API proxy and api.event-ly.in all returned 200. No host environment,
+  database records, domains or payment mode changed in this task. Publication
+  and hosted-release confirmation are the remaining steps; physical phone,
+  deployed cash/Google/payment/email acceptance retain the earlier limitations.
 
 ## Previous task — event cash desk and email delivery (2026-10-27)
 
