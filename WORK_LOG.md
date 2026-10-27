@@ -62,9 +62,21 @@ Last updated: 2026-10-27 (Asia/Calcutta)
   no general CPU/FPS or provider-latency improvement is claimed.
 - Local Vite :5173 and API :8000 are healthy. Before publication event-ly.in,
   its API proxy and api.event-ly.in all returned 200. No host environment,
-  database records, domains or payment mode changed in this task. Publication
-  and hosted-release confirmation are the remaining steps; physical phone,
-  deployed cash/Google/payment/email acceptance retain the earlier limitations.
+  database records, domains or payment mode changed in this task.
+- Publication completed: normal push updated main 30fc60e -> e5b3ac7, retaining
+  all existing history. GitHub Actions run 40486430432 passed for that exact
+  implementation commit (lockfile installs/build/syntax/backend/browser checks).
+  Vercel Production deployment 7355666663 also succeeded for the same commit.
+  The public site serves the new index-CD0LLdOU.js asset; both public API routes
+  now return the new 594-byte summary with HTTP 200, confirming the new backend
+  behavior is live. Evidence: audit/publication-live-{before,after}.json.
+- Read-only live mobile Chrome smoke passed events/login: zero page errors,
+  no horizontal overflow, no canvas/renderer download, visible login form.
+  Evidence: audit/publication-live-browser.json. No hosted sign-in, cash sale,
+  real payment or email was executed in this task. Physical phone and deployed
+  cash/Google/payment/email acceptance retain the earlier limitations. Next:
+  owner can use the live update; follow their next scope. This final handoff
+  updates only documentation/evidence after the tested implementation commit.
 
 ## Previous task — event cash desk and email delivery (2026-10-27)
 
