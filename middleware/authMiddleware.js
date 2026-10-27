@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
+const User = require('../models/User');
 
-const authM = (req, res, next) => {
+const authM = async (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
@@ -10,6 +11,7 @@ const authM = (req, res, next) => {
             });
         }
 
+        if (!/^Bearer \S+$/i.test(authHeader)) return res.status(401).json({ message: 'Invalid authorization header' });
         const token = authHeader.split(" ")[1];
 
         const decoded = jwt.verify(
@@ -17,11 +19,14 @@ const authM = (req, res, next) => {
             process.env.JWT_SECRET
         );
 
-        req.user = decoded;
+        const account = await User.findById(decoded.id).select('name email role status isEmailVerified');
+        if (!account || account.status !== 'active' || !account.isEmailVerified) return res.status(401).json({ message: 'This account is not permitted to sign in.' });
+        req.user = { id: String(account._id), name: account.name, email: account.email, role: account.role };
 
         next();
 
     } catch (err) {
+        if (!['JsonWebTokenError', 'TokenExpiredError', 'NotBeforeError', 'CastError'].includes(err.name)) return res.status(503).json({ message: 'Account verification is temporarily unavailable.' });
         return res.status(401).json({
             message: "Invalid token"
         });

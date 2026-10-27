@@ -37,6 +37,13 @@ const bookingAnswerSchema = new mongoose.Schema({
 }, { _id: false });
 
 const bookingSchema = new mongoose.Schema({
+    purchase: { type: mongoose.Schema.Types.ObjectId, ref: 'Purchase', unique: true, sparse: true },
+    eventSnapshot: mongoose.Schema.Types.Mixed,
+    attendeeSnapshot: mongoose.Schema.Types.Mixed,
+    deliveryStatus: { type: String, enum: ['pending', 'sent', 'failed'], default: 'pending' },
+    deliveryAttempts: { type: Number, default: 0 },
+    deliveryLeaseUntil: Date,
+    nextDeliveryAt: { type: Date, default: Date.now },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -51,7 +58,7 @@ const bookingSchema = new mongoose.Schema({
 
     tickets: {
         type: Number,
-        default: 1
+        default: 1, min: 1, max: 10, validate: Number.isInteger
     },
 
     totalPrice: {

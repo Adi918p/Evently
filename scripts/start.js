@@ -152,7 +152,7 @@ async function runDevPair() {
       cwd,
       // Inherit nothing: both streams are forwarded so they can be labelled.
       stdio: ["ignore", "pipe", "pipe"],
-      env: process.env,
+      env: { ...process.env, VITE_API_TARGET: process.env.VITE_API_TARGET || `http://localhost:${API_PORT}` },
     });
     forward(child.stdout, who);
     forward(child.stderr, who);
@@ -198,7 +198,7 @@ function main() {
   if (isProduction) {
     say("start", `production mode - api only (${marker ? `${marker} is set` : "NODE_ENV=production"})`);
     // In-process on purpose: see the header comment.
-    require(path.join(ROOT, "server.js"));
+    require(path.join(ROOT, "server.js")).startServer();
     return;
   }
 

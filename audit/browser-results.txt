@@ -1,0 +1,18 @@
+✔ free checkout validates required questions, confirms, survives refresh and downloads PDF (5874.6616ms)
+(node:25456) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ paid browser checkout completes through bound order verification (2205.5651ms)
+✔ mobile menu traps focus, restores the trigger and does not overflow (1918.2748ms)
+(node:25456) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ organizer registration and ticket settings persist through the actual form (1505.0236ms)
+✔ scanner admits a new ticket absent from its loaded roster and rejects reuse after reload (2510.9539ms)
+✔ browser pages produced no uncaught JavaScript errors (1.9449ms)
+MongoDB disconnected
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15641.1127

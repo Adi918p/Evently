@@ -17,7 +17,7 @@
 const TOKEN_KEY = "token";
 
 
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "";
+const API_ORIGIN = ""; // Same-origin API/media proxy also binds OAuth cookies to the browser origin.
 /* ==========================================================================
    Token handling
    ========================================================================== */
@@ -325,7 +325,7 @@ export const auth = {
    * is a URL rather than a request. Absolute when VITE_API_ORIGIN is set; see
    * the note on API_ORIGIN for why this one call skips the proxy.
    */
-  googleUrl: () => `${API_ORIGIN}/api/auth/google`
+  exchangeGoogle: () => request("/api/auth/google/exchange", { method: "POST", body: {} })
 };
 
 /* ==========================================================================
@@ -353,6 +353,8 @@ export const events = {
   /** -> { success, event, seatsLeft } */
   get: (id, signal) =>
     request(`/api/events/${encodeURIComponent(id)}`, { signal }),
+
+  manage: (id, signal) => request(`/api/events/${encodeURIComponent(id)}/manage`, { auth: true, signal }),
 
   /** Organizer's own events. */
   mine: (signal) => request("/api/events/my", { auth: true, signal }),
@@ -402,10 +404,11 @@ export const events = {
 
 export const payments = {
   /** -> { success, order, keyId } - keyId is the public Razorpay key. */
-  createOrder: (eventId, tickets) =>
+  status: (id, signal) => request(`/api/payments/purchases/${encodeURIComponent(id)}`, { auth: true, signal }),
+  createOrder: (eventId, tickets, answers, requestKey) =>
     request("/api/payments/create-order", {
       method: "POST",
-      body: { eventId, tickets },
+      body: { eventId, tickets, answers, requestKey },
       auth: true,
     }),
 

@@ -98,14 +98,14 @@ export const inferCategory = (event) => {
    Formatting
    ========================================================================== */
 
-/** Indian rupee, no decimals. Free events say "Free", not "₹0". */
+/** Indian rupees with up to two decimals. Free events say "Free", not "₹0". */
 export const formatPrice = (value) => {
   const amount = Number(value);
   if (!Number.isFinite(amount) || amount <= 0) return "Free";
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(amount);
 };
 
@@ -130,6 +130,14 @@ export const isPastEvent = (event) => {
   const endOfDay = new Date(date);
   endOfDay.setHours(23, 59, 59, 999);
   return endOfDay.getTime() < Date.now();
+};
+
+/** Sales use the same Indian start-time cutoff as the booking API. */
+export const isBookingClosed = (event, now = Date.now()) => {
+  const date = eventDate(event);
+  if (!date) return true;
+  const time = /^([01]\d|2[0-3]):[0-5]\d$/.test(event.time || '') ? `${event.time}:00` : '23:59:59';
+  return new Date(`${date.toISOString().slice(0, 10)}T${time}+05:30`).getTime() <= now;
 };
 
 export const seatsLeft = (event, override) => {

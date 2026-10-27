@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.join(__dirname, "..");
-const ignoredDirs = new Set(["node_modules", ".git"]);
+const ignoredDirs = new Set(["node_modules", ".git", ".cache", ".npm-cache", "dist"]);
 const files = [];
 
 function collectJsFiles(dir) {

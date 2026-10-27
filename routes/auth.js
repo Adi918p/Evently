@@ -7,9 +7,14 @@ const crypto = require("crypto");
 const dns = require("dns").promises;
 const authMiddleware = require("../middleware/authMiddleware");
 const authController = require("../Controllers/authController");
+const limits = require('../middleware/limits');
+const oauth = require('../utils/oauth');
+const { respondError, HttpError } = require('../utils/httpError');
+const { escapeHtml } = require('../utils/mailer');
 const sendEmail = require("../utils/sendEmail");
 
 const router = express.Router();
+router.use((req, res, next) => req.path === '/me' && req.method === 'GET' ? next() : limits.authentication(req, res, next));
 const OTP_EXPIRY_MINUTES = 10;
 const EMAIL_FORMAT_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PASSWORD_MIN_LENGTH = 8;
@@ -23,7 +28,7 @@ const PASSWORD_STRENGTH_REGEXES = [
 const normalizeEmail = (email) => String(email || "").trim().toLowerCase();
 
 const createOtpCode = () =>
-    Math.floor(100000 + Math.random() * 900000).toString();
+    crypto.randomInt(100000, 1000000).toString();
 
 const hashOtp = (otp) =>
     crypto.createHash("sha256").update(String(otp)).digest("hex");
@@ -32,6 +37,7 @@ const validatePasswordStrength = (password) => {
     const value = String(password || "");
     const failedRules = [];
 
+    if (Buffer.byteLength(value, "utf8") > 72) failedRules.push("no more than 72 UTF-8 bytes");
     if (value.length < PASSWORD_MIN_LENGTH) {
         failedRules.push(`at least ${PASSWORD_MIN_LENGTH} characters`);
     }
@@ -78,7 +84,7 @@ const isValidEmailDomain = async (email) => {
 const sendVerificationOtpEmail = async (email, otpCode, userName) => {
     const html = `
         <h2>Verify your Evently email</h2>
-        <p>Hello ${userName},</p>
+        <p>Hello ${escapeHtml(userName)},</p>
         <p>Your OTP is <strong>${otpCode}</strong>.</p>
         <p>This code will expire in ${OTP_EXPIRY_MINUTES} minutes.</p>
         <p>If you didn't request this, you can ignore this email.</p>
@@ -91,7 +97,7 @@ const sendVerificationOtpEmail = async (email, otpCode, userName) => {
     );
 };
 
-router.post("/register", async (req, res) => {
+router.post("/register", limits.email, async (req, res) => {
     try {
         const { name, email, password } = req.body;
         const normalizedName = String(name || "").trim();
@@ -153,7 +159,8 @@ router.post("/register", async (req, res) => {
             password: hashedPassword,
             isEmailVerified: false,
             emailVerificationOtpHash: otpHash,
-            emailVerificationOtpExpiresAt: otpExpiresAt
+            emailVerificationOtpExpiresAt: otpExpiresAt,
+            emailVerificationSentAt: new Date(), emailVerificationAttempts: 0
         });
 
         await user.save();
@@ -202,18 +209,8 @@ router.post("/check-email", async (req, res) => {
             });
         }
 
-        const existingUser = await User.findOne({ email: normalizedEmail });
         const deliverable = await isValidEmailDomain(normalizedEmail);
-
-        return res.json({
-            success: true,
-            registered: Boolean(existingUser),
-            pendingVerification: Boolean(existingUser && existingUser.isEmailVerified === false),
-            deliverable,
-            message: existingUser
-                ? "Email is already registered"
-                : (deliverable ? "Email looks deliverable" : "Email domain cannot receive mail")
-        });
+        return res.json({ success: true, deliverable, message: deliverable ? 'Email looks deliverable' : 'Email domain cannot receive mail' });
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -233,49 +230,11 @@ router.post("/verify-email-otp", async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ email: normalizedEmail });
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-
-        if (user.isEmailVerified !== false) {
-            return res.json({
-                success: true,
-                message: "Email already verified"
-            });
-        }
-
-        if (
-            !user.emailVerificationOtpHash ||
-            !user.emailVerificationOtpExpiresAt ||
-            user.emailVerificationOtpExpiresAt < new Date()
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "OTP expired. Request a new OTP."
-            });
-        }
-
-        if (hashOtp(otp) !== user.emailVerificationOtpHash) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid OTP"
-            });
-        }
-
-        user.isEmailVerified = true;
-        user.emailVerificationOtpHash = null;
-        user.emailVerificationOtpExpiresAt = null;
-        user.emailVerifiedAt = new Date();
-        await user.save();
-
-        return res.json({
-            success: true,
-            message: "Email verified successfully"
-        });
+        const attempt = await User.findOneAndUpdate({ email: normalizedEmail, isEmailVerified: false, emailVerificationOtpExpiresAt: { $gt: new Date() }, $or: [{ emailVerificationAttempts: { $lt: 5 } }, { emailVerificationAttempts: { $exists: false } }] }, { $inc: { emailVerificationAttempts: 1 } }, { new: true });
+        if (!attempt || hashOtp(otp) !== attempt.emailVerificationOtpHash) return res.status(400).json({ success: false, message: 'Invalid or expired OTP. After five attempts, request a new code.' });
+        const updated = await User.updateOne({ _id: attempt._id, emailVerificationOtpHash: attempt.emailVerificationOtpHash, isEmailVerified: false }, { $set: { isEmailVerified: true, emailVerificationOtpHash: null, emailVerificationOtpExpiresAt: null, emailVerifiedAt: new Date() } });
+        if (updated.modifiedCount !== 1) return res.status(400).json({ success: false, message: 'This code has already been used or replaced.' });
+        return res.json({ success: true, message: 'Email verified successfully' });
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -284,7 +243,7 @@ router.post("/verify-email-otp", async (req, res) => {
     }
 });
 
-router.post("/resend-email-otp", async (req, res) => {
+router.post("/resend-email-otp", limits.email, async (req, res) => {
     try {
         const normalizedEmail = normalizeEmail(req.body?.email);
 
@@ -295,33 +254,10 @@ router.post("/resend-email-otp", async (req, res) => {
             });
         }
 
-        const user = await User.findOne({ email: normalizedEmail });
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-
-        if (user.isEmailVerified !== false) {
-            return res.status(400).json({
-                success: false,
-                message: "Email is already verified"
-            });
-        }
-
         const otpCode = createOtpCode();
-        user.emailVerificationOtpHash = hashOtp(otpCode);
-        user.emailVerificationOtpExpiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
-        await user.save();
-
-        await sendVerificationOtpEmail(normalizedEmail, otpCode, user.name);
-
-        return res.json({
-            success: true,
-            message: "OTP resent successfully"
-        });
+        const user = await User.findOneAndUpdate({ email: normalizedEmail, isEmailVerified: false, $or: [{ emailVerificationSentAt: { $lte: new Date(Date.now() - 60_000) } }, { emailVerificationSentAt: null }] }, { $set: { emailVerificationOtpHash: hashOtp(otpCode), emailVerificationOtpExpiresAt: new Date(Date.now() + OTP_EXPIRY_MINUTES * 60_000), emailVerificationAttempts: 0, emailVerificationSentAt: new Date() } }, { new: true });
+        if (user) await sendVerificationOtpEmail(normalizedEmail, otpCode, user.name);
+        return res.json({ success: true, message: 'If the account needs verification and its cooldown has elapsed, a new code has been sent.' });
     } catch (err) {
         return res.status(500).json({
             success: false,
@@ -377,7 +313,7 @@ router.post('/login', async (req, res) => {
                 message: "Account banned"
             });
         }
-        const match = await hash.compare(password, user.password)
+        const match = typeof password === "string" && Buffer.byteLength(password, "utf8") <= 72 && await hash.compare(password, user.password)
         if (!match) {
             return res.status(401).json({
                 success: false,
@@ -419,32 +355,32 @@ router.get(
 
 
 
-// GOOGLE
-router.get("/google",
-    passport.authenticate("google", { scope: ["profile", "email"] })
-);
-router.get("/google/callback",
-    passport.authenticate("google", { session: false }),
-    (req, res) => {
-
-        const token = jwt.sign(
-            {
-                id: req.user._id,
-                name: req.user.name,
-                email: req.user.email,
-                role: req.user.role
-            },
-            process.env.JWT_SECRET,
-            { expiresIn: "7d" }
-        );
-
-        res.redirect(
-            `${process.env.FRONTEND_URL}/login.html?token=${token}`
-        );
-    }
-);
-
-
-
-
-module.exports = router;    
+// OAuth state is a one-time database record bound to this browser's HttpOnly cookie.
+router.get('/google', async (req, res, next) => {
+    try {
+        if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) throw new HttpError(503, 'Google sign-in is not configured.');
+        const state = await oauth.issue(res, 'state');
+        passport.authenticate('google', { scope: ['profile', 'email'], state, session: false })(req, res, next);
+    } catch (err) { respondError(res, err); }
+});
+router.get('/google/callback', async (req, res, next) => {
+    try { await oauth.consume(req, res, 'state', String(req.query.state || '')); }
+    catch (err) { return respondError(res, err); }
+    passport.authenticate('google', { session: false }, async (err, user) => {
+        if (err || !user || user.status !== 'active') return res.redirect(new URL('/login?oauth=failed', process.env.FRONTEND_URL).href);
+        try {
+            await oauth.issue(res, 'handoff', user._id);
+            res.redirect(new URL('/login?oauth=complete', process.env.FRONTEND_URL).href);
+        } catch (error) { respondError(res, error); }
+    })(req, res, next);
+});
+router.post('/google/exchange', async (req, res) => {
+    try {
+        const handoff = await oauth.consume(req, res, 'handoff');
+        const user = await User.findById(handoff.user);
+        if (!user || user.status !== 'active' || !user.isEmailVerified) throw new HttpError(403, 'This account cannot sign in.');
+        const token = jwt.sign({ id: user._id, name: user.name, email: user.email, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        res.set('Cache-Control', 'no-store').json({ success: true, token });
+    } catch (err) { respondError(res, err); }
+});
+module.exports = router;

@@ -41,7 +41,7 @@ const SELF_SERVE = [
     to: "/profile",
     icon: IdentificationCard,
     title: "Fix your account details",
-    body: "Update the name and email your tickets are issued against.",
+    body: "View your account details. Contact support to request a correction.",
   },
 ];
 

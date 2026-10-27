@@ -18,12 +18,14 @@ import {
 import { format } from "date-fns";
 import GlassCard from "../../components/ui/GlassCard";
 import Button from "../../components/ui/Button";
+import Modal from "../../components/ui/Modal";
 import Badge from "../../components/ui/Badge";
 import { Input, Select } from "../../components/ui/Field";
 import { EmptyState, ErrorState, Loader } from "../../components/ui/Feedback";
 import { Reveal } from "../../components/ui/Reveal";
 import Seo from "../../components/seo/Seo";
 import { useApi } from "../../lib/useApi";
+import { useScannerSounds } from "../../lib/useScannerSounds";
 import {
   events as eventsApi,
   bookings as bookingsApi,
@@ -32,60 +34,15 @@ import { eventDate, formatNumber, isPastEvent } from "../../lib/constants";
 import { spring } from "../../motion/presets";
 
 /**
- * Door scanner.
- *
- * The design is dictated by three facts about the backend:
- *
- * 1. POST /api/bookings/verify-ticket takes a booking `_id`, but the QR encoded
- *    at booking time only carries `bookingId` for paid tickets. Free ones encode
- *    { ticketId, eventId, userId }. So the page loads the chosen event's guest
- *    list up front and resolves either shape locally against it.
- *
- * 2. verifyTicket does not check that the booking belongs to an event you own -
- *    any organizer id would be accepted. Resolving against the loaded roster
- *    first means a ticket for someone else's event is refused here rather than
- *    silently marked as used.
- *
- * 3. verifyTicket also does not check `status`, so a cancelled booking would be
- *    checked in happily. That is caught locally too.
- *
- * Camera decoding uses the built-in BarcodeDetector. No QR library is bundled,
- * and Safari and Firefox do not ship the API, so the manual ticket-ID entry and
- * the tap-to-admit list are the real interface - the camera is the shortcut when
- * the browser happens to support it (gesture-alternative).
+ * Door scanner. The server validates the selected event, organizer, pass status,
+ * and duplicate admission, then atomically persists check-in. The roster is only
+ * a convenience view; newly purchased tickets can be admitted without reloading.
+ * Camera decoding uses BarcodeDetector where supported; manual entry is always available.
  */
-
-/** Ignore the same code re-appearing in consecutive video frames. */
-const RESCAN_MS = 2500;
 
 /* ==========================================================================
    Feedback at a loud door
    ========================================================================== */
-
-let audioContext = null;
-
-/** Short blip. Two tones so "in" and "no" are distinguishable without looking. */
-function blip(ok) {
-  try {
-    const Ctor = window.AudioContext || window.webkitAudioContext;
-    if (!Ctor) return;
-    audioContext = audioContext || new Ctor();
-    if (audioContext.state === "suspended") audioContext.resume();
-    const now = audioContext.currentTime;
-    const osc = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-    osc.type = "sine";
-    osc.frequency.value = ok ? 880 : 260;
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + (ok ? 0.16 : 0.32));
-    osc.connect(gain).connect(audioContext.destination);
-    osc.start(now);
-    osc.stop(now + (ok ? 0.18 : 0.34));
-  } catch {
-    /* audio is a nicety, never a requirement */
-  }
-}
 
 function buzz(ok) {
   try {
@@ -102,7 +59,7 @@ function buzz(ok) {
 /**
  * Accepts a raw QR string or a hand-typed ticket id and returns whatever
  * identifiers it can find. Nothing here trusts the payload - it is only used to
- * look up a booking in the roster we already fetched.
+ * ask the server to validate the pass.
  */
 function readPayload(raw) {
   const text = String(raw || "").trim();
@@ -125,7 +82,7 @@ function readPayload(raw) {
 }
 
 /* ==========================================================================
-   Result banner
+   Result dialog
    ========================================================================== */
 
 const TONES = {
@@ -149,20 +106,21 @@ const TONES = {
   },
 };
 
-function Verdict({ result }) {
-  const reduced = useReducedMotion();
+function Verdict({ result, onAcknowledge }) {
   const tone = TONES[result?.tone] || TONES.warn;
   const { Icon } = tone;
 
   return (
-    <AnimatePresence mode="wait">
+    <Modal
+      open={Boolean(result)}
+      title={result?.title}
+      description="Scanning is paused. Press OK when you’re ready for the next ticket."
+      size="sm"
+      dismissOnBackdrop={false}
+      footer={<Button variant="primary" fullWidth data-autofocus onClick={onAcknowledge}>OK</Button>}
+    >
       {result ? (
-        <motion.div
-          key={result.key}
-          initial={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
-          animate={reduced ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-          exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.98 }}
-          transition={spring.snap}
+        <div
           className="flex items-start gap-4 rounded-[var(--radius-lg)] border p-5"
           style={{ borderColor: tone.border, background: tone.bg }}
         >
@@ -170,21 +128,15 @@ function Verdict({ result }) {
             <Icon size={30} weight="fill" />
           </span>
           <div className="min-w-0">
-            <p
-              className="font-display text-lg font-bold leading-tight"
-              style={{ color: tone.color }}
-            >
-              {result.title}
-            </p>
             {result.detail ? (
               <p className="wrap-anywhere mt-1 text-sm leading-relaxed text-[var(--color-fg-muted)]">
                 {result.detail}
               </p>
             ) : null}
           </div>
-        </motion.div>
+        </div>
       ) : null}
-    </AnimatePresence>
+    </Modal>
   );
 }
 
@@ -204,13 +156,18 @@ export default function Scanner() {
 
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState(null);
+  const [startingCamera, setStartingCamera] = useState(false);
+  const { play: playSound, stop: stopSound, unlock: unlockSound, error: soundError } = useScannerSounds();
 
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const detectorRef = useRef(null);
   const loopRef = useRef(0);
-  const lastScan = useRef({ code: "", at: 0 });
-  const resultKey = useRef(0);
+  const scanLocked = useRef(false);
+  const frameVersion = useRef(0);
+  const cameraVersion = useRef(0);
+  const mounted = useRef(true);
+  const locked = busy || Boolean(result);
 
   /** Only advertise camera scanning where the browser can actually decode. */
   const cameraSupported =
@@ -258,7 +215,7 @@ export default function Scanner() {
   );
 
   const doorCount = useMemo(() => {
-    const live = bookings.filter((b) => b.status !== "cancelled");
+    const live = bookings.filter((b) => b.status === "confirmed");
     return {
       expected: live.length,
       in: live.filter((b) => b.checkedIn).length,
@@ -273,117 +230,55 @@ export default function Scanner() {
 
   const say = useCallback(
     (tone, title, detail) => {
-      resultKey.current += 1;
-      setResult({ key: resultKey.current, tone, title, detail });
-      if (sound) blip(tone === "ok");
+      setResult({ tone, title, detail });
+      if (sound) playSound(tone === "ok");
       buzz(tone === "ok");
     },
-    [sound]
+    [sound, playSound]
   );
 
-  /**
-   * The whole admission decision. Resolution happens against the roster we
-   * already hold, so a ticket for another event never reaches the API.
-   */
-  const admit = useCallback(
-    async (raw) => {
-      if (busy) return;
-      const { ticketId, bookingId } = readPayload(raw);
-      if (!ticketId && !bookingId) return;
+  const acknowledge = () => {
+    stopSound();
+    if (sound) unlockSound();
+    setResult(null);
+    frameVersion.current += 1;
+    scanLocked.current = false;
+  };
 
-      const needle = String(ticketId || "").toUpperCase();
-      const booking =
-        (bookingId && bookings.find((b) => String(b._id) === bookingId)) ||
-        (needle &&
-          bookings.find(
-            (b) => String(b.ticketId || "").toUpperCase() === needle
-          )) ||
-        null;
-
-      if (!booking) {
-        say(
-          "bad",
-          "Not on this list",
-          `Nothing matching ${ticketId || bookingId} is booked for ${
-            selectedEvent?.title || "this event"
-          }. Check they're at the right door, or pick the right event above.`
-        );
+  // Only show admission after the server confirms a persisted check-in.
+  const admit = useCallback(async raw => {
+    // A ref locks synchronously, before React renders or another decoder finishes.
+    if (scanLocked.current || !selectedEvent?._id) return;
+    scanLocked.current = true;
+    frameVersion.current += 1;
+    if (sound) unlockSound();
+    const { ticketId, bookingId } = readPayload(raw);
+    if (!ticketId && !bookingId) {
+      say('bad', 'Invalid ticket', 'This QR code does not contain a ticket ID.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const response = await bookingsApi.verifyTicket({ bookingId, ticketId, eventId: selectedEvent._id, mode: 'confirm' });
+      if (!mounted.current) return;
+      const booking = response.booking;
+      if (!response.ok || response.state !== 'admitted' || !booking?.checkedIn) {
+        say(response.state === 'checked-in' ? 'warn' : 'bad', response.state === 'checked-in' ? 'Already used' : 'Entry refused', response.message || 'This pass cannot be admitted.');
+        roster.reload();
         return;
       }
-
-      if (booking.status === "cancelled") {
-        say(
-          "bad",
-          "Cancelled booking",
-          `${booking.user?.name || "This guest"} cancelled. Don't let them in on this ticket.`
-        );
-        return;
-      }
-
-      if (booking.checkedIn) {
-        const at = booking.checkedInAt ? new Date(booking.checkedInAt) : null;
-        say(
-          "warn",
-          "Already used",
-          `${booking.user?.name || "This ticket"} came in${
-            at && !Number.isNaN(at.getTime()) ? ` at ${format(at, "HH:mm")}` : ""
-          }. One scan per booking.`
-        );
-        return;
-      }
-
-      setBusy(true);
-      try {
-        const response = await bookingsApi.verifyTicket({ bookingId: booking._id });
-        const at = response?.booking?.checkedInAt || new Date().toISOString();
-        const heads = Number(booking.tickets) || 1;
-
-        roster.setData((prev) => ({
-          ...prev,
-          bookings: (prev?.bookings || []).map((row) =>
-            row._id === booking._id
-              ? { ...row, checkedIn: true, checkedInAt: at }
-              : row
-          ),
-        }));
-
-        setAdmitted((prev) =>
-          [
-            {
-              id: booking._id,
-              name: booking.user?.name || "Guest",
-              tickets: heads,
-              at,
-            },
-            ...prev,
-          ].slice(0, 12)
-        );
-
-        say(
-          "ok",
-          `Let ${heads === 1 ? "them" : `all ${heads}`} in`,
-          `${booking.user?.name || "Guest"} · ${heads} ticket${heads === 1 ? "" : "s"}${
-            booking.user?.email ? ` · ${booking.user.email}` : ""
-          }`
-        );
-      } catch (err) {
-        if (/already checked in/i.test(err?.message || "")) {
-          roster.setData((prev) => ({
-            ...prev,
-            bookings: (prev?.bookings || []).map((row) =>
-              row._id === booking._id ? { ...row, checkedIn: true } : row
-            ),
-          }));
-          say("warn", "Already used", "Another device scanned this one first.");
-        } else {
-          say("bad", "Check-in failed", err?.message || "Try again.");
-        }
-      } finally {
-        setBusy(false);
-      }
-    },
-    [bookings, busy, roster.setData, say, selectedEvent]
-  );
+      roster.setData(previous => ({ ...previous, bookings: [...(previous?.bookings || []).filter(row => row._id !== booking._id), booking] }));
+      const heads = Number(booking.tickets) || 1;
+      setAdmitted(previous => [{ id: booking._id, name: booking.user?.name || 'Guest', tickets: heads, at: booking.checkedInAt }, ...previous].slice(0, 12));
+      const details = (response.display || []).map(row => row.label + ': ' + row.value).join(' · ');
+      say('ok', 'Let ' + heads + (heads === 1 ? ' guest in' : ' guests in'), details || booking.user?.name || 'Admission saved.');
+    } catch (error) {
+      if (mounted.current) say('bad', 'Check-in failed', error.message || 'Try again.');
+    } finally {
+      if (mounted.current) setBusy(false);
+      // Stay locked through success AND failure until the operator presses OK.
+    }
+  }, [selectedEvent, roster.setData, roster.reload, say, sound, unlockSound]);
 
   // The decode loop reads the latest `admit` through a ref. Depending on it
   // directly would tear down and restart requestAnimationFrame on every render
@@ -394,15 +289,21 @@ export default function Scanner() {
   /* ---------- Camera ---------- */
 
   const stopCamera = useCallback(() => {
+    cameraVersion.current += 1;
+    frameVersion.current += 1;
     cancelAnimationFrame(loopRef.current);
     loopRef.current = 0;
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
     if (videoRef.current) videoRef.current.srcObject = null;
     setScanning(false);
+    setStartingCamera(false);
   }, []);
 
   const startCamera = useCallback(async () => {
+    const version = ++cameraVersion.current;
+    if (sound) unlockSound();
+    setStartingCamera(true);
     setCameraError(null);
     try {
       detectorRef.current =
@@ -413,6 +314,10 @@ export default function Scanner() {
         video: { facingMode: { ideal: "environment" } },
         audio: false,
       });
+      if (!mounted.current || version !== cameraVersion.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       streamRef.current = stream;
       const video = videoRef.current;
       if (!video) {
@@ -421,8 +326,11 @@ export default function Scanner() {
       }
       video.srcObject = stream;
       await video.play();
+      if (!mounted.current || version !== cameraVersion.current) return;
       setScanning(true);
     } catch (err) {
+      if (!mounted.current || version !== cameraVersion.current) return;
+      stopCamera();
       const name = err?.name || "";
       setCameraError(
         name === "NotAllowedError"
@@ -433,8 +341,10 @@ export default function Scanner() {
               "The camera couldn't start. Type the ticket ID instead."
       );
       setScanning(false);
+    } finally {
+      if (mounted.current && version === cameraVersion.current) setStartingCamera(false);
     }
-  }, []);
+  }, [sound, unlockSound, stopCamera]);
 
   // The decode loop. Throttled well below frame rate - reading every frame
   // burns battery for no extra accuracy (main-thread-budget).
@@ -442,27 +352,31 @@ export default function Scanner() {
     if (!scanning) return undefined;
     let stopped = false;
     let lastRun = 0;
+    let decoding = false;
+    const camera = cameraVersion.current;
 
     const tick = async (now) => {
-      if (stopped) return;
+      if (stopped || camera !== cameraVersion.current) return;
       loopRef.current = requestAnimationFrame(tick);
-      if (now - lastRun < 220) return;
+      if (scanLocked.current || decoding || now - lastRun < 120) return;
       lastRun = now;
 
       const video = videoRef.current;
       const detector = detectorRef.current;
       if (!video || !detector || video.readyState < 2) return;
 
+      decoding = true;
+      const version = frameVersion.current;
       try {
         const codes = await detector.detect(video);
+        if (stopped || version !== frameVersion.current || scanLocked.current) return;
         const value = codes?.[0]?.rawValue;
         if (!value) return;
-        const seen = lastScan.current;
-        if (seen.code === value && now - seen.at < RESCAN_MS) return;
-        lastScan.current = { code: value, at: now };
-        admitRef.current(value);
+        void admitRef.current(value);
       } catch {
         /* a failed frame is normal; the next one usually decodes */
+      } finally {
+        decoding = false;
       }
     };
 
@@ -475,7 +389,10 @@ export default function Scanner() {
 
   // Release the camera on unmount and when the event changes - leaving it live
   // keeps the indicator light on, which reads as the page spying.
-  useEffect(() => stopCamera, [stopCamera]);
+  useEffect(() => {
+    mounted.current = true;
+    return () => { mounted.current = false; stopCamera(); };
+  }, [stopCamera]);
   useEffect(() => {
     setResult(null);
     setAdmitted([]);
@@ -486,7 +403,7 @@ export default function Scanner() {
   const submitManual = (event) => {
     event.preventDefault();
     const value = manual.trim();
-    if (!value) return;
+    if (!value || scanLocked.current) return;
     admit(value);
     setManual("");
   };
@@ -531,7 +448,7 @@ export default function Scanner() {
   }
 
   const waiting = bookings
-    .filter((b) => b.status !== "cancelled" && !b.checkedIn)
+    .filter((b) => b.status === "confirmed" && !b.checkedIn)
     .sort((a, b) =>
       String(a.user?.name || "").localeCompare(String(b.user?.name || ""))
     );
@@ -566,7 +483,8 @@ export default function Scanner() {
               <Select
                 label="Which door"
                 value={eventId}
-                onChange={(e) => setEventId(e.target.value)}
+                disabled={locked}
+                onChange={(e) => { stopCamera(); setEventId(e.target.value); }}
                 options={myEvents.map((event) => {
                   const date = eventDate(event);
                   return {
@@ -653,24 +571,11 @@ export default function Scanner() {
                           Stop camera
                         </Button>
                       ) : (
-                        <Button variant="primary" onClick={startCamera}>
+                        <Button variant="primary" onClick={startCamera} loading={startingCamera} disabled={locked}>
                           <Camera size={17} aria-hidden="true" />
                           Start camera
                         </Button>
                       )}
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setSound((value) => !value)}
-                        aria-pressed={sound}
-                      >
-                        {sound ? (
-                          <SpeakerHigh size={16} aria-hidden="true" />
-                        ) : (
-                          <SpeakerSlash size={16} aria-hidden="true" />
-                        )}
-                        {sound ? "Sound on" : "Sound off"}
-                      </Button>
                     </div>
 
                     {cameraError ? (
@@ -699,12 +604,27 @@ export default function Scanner() {
                 )}
               </div>
 
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <Button variant="ghost" size="sm" aria-pressed={sound} onClick={() => {
+                  if (sound) stopSound(); else unlockSound();
+                  setSound(value => !value);
+                }}>
+                  {sound ? <SpeakerHigh size={16} aria-hidden="true" /> : <SpeakerSlash size={16} aria-hidden="true" />}
+                  {sound ? "Sound on" : "Sound off"}
+                </Button>
+                <p role="status" className="text-sm text-[var(--color-fg-muted)]">
+                  {busy ? "Checking ticket…" : result ? "Paused until you press OK" : scanning ? "Ready for the next ticket" : "Ready to check in"}
+                </p>
+              </div>
+              {sound && soundError ? <p role="status" className="mt-2 text-sm text-[var(--color-warning)]">{soundError}</p> : null}
+
               {/* ---------- Manual ---------- */}
               <form onSubmit={submitManual} className="mt-6">
                 <Input
                   label="Or enter a ticket ID"
                   icon={Keyboard}
                   value={manual}
+                  disabled={locked}
                   onChange={(e) => setManual(e.target.value)}
                   placeholder="EVLT-… or EVT-…"
                   autoComplete="off"
@@ -718,7 +638,7 @@ export default function Scanner() {
                   variant="secondary"
                   fullWidth
                   loading={busy}
-                  disabled={!manual.trim()}
+                  disabled={locked || !manual.trim()}
                   className="mt-3"
                 >
                   Check in
@@ -727,10 +647,7 @@ export default function Scanner() {
             </GlassCard>
           </Reveal>
 
-          {/* Verdict sits directly under the controls, where eyes already are. */}
-          <div aria-live="polite" aria-atomic="true">
-            <Verdict result={result} />
-          </div>
+          <Verdict result={result} onAcknowledge={acknowledge} />
         </div>
 
         {/* ================= Right: the list ================= */}
@@ -864,7 +781,7 @@ export default function Scanner() {
                         <button
                           type="button"
                           onClick={() => admit(booking.ticketId || booking._id)}
-                          disabled={busy}
+                          disabled={locked}
                           className="flex w-full min-h-12 items-center gap-3 rounded-[var(--radius-md)] border border-transparent px-3 py-2 text-left transition-colors hover:border-[var(--glass-edge)] hover:bg-white/[0.06] disabled:opacity-45"
                         >
                           <UserCircle

@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const { syncImages, matchesImageType } = require('../services/eventImages');
+const { HttpError, respondError } = require('../utils/httpError');
 const Event = require("../models/Events");
 const Booking = require("../models/Booking");
 const EventImage = require("../models/EventImage");
@@ -85,47 +88,6 @@ const sanitizeTicketConfig = (input) => {
  * The cost of a miss is one image expiring in 24 hours, which is recoverable by
  * re-uploading, unlike a phantom failure.
  */
-const retainEventImages = async (event) => {
-    const keys = collectEventImages(event).map(imageKey).filter(Boolean);
-    if (!keys.length) return;
-
-    await EventImage.updateMany(
-        { key: { $in: keys } },
-        { $set: { expiresAt: null } }
-    ).catch(() => {});
-};
-
-/** Deletes the images an edit or a delete left unreferenced, in either storage. */
-const removeUnusedEventImages = async (before, after) => {
-    const retained = new Set(collectEventImages(after));
-    const dropped = collectEventImages(before).filter((image) => !retained.has(image));
-    if (!dropped.length) return;
-
-    const keys = dropped.map(imageKey).filter(Boolean);
-    const files = dropped.filter(isLegacyUpload);
-
-    await Promise.all([
-        keys.length
-            ? EventImage.deleteMany({ key: { $in: keys } }).catch(() => {})
-            : Promise.resolve(),
-        ...files.map((image) =>
-            fs.promises.unlink(path.join(__dirname, "..", "Public", image.replace(/^\//, ""))).catch(() => {})
-        )
-    ]);
-};
-
-/**
- * POST /api/events/uploads
- *
- * Takes base64 data URLs in the JSON body - there is no multipart handler - and
- * writes the bytes into MongoDB, returning the app-relative paths to store on the
- * event. Previously these became files under Public/uploads, which meant every
- * redeploy of a host with an ephemeral filesystem silently deleted every banner
- * an organiser had uploaded.
- *
- * Validation runs over the whole batch before a single document is written, so a
- * request with one oversized image does not half-succeed.
- */
 exports.uploadImages = async (req, res) => {
     const files = Array.isArray(req.body?.files) ? req.body.files : [];
 
@@ -148,6 +110,7 @@ exports.uploadImages = async (req, res) => {
             }
 
             const imageBuffer = Buffer.from(match[2], "base64");
+            if (match[1].toLowerCase() !== contentType || !matchesImageType(imageBuffer, contentType)) return res.status(400).json({ success: false, message: 'Image contents do not match the file type.' });
             if (!imageBuffer.length || imageBuffer.length > maxImageBytes) {
                 return res.status(400).json({ success: false, message: "Each image must be smaller than 4 MB" });
             }
@@ -163,6 +126,8 @@ exports.uploadImages = async (req, res) => {
     const savedKeys = [];
 
     try {
+        const usage = await EventImage.aggregate([{ $match: { owner: new mongoose.Types.ObjectId(req.user.id) } }, { $group: { _id: null, bytes: { $sum: '$bytes' } } }]);
+        if ((usage[0]?.bytes || 0) + totalBytes > 256 * 1024 * 1024) return res.status(413).json({ success: false, message: 'Image storage limit reached. Contact support.' });
         const expiresAt = new Date(Date.now() + EventImage.UNCLAIMED_MS);
 
         for (const file of preparedFiles) {
@@ -219,7 +184,9 @@ exports.createEvent = async (req, res) => {
         const ticketConfig = sanitizeTicketConfig(req.body.ticketConfig);
         const registrationFields = sanitizeRegistrationFields(req.body.registrationFields);
 
-        const event = await Event.create({
+        let event;
+        await mongoose.connection.transaction(async session => {
+        [event] = await Event.create([{
 
             title,
             description,
@@ -236,7 +203,6 @@ exports.createEvent = async (req, res) => {
             maploc,
             gallery,
             lineup,
-            stats,
             ...(ticketConfig ? { ticketConfig } : {}),
             registrationFields,
 
@@ -245,12 +211,13 @@ exports.createEvent = async (req, res) => {
             status: "approved",
 
             organizer: req.user.id
-
+        }], { session });
+        await syncImages(null, event, req.user, session);
         });
 
         // The images are referenced by a saved event now, so they stop being
         // scratch uploads with an expiry on them.
-        await retainEventImages(event);
+
 
         res.status(201).json({
             success: true,
@@ -260,7 +227,7 @@ exports.createEvent = async (req, res) => {
     }
     catch (err) {
 
-        res.status(err.name === "ValidationError" ? 400 : 500).json({
+        res.status(err.status || (err.name === "ValidationError" ? 400 : 500)).json({
             success: false,
             message: err.message
         });
@@ -274,7 +241,7 @@ exports.getMyEvents = async (req, res) => {
     try {
 
         const events = await Event.find({
-            organizer: req.user.id
+            organizer: req.user.id, archivedAt: null
         });
 
         res.status(200).json({
@@ -445,14 +412,13 @@ exports.updateEvent = async (req, res) => {
             });
         }
 
-        const updatedEvent = await Event.findByIdAndUpdate(
-            req.params.id,
-            changes,
-            { new: true, runValidators: true }
-        );
-
-        await retainEventImages(updatedEvent);
-        await removeUnusedEventImages(event, updatedEvent);
+        let updatedEvent;
+        await mongoose.connection.transaction(async session => {
+            if (changes.status === 'rejected' && await Booking.exists({ event: event._id, status: 'confirmed' }).session(session)) throw new HttpError(409, 'Events with confirmed bookings cannot be hidden. Contact support to arrange cancellation.');
+            updatedEvent = await Event.findOneAndUpdate({ _id: req.params.id, archivedAt: null, __v: event.__v, ticketsSold: { $lte: nextSeats } }, { $set: changes, $inc: { __v: 1 } }, { new: true, runValidators: true, session });
+            if (!updatedEvent) throw new HttpError(409, 'This event changed while you were editing. Refresh and try again.');
+            await syncImages(event, updatedEvent, req.user, session);
+        });
 
         res.status(200).json({
 
@@ -464,7 +430,7 @@ exports.updateEvent = async (req, res) => {
     }
     catch (err) {
 
-        res.status(err.name === "ValidationError" || err.name === "CastError" ? 400 : 500).json({
+        res.status(err.status || (err.name === "ValidationError" || err.name === "CastError" ? 400 : 500)).json({
 
             success: false,
             message: err.message
@@ -516,11 +482,10 @@ exports.deleteEvent = async(req,res)=>{
 
         }
 
-        await Event.findByIdAndDelete(
-            req.params.id
-        );
-
-        await removeUnusedEventImages(event, null);
+        await mongoose.connection.transaction(async session => {
+            if (await Booking.exists({ event: event._id, status: 'confirmed' }).session(session)) throw new HttpError(409, 'Events with confirmed bookings cannot be deleted. Contact support to arrange cancellation.');
+            await Event.updateOne({ _id: event._id }, { $set: { archivedAt: new Date() }, $inc: { __v: 1 } }, { session });
+        });
 
         res.status(200).json({
 
@@ -532,7 +497,7 @@ exports.deleteEvent = async(req,res)=>{
     }
     catch(err){
 
-        res.status(500).json({
+        res.status(err.status || 500).json({
 
             success:false,
             message:err.message

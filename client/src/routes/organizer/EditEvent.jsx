@@ -34,7 +34,7 @@ export default function EditEvent() {
   const { user, isAdmin } = useAuth();
 
   const { data, error, loading } = useApi(
-    (signal) => eventsApi.get(id, signal),
+    (signal) => eventsApi.manage(id, signal),
     [id]
   );
 

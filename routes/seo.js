@@ -78,7 +78,7 @@ const CLUB_ROUTES = ["/clubs/1", "/clubs/2", "/clubs/3", "/clubs/4"];
 const PAST_EVENT_WINDOW_DAYS = 180;
 
 /** Matches the visibility rule in routes/events.js — pending stays discoverable. */
-const VISIBLE = { status: { $in: ["approved", "pending"] } };
+const VISIBLE = { archivedAt: null, status: { $in: ["approved", "pending"] } };
 
 /* ==========================================================================
    Escaping
@@ -651,6 +651,13 @@ const render = async (req, res) => {
     if (moved) return res.redirect(301, canonicalUrl(moved));
 
     const eventMatch = EVENT_PATH.exec(pathname);
+    const notFound = () => res.status(404).type('html').send(renderPage({ title: formatTitle('Page not found'), description: 'This page does not exist.', canonical, image: absoluteUrl(DEFAULT_OG_IMAGE), noindex: true, body: staticBody('Page not found', 'Browse upcoming events instead.', canonicalUrl('/events')) }));
+    if (!PAGES[pathname] && !eventMatch && !CLUB_ROUTES.includes(pathname) && !isPrivatePath(pathname) && !/^\/(events|clubs)\//.test(pathname)) return notFound();
+    if (CLUB_ROUTES.includes(pathname)) {
+        const { getClub } = await import('../client/src/data/clubs.js');
+        const club = getClub(pathname.split('/').pop());
+        return res.type('html').send(renderPage({ title: formatTitle(club.title), description: club.description, canonical, image: absoluteUrl(club.banner), imageAlt: club.title, body: staticBody(club.title, club.description + ' ' + club.address, canonical) }));
+    }
 
     if (eventMatch && isDatabaseReady()) {
         try {
@@ -719,7 +726,7 @@ const render = async (req, res) => {
                 })
             );
         } catch {
-            /* fall through to the generic page below */
+            return res.status(503).set('Retry-After', '300').set('Cache-Control', 'no-store').type('html').send(renderPage({ title: formatTitle('Temporarily unavailable'), description: 'Please try again shortly.', canonical, image: absoluteUrl(DEFAULT_OG_IMAGE), noindex: true, body: staticBody('Temporarily unavailable', 'Please try again shortly.', canonical) }));
         }
     }
 

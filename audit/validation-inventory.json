@@ -1,0 +1,1538 @@
+{
+  "date": "2026-10-26",
+  "scope": "All tracked and non-ignored new files inventoried; first-party script/JSON/CSS syntax and literal active media paths checked. Binary media listed, not visually inspected. Excludes ignored secrets, dependencies and generated output.",
+  "trackedFiles": 265,
+  "counts": {
+    "javascript": 147,
+    "inlineScripts": 20,
+    "json": 16,
+    "css": 11,
+    "binary": 44
+  },
+  "failures": [],
+  "missingMedia": [],
+  "files": [
+    {
+      "path": ".env.example",
+      "bytes": 694,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": ".github/workflows/checks.yml",
+      "bytes": 1458,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "AGENTS.md",
+      "bytes": 658,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "AUDIT.md",
+      "bytes": 47071,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "WORK_LOG.md",
+      "bytes": 24589,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/README.md",
+      "bytes": 903,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/browser-results.txt",
+      "bytes": 1100,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/build-results.txt",
+      "bytes": 5270,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/checkout-desktop.png",
+      "bytes": 527388,
+      "category": "media"
+    },
+    {
+      "path": "audit/dependency-audit-backend.json",
+      "bytes": 363,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/dependency-audit-before.json",
+      "bytes": 32958,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/dependency-audit-client.json",
+      "bytes": 365,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/file-inventory.json",
+      "bytes": 29481,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/inspect-source.cjs",
+      "bytes": 1087,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/inventory.cjs",
+      "bytes": 3182,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/menu-mobile.png",
+      "bytes": 93780,
+      "category": "media"
+    },
+    {
+      "path": "audit/probe-results.json",
+      "bytes": 3217,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/regression-results.txt",
+      "bytes": 11202,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/repo-backend-results.txt",
+      "bytes": 11613,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/repo-browser-results.txt",
+      "bytes": 1460,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/repo-build-results.txt",
+      "bytes": 5382,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/repo-race-before.txt",
+      "bytes": 1266,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/reproduce-findings.cjs",
+      "bytes": 13760,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "audit/scanner-browser-results.txt",
+      "bytes": 1387,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "audit/scanner-error-mobile.png",
+      "bytes": 77649,
+      "category": "media"
+    },
+    {
+      "path": "audit/scanner-success-desktop.png",
+      "bytes": 159938,
+      "category": "media"
+    },
+    {
+      "path": "audit/validation-inventory.json",
+      "bytes": 35603,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/assets/sounds/error.mp3",
+      "bytes": 32737,
+      "category": "active-frontend-or-config"
+    },
+    {
+      "path": "client/src/assets/sounds/success.mp3",
+      "bytes": 33481,
+      "category": "active-frontend-or-config"
+    },
+    {
+      "path": "client/src/components/forms/RegistrationEditor.jsx",
+      "bytes": 2323,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/forms/RegistrationFields.jsx",
+      "bytes": 1909,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/forms/TicketSettings.jsx",
+      "bytes": 1450,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/data/ticket-fields.json",
+      "bytes": 2109,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/uploadBatches.js",
+      "bytes": 719,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/useDialogFocus.js",
+      "bytes": 1938,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/useScannerSounds.js",
+      "bytes": 2891,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "middleware/limits.js",
+      "bytes": 414,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/AuthHandoff.js",
+      "bytes": 389,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/Purchase.js",
+      "bytes": 1503,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "scripts/local-integration.cjs",
+      "bytes": 6191,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "scripts/local-webhook-relay.cjs",
+      "bytes": 1977,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "services/eventImages.js",
+      "bytes": 2507,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "services/purchases.js",
+      "bytes": 14528,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "services/recovery.js",
+      "bytes": 2381,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "services/ticketDelivery.js",
+      "bytes": 1699,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/brevo-smoke.cjs",
+      "bytes": 5473,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/browser.test.cjs",
+      "bytes": 21574,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/integration.test.cjs",
+      "bytes": 24176,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/mailer.test.cjs",
+      "bytes": 3093,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/razorpay-smoke.cjs",
+      "bytes": 1477,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/unit.test.cjs",
+      "bytes": 6797,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "tests/webhook-relay.test.cjs",
+      "bytes": 1846,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/eventPolicy.js",
+      "bytes": 1792,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/httpError.js",
+      "bytes": 544,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/migrationCleanup.js",
+      "bytes": 1154,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/oauth.js",
+      "bytes": 1580,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": ".claude/launch.json",
+      "bytes": 200,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 1587,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": ".node-version",
+      "bytes": 3,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "bytes": 76,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "Controllers/adminController.js",
+      "bytes": 7946,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "Controllers/authController.js",
+      "bytes": 562,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "Controllers/bookingController.js",
+      "bytes": 12391,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "Controllers/eventController.js",
+      "bytes": 17567,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "Controllers/imageController.js",
+      "bytes": 4256,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "Controllers/paymentController.js",
+      "bytes": 2400,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "DEPLOY.md",
+      "bytes": 13034,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "Public/Exp.html",
+      "bytes": 12337,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/Media/AfterHour/1.webp",
+      "bytes": 155746,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/AfterHour/2.webp",
+      "bytes": 169456,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/AfterHour/3.webp",
+      "bytes": 167886,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/AfterHour/banner.avif",
+      "bytes": 42443,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Club91/1.webp",
+      "bytes": 94264,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Club91/2.webp",
+      "bytes": 72034,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Club91/3.webp",
+      "bytes": 76216,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Club91/4.webp",
+      "bytes": 82332,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Club91/banner.avif",
+      "bytes": 799789,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Luna/1.avif",
+      "bytes": 114648,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Luna/2.webp",
+      "bytes": 222538,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Luna/3.webp",
+      "bytes": 198196,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Luna/4.webp",
+      "bytes": 205116,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Luna/banner.avif",
+      "bytes": 320722,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Pablo/1.webp",
+      "bytes": 131868,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Pablo/2.webp",
+      "bytes": 168440,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Pablo/3.webp",
+      "bytes": 137404,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Pablo/4.webp",
+      "bytes": 167726,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Pablo/banner.webp",
+      "bytes": 126062,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/Background.png",
+      "bytes": 1805091,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/calendar.png",
+      "bytes": 11689,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/categories.png",
+      "bytes": 10529,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/clock.png",
+      "bytes": 14864,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/club-cat.png",
+      "bytes": 29380,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/club.jpg",
+      "bytes": 5657509,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/dj.jpg",
+      "bytes": 62922,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/google.png",
+      "bytes": 1247,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/instagram.png",
+      "bytes": 16180,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/lgo.png",
+      "bytes": 350898,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/location.png",
+      "bytes": 16080,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/logo.jpg",
+      "bytes": 1261189,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/music-cat.png",
+      "bytes": 15514,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/networking-cat.png",
+      "bytes": 39543,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/no-event.jpg",
+      "bytes": 8481,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/pfp.jpg",
+      "bytes": 10046,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/search.png",
+      "bytes": 8350,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/tech.jpg",
+      "bytes": 63965,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Png/x.png",
+      "bytes": 17708,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/Reference.png",
+      "bytes": 1948962,
+      "category": "media"
+    },
+    {
+      "path": "Public/Media/upview.mp4",
+      "bytes": 13237952,
+      "category": "media"
+    },
+    {
+      "path": "Public/admin/analytics.html",
+      "bytes": 8906,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/admin/css/admin.css",
+      "bytes": 32632,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/admin/dashboard.html",
+      "bytes": 8978,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/admin/events.html",
+      "bytes": 8244,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/admin/inbox.html",
+      "bytes": 7008,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/admin/js/admin-analytics.js",
+      "bytes": 3306,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/admin/js/admin-dashboard.js",
+      "bytes": 1108,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/admin/js/admin-events.js",
+      "bytes": 8479,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/admin/js/admin-inbox.js",
+      "bytes": 3200,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/admin/js/admin-users.js",
+      "bytes": 4248,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/admin/users.html",
+      "bytes": 7149,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/club.html",
+      "bytes": 22885,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/contact.html",
+      "bytes": 7259,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/create-event.html",
+      "bytes": 9084,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/css/auth.css",
+      "bytes": 5529,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/detail-pages.css",
+      "bytes": 8023,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/event-form.css",
+      "bytes": 6690,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/legal.css",
+      "bytes": 1910,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/nav.css",
+      "bytes": 5819,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/organizer.css",
+      "bytes": 6322,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/responsive.css",
+      "bytes": 6221,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/css/style.css",
+      "bytes": 31882,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/dashboard.html",
+      "bytes": 21212,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/edit-event.html",
+      "bytes": 14405,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/event-bookings.html",
+      "bytes": 11152,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/event.html",
+      "bytes": 35212,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/faq.html",
+      "bytes": 4669,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/index.html",
+      "bytes": 15486,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/js/app.js",
+      "bytes": 564,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/js/auth.js",
+      "bytes": 12300,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/js/event-form.js",
+      "bytes": 2717,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/js/nav.js",
+      "bytes": 4733,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/js/script.js",
+      "bytes": 12285,
+      "category": "archived-frontend",
+      "parse": "pass"
+    },
+    {
+      "path": "Public/login.html",
+      "bytes": 18657,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/mybookings.html",
+      "bytes": 18689,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/new.html",
+      "bytes": 4004,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/privacy.html",
+      "bytes": 4566,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/profile.html",
+      "bytes": 9558,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/scanner.html",
+      "bytes": 14885,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/support.html",
+      "bytes": 5869,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "Public/terms.html",
+      "bytes": 4471,
+      "category": "archived-frontend",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1885,
+      "category": "backend-tooling-or-config"
+    },
+    {
+      "path": "client/.gitignore",
+      "bytes": 467,
+      "category": "active-frontend-or-config"
+    },
+    {
+      "path": "client/index.html",
+      "bytes": 4160,
+      "category": "active-frontend-or-config",
+      "inlineScriptParse": "pass"
+    },
+    {
+      "path": "client/package-lock.json",
+      "bytes": 111336,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/package.json",
+      "bytes": 639,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/public/robots.txt",
+      "bytes": 289,
+      "category": "active-frontend-or-config"
+    },
+    {
+      "path": "client/public/sitemap.xml",
+      "status": "deleted"
+    },
+    {
+      "path": "client/scripts/audit-tw.mjs",
+      "bytes": 2939,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/scripts/contrast-audit.js",
+      "bytes": 5900,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/App.jsx",
+      "bytes": 9984,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ErrorBoundary.jsx",
+      "bytes": 946,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/bookings/BookingTicket.jsx",
+      "bytes": 5155,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/events/EventCard.jsx",
+      "bytes": 6257,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/forms/ContactForm.jsx",
+      "bytes": 8321,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/forms/EventForm.jsx",
+      "bytes": 30816,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/layout/DocPage.jsx",
+      "bytes": 3102,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/layout/Footer.jsx",
+      "bytes": 7093,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/layout/Nav.jsx",
+      "bytes": 18419,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/search/SearchOverlay.jsx",
+      "bytes": 4350,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/seo/Seo.jsx",
+      "bytes": 6589,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Accordion.jsx",
+      "bytes": 3202,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Badge.jsx",
+      "bytes": 5286,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Button.jsx",
+      "bytes": 4959,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Carousel.jsx",
+      "bytes": 12036,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/CountUp.jsx",
+      "bytes": 3036,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Feedback.jsx",
+      "bytes": 5990,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Field.jsx",
+      "bytes": 10758,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/GlassCard.jsx",
+      "bytes": 6182,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Marquee.jsx",
+      "bytes": 6664,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Modal.jsx",
+      "bytes": 7787,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/Reveal.jsx",
+      "bytes": 2692,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/components/ui/StackCards.jsx",
+      "bytes": 6272,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/data/clubs.js",
+      "bytes": 5597,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/data/faqs.js",
+      "bytes": 3010,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/data/seo-pages.json",
+      "bytes": 2650,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/api.js",
+      "bytes": 16932,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/auth.jsx",
+      "bytes": 3844,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/constants.js",
+      "bytes": 5816,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/images.js",
+      "bytes": 8662,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/razorpay.js",
+      "bytes": 1545,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/seo.js",
+      "bytes": 13199,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/toast.jsx",
+      "bytes": 4966,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/useApi.js",
+      "bytes": 3153,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/lib/useMediaQuery.js",
+      "bytes": 1542,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/main.jsx",
+      "bytes": 649,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/motion/presets.js",
+      "bytes": 6829,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/BookingSuccess.jsx",
+      "bytes": 3457,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/ClubDetail.jsx",
+      "bytes": 11359,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Clubs.jsx",
+      "bytes": 5177,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Contact.jsx",
+      "bytes": 4727,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/EventDetail.jsx",
+      "bytes": 22118,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Events.jsx",
+      "bytes": 13916,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Experience.jsx",
+      "bytes": 9545,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Faq.jsx",
+      "bytes": 3580,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Home.jsx",
+      "bytes": 38585,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Login.jsx",
+      "bytes": 21555,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/MyBookings.jsx",
+      "bytes": 11419,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/NotFound.jsx",
+      "bytes": 3540,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Privacy.jsx",
+      "bytes": 1726,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Profile.jsx",
+      "bytes": 11007,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Support.jsx",
+      "bytes": 6934,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/Terms.jsx",
+      "bytes": 1531,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/admin/AdminAnalytics.jsx",
+      "bytes": 23258,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/admin/AdminDashboard.jsx",
+      "bytes": 16745,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/admin/AdminEvents.jsx",
+      "bytes": 14918,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/admin/AdminInbox.jsx",
+      "bytes": 15982,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/admin/AdminNav.jsx",
+      "bytes": 1908,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/admin/AdminUsers.jsx",
+      "bytes": 16887,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/guards.jsx",
+      "bytes": 1831,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/legacy.jsx",
+      "bytes": 2940,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/organizer/CreateEvent.jsx",
+      "bytes": 6174,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/organizer/Dashboard.jsx",
+      "bytes": 17696,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/organizer/EditEvent.jsx",
+      "bytes": 7925,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/organizer/EventBookings.jsx",
+      "bytes": 18285,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/routes/organizer/Scanner.jsx",
+      "bytes": 32486,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/styles/global.css",
+      "bytes": 13894,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/styles/tokens.css",
+      "bytes": 7185,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/AmbientScene.jsx",
+      "bytes": 6110,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/Canvas3D.jsx",
+      "bytes": 1513,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/GlassShards.jsx",
+      "bytes": 3937,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/Particles.jsx",
+      "bytes": 5898,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/SceneLayer.jsx",
+      "bytes": 2703,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/usePointer.js",
+      "bytes": 1203,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/src/three/useSceneQuality.js",
+      "bytes": 3254,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/vercel.json",
+      "bytes": 1515,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "client/vite.config.js",
+      "bytes": 1196,
+      "category": "active-frontend-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "config/db.js",
+      "bytes": 3085,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "config/passport.js",
+      "bytes": 1636,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "middleware/authMiddleware.js",
+      "bytes": 1547,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "middleware/roleMiddleware.js",
+      "bytes": 587,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/Booking.js",
+      "bytes": 2829,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/Contact.js",
+      "bytes": 677,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/EventImage.js",
+      "bytes": 3448,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/Events.js",
+      "bytes": 6837,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "models/User.js",
+      "bytes": 1236,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "nodemon.json",
+      "bytes": 221,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "package-lock.json",
+      "bytes": 102804,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "package.json",
+      "bytes": 1340,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/Bookingroute.js",
+      "bytes": 711,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/admin.js",
+      "bytes": 1877,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/auth.js",
+      "bytes": 14201,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/contact.js",
+      "bytes": 829,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/events.js",
+      "bytes": 5342,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/images.js",
+      "bytes": 284,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/payments.js",
+      "bytes": 488,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "routes/seo.js",
+      "bytes": 32166,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "scripts/check-js.js",
+      "bytes": 987,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "scripts/migrateEventImages.js",
+      "bytes": 7036,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "scripts/start.js",
+      "bytes": 7797,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "server.js",
+      "bytes": 9873,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/generateTicketPdf.js",
+      "bytes": 22130,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/imagePaths.js",
+      "bytes": 2297,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/mailer.js",
+      "bytes": 5526,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/registrationFields.js",
+      "bytes": 10651,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/sendEmail.js",
+      "bytes": 731,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    },
+    {
+      "path": "utils/ticketFields.js",
+      "bytes": 7206,
+      "category": "backend-tooling-or-config",
+      "parse": "pass"
+    }
+  ]
+}

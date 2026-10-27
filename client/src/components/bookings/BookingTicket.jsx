@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { bookings as bookingsApi } from "../../lib/api";
+import { useToast } from "../../lib/toast";
 import Modal from "../ui/Modal";
 import Button from "../ui/Button";
 import { DownloadSimple, SealCheck, Warning } from "@phosphor-icons/react";
@@ -11,11 +14,8 @@ import { formatPrice } from "../../lib/constants";
  * scanner was built to read, with no client-side regeneration that could drift
  * from it.
  *
- * The A4 PDF version is emailed at purchase. There is deliberately no download
- * link for it here: the PDFs sit in the server's tickets/ directory named only
- * by ticket id, so serving that directory would hand anyone who guesses an id
- * somebody else's pass. Saving the QR image covers the actual need - having the
- * code on your phone at the door - and works offline once saved.
+ * PDF downloads go through the authenticated booking endpoint. The ticket
+ * directory is never exposed as a public static folder.
  */
 
 /** Data URLs can be handed straight to a download link; no blob needed. */
@@ -24,6 +24,10 @@ export function qrDownloadName(booking) {
 }
 
 export function QrPanel({ booking, event, compact = false }) {
+  const [downloading, setDownloading] = useState(false);
+  const toast = useToast();
+  if (booking && booking.status !== 'confirmed') return <p role="status">This booking is {booking.status}. It does not provide a valid entry pass.</p>;
+  const downloadPdf = async () => { setDownloading(true); try { await bookingsApi.downloadTicket(booking._id, booking.ticketId); } catch (error) { toast.error(error.message); } finally { setDownloading(false); } };
   if (!booking?.qrCode) {
     return (
       <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-warning)]/40 bg-[var(--color-warning)]/10 p-4">
@@ -108,6 +112,7 @@ export function QrPanel({ booking, event, compact = false }) {
         <DownloadSimple size={18} aria-hidden="true" />
         Save QR image
       </Button>
+      <Button variant="primary" fullWidth loading={downloading} onClick={downloadPdf}>Download PDF pass</Button>
     </div>
   );
 }

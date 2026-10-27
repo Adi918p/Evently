@@ -40,13 +40,11 @@ Root Directory is the setting people miss. The repo root is the Express app; the
 Vercel project must be pointed at `client/`, which is also why `vercel.json`
 lives there rather than at the root.
 
-### Environment variable
+### Browser API origin
 
-`VITE_API_ORIGIN` = `https://api.event-ly.in`
-
-Vite inlines `VITE_*` vars at build time, so changing this needs a redeploy, not
-a restart. It is read in exactly one place — the Google OAuth start URL. Leave
-it unset locally so the value stays empty and the Vite dev proxy handles it.
+All API calls, including Google sign-in, use the current website origin.
+Remove obsolete VITE_API_ORIGIN from Vercel settings; the application no longer
+reads it. OAuth state and exchange cookies must stay on the same site.
 
 Note that the rewrite destinations in `vercel.json` are hardcoded. `vercel.json`
 does not interpolate environment variables, so the API host appears there
@@ -78,7 +76,7 @@ Do **not** set `PORT` — Render assigns it and `server.js` reads it.
 ### Environment variables
 
 `MONGO_URI`, `JWT_SECRET`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`,
-`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RESEND_API_KEY`, `MAIL_FROM`,
+`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`, `BREVO_API_KEY`, `MAIL_TRANSPORT`, `MAIL_FROM`, `MAIL_FROM_NAME`,
 `EMAIL_USER`, `EMAIL_PASS`, `FRONTEND_URL`
 
 `FRONTEND_URL` must be `https://event-ly.in` — the Vercel domain, no trailing
@@ -101,31 +99,26 @@ to rewrite to and every request fails.
 
 ## Google OAuth
 
-In Google Cloud Console, the authorised redirect URI must be:
+Register this exact authorized redirect URI in Google Cloud Console:
 
+```text
+https://event-ly.in/api/auth/google/callback
 ```
-https://api.event-ly.in/api/auth/google/callback
-```
 
-The strategy in `config/passport.js` uses a *relative* `callbackURL`, so it
-adapts to whichever host serves the request. Only Google's allowlist is
-absolute, and it must match byte for byte.
+The strategy derives an absolute callback from FRONTEND_URL; it does not infer
+HTTP/HTTPS from proxy headers. Locally, set FRONTEND_URL=http://localhost:5173
+and allow http://localhost:5173/api/auth/google/callback in the Google client.
+For a built app served directly on port 8000, use that origin consistently.
 
-The full round trip, worth reading once because it looks wrong in the middle:
+1. The browser opens /api/auth/google on the website origin.
+2. The API stores a short-lived, single-use state record and HttpOnly cookie.
+3. Google returns through the same website proxy. The API checks both state
+   and the account's current status before issuing a short-lived handoff cookie.
+4. /login?oauth=complete exchanges that cookie once for the bearer token.
+   Tokens are never put in redirect query strings.
 
-1. User clicks "Continue with Google" on event-ly.in. The button navigates to
-   `https://api.event-ly.in/api/auth/google` — straight to the API host, not
-   through the proxy. This is the one place `VITE_API_ORIGIN` is used.
-2. Render redirects to Google. Google returns to the callback above.
-3. Render signs a JWT and redirects to
-   `${FRONTEND_URL}/login.html?token=<jwt>`.
-4. Vercel serves the SPA for `/login.html`, and
-   `client/src/routes/legacy.jsx` rewrites it to `/login`, which reads the token
-   out of the query string and stores it.
-
-Step 3's `.html` path is deliberate and is baked into the deployed server.
-`legacy.jsx` exists partly to absorb it. Don't "tidy" either end without
-changing both.
+The proxy must forward Set-Cookie unchanged and must not cache auth responses.
+Existing old token-query callbacks are intentionally no longer accepted.
 
 ## Local development
 
@@ -164,7 +157,7 @@ so the URL resolves rather than hitting the SPA.
 **Google sign-in ends on api.event-ly.in** — `FRONTEND_URL` is wrong on Render.
 
 **Google returns `redirect_uri_mismatch`** — the Console entry does not exactly
-match `https://api.event-ly.in/api/auth/google/callback`.
+match `https://event-ly.in/api/auth/google/callback`.
 
 **`npm ci` fails with `lock file out of sync`** — `client/package-lock.json` is
 behind `client/package.json`. Run `npm --prefix client install` locally and
@@ -178,5 +171,104 @@ free instance has little headroom. `vite.config.js` already splits `three` and
 
 Point the apex `event-ly.in` back at Render and clear nothing else. Render is
 still building and serving `client/dist` with a working SPA fallback, so it
-serves the whole app unaided. `VITE_API_ORIGIN` being baked into the Vercel
-bundle does not matter, because nobody is being served that bundle.
+serves the whole app unaided. Keep FRONTEND_URL and the Google callback on the
+apex origin.
+
+## Purchase integrity and recovery
+
+MongoDB must be a replica set (including Atlas) or a supported sharded cluster.
+Booking creation, seat allocation, purchase state and event/image edits use
+transactions; a standalone database is intentionally not supported for writes.
+Back up the database before deployment. Ensure Mongoose can create indexes and
+confirm unique indexes on purchases (user/requestKey, orderId, paymentId),
+bookings (purchase, ticketId, paymentId, orderId) and OAuth handoff hashes before
+opening checkout. Resolve any existing duplicates explicitly; do not drop data
+or indexes as a shortcut. Existing bookings are not rewritten by this release.
+
+The API creates an immutable purchase before opening Checkout. Only a matching
+captured payment can fulfill it. A zero-price event uses the free-booking API.
+The browser receives a specific purchase ID and can resume its status from My
+bookings. Changing an event's price/questions does not change a paid purchase's
+stored details. Sales close at the event start time in Asia/Kolkata, or at the
+end of that date when the event has no time.
+
+Keep the current Razorpay **test** keys until the owner chooses to switch. Set
+RAZORPAY_WEBHOOK_SECRET separately and configure a test-mode webhook at:
+
+```text
+https://event-ly.in/api/payments/webhook
+```
+
+Subscribe to payment.captured, order.paid and refund.processed/refund.failed.
+The handler validates the signature over the raw body, then retrieves current
+provider state. Do not put the bearer-auth middleware in front of this route.
+Use automatic capture or configure capture in Razorpay; an authorized payment
+does not issue a pass. See [Razorpay's integration steps](https://razorpay.com/docs/payments/payment-gateway/web-integration/standard/integration-steps/)
+and [webhook validation/testing](https://razorpay.com/docs/webhooks/validate-test/).
+
+The Express process runs recovery every 30 seconds: it revisits unfulfilled
+purchases, recovers lost order responses by receipt, and retries full refunds
+when payment succeeds after seats or eligibility disappear. Retries use durable
+database state and leases. Keep the API process running; a sleeping host delays
+recovery. A known failed refund remains pending for operator review rather than
+creating another refund repeatedly. A full refund reported for an issued pass
+atomically cancels it and releases its seats. Partial refunds do not cancel the
+whole booking automatically and need an explicit support decision. Subscribe to
+refund webhooks so dashboard refunds reach Evently.
+
+Ticket email delivery has up to five background attempts. Downloading a PDF
+remains available to the booking owner if mail fails. Monitor failed deliveries
+and refund_pending purchases. Historical purchases made with a different
+Razorpay environment are not reconciled with the new environment's keys; settle
+test purchases and outstanding refunds before switching. Use a fresh webhook
+secret and matching keys for the new environment.
+
+Events with confirmed bookings cannot be deleted or hidden. Unsold events are
+archived, preserving records. Existing administrator accounts cannot be demoted
+or suspended through these endpoints; account-owner maintenance is required.
+Uploaded images must be owned by the editor; referenced shared/historical images
+are retained. Legacy file deletion is opt-in and runs after successful saves.
+
+## Verification and remaining release checks
+
+```text
+npm ci
+npm --prefix client ci
+npm test
+npm --prefix client run build
+npm run test:browser
+node audit/inventory.cjs
+npm audit
+npm --prefix client audit
+```
+
+The tests start a fresh local MongoDB replica set; they do not use MONGO_URI or
+production records. The first run downloads a MongoDB binary into .cache.
+Browser tests use installed Chrome, the production build and simulated Razorpay
+callbacks; external browser requests are blocked. The optional
+`node tests/razorpay-smoke.cjs --test-mode` creates an unpaid order using the
+configured test keys. It refuses live keys and does not create a payment.
+
+Before release, finish an actual Razorpay test payment, verify capture/webhook
+delivery, close the checkout before its callback and confirm recovery, exercise
+a refund, complete Google sign-in through the deployed proxy, and confirm a
+real ticket email arrives. RAZORPAY_WEBHOOK_SECRET was absent in the local
+configuration reviewed on 2026-10-26; it must be supplied by the owner. Google
+Console also needs the updated callback above. No real payment capture, email
+send, production database operation or deployment was performed by these tests.
+
+API limits use per-process memory plus persistent OTP attempt/cooldown records.
+Configure TRUST_PROXY only for known proxies after checking the real ingress
+path. Leaving it unset can group proxied visitors under a shared IP; trusting
+unverified forwarding headers lets callers evade limits. Use a shared rate-limit
+store or edge protection when scaling to multiple API instances. Monitor and
+review the deployed host configuration; local passing tests are not a security
+certification. The existing large Three.js chunk warning remains a performance
+measurement item, not a failed build.
+
+## Current email provider and external test setup
+
+Brevo is the default transactional email provider. The Resend integration has
+been removed. Complete the sender/key setup in [INTEGRATION_SETUP.md](INTEGRATION_SETUP.md)
+before deploying this mailer change. The same guide records the exact webhook
+and Google configuration dependencies; choose the intended public origin first.

@@ -1,169 +1,21 @@
 const mongoose = require("mongoose");
-const QRCode = require("qrcode");
 
 const Booking = require('../models/Booking');
 const Event = require('../models/Events');
+const Purchase = require('../models/Purchase');
 const generateTicketPdf = require("../utils/generateTicketPdf");
 const { buildTicketView } = require("../utils/ticketFields");
-const { resolveAnswers } = require("../utils/registrationFields");
 
+const purchases = require('../services/purchases');
+const { respondError, HttpError } = require('../utils/httpError');
 exports.createBooking = async (req, res) => {
-
     try {
-
-        const { eventId, tickets } = req.body;
-        const ticketCount = Number(tickets);
-
-        /* ---------------- FIND EVENT ---------------- */
-
-        const event = await Event.findById(eventId);
-
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: "Event not found"
-            });
-        }
-
-        /* ---------------- VALIDATE TICKETS ---------------- */
-
-        if (
-            !Number.isInteger(ticketCount) ||
-            ticketCount <= 0 ||
-            ticketCount > 10
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid ticket count"
-            });
-        }
-
-        /* ---------------- AVAILABLE SEATS ---------------- */
-
-        const availableSeats = Math.max(
-            Number(event.seats || 0) - Number(event.ticketsSold || 0),
-            0
-        );
-
-        if (ticketCount > availableSeats) {
-
-            return res.status(409).json({
-                success: false,
-                message: `Only ${availableSeats} seats left`
-            });
-
-        }
-
-        /* ---------------- TOTAL PRICE ---------------- */
-
-        const totalPrice =
-            event.price * ticketCount;
-
-        /* ---------------- ORGANISER'S OWN QUESTIONS ---------------- */
-
-        // Nothing has been written yet, so this path can still refuse: a missing
-        // required answer comes back as a 400 the booking form can show against
-        // the field. The paid path cannot do that - see paymentController.
-        const { answers, errors } = resolveAnswers(event.registrationFields, req.body.answers);
-
-        if (errors.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: errors[0],
-                errors
-            });
-        }
-
-        /* ---------------- TICKET ID ---------------- */
-
-        const ticketId =
-            "EVT-" +
-            Date.now() +
-            "-" +
-            Math.floor(Math.random() * 1000);
-
-        const qrData = JSON.stringify({
-            ticketId,
-            eventId,
-            userId: req.user.id
-        });
-
-        const qrCode = await QRCode.toDataURL(qrData);
-
-        /* ---------------- CREATE BOOKING ---------------- */
-
-        const booking =
-            await Booking.create({
-
-                user: req.user.id,
-
-                event: eventId,
-
-                tickets: ticketCount,
-
-                totalPrice,
-
-                ticketId,
-
-                qrCode,
-
-                answers,
-
-                status: "confirmed"
-
-            });
-
-        /* ---------------- UPDATE SOLD TICKETS ---------------- */
-
-        const updatedEvent = await Event.findOneAndUpdate(
-            {
-                _id: eventId,
-                $expr: {
-                    $lte: [
-                        { $add: ["$ticketsSold", ticketCount] },
-                        "$seats"
-                    ]
-                }
-            },
-            { $inc: { ticketsSold: ticketCount } },
-            { returnDocument: "after" }
-        );
-
-        if (!updatedEvent) {
-            await Booking.findByIdAndDelete(booking._id);
-            return res.status(409).json({
-                success: false,
-                message: "Those seats were just taken. Please try again."
-            });
-        }
-
-        /* ---------------- RESPONSE ---------------- */
-
-        res.status(201).json({
-
-            success: true,
-
-            booking,
-
-            ticketId
-
-        });
-
-    }
-    catch (err) {
-
-        res.status(500).json({
-
-            success: false,
-
-            message: err.message
-
-        });
-
-    }
-
+        const purchase = await purchases.prepare(req.user.id, req.body, true);
+        const completed = await purchases.fulfill(purchase._id);
+        if (completed.state === 'failed') throw new HttpError(409, completed.reason);
+        return res.status(201).json(await purchases.present(completed));
+    } catch (error) { return respondError(res, error); }
 };
-
 
 exports.getMyBookings = async (req, res) => {
 
@@ -175,12 +27,13 @@ exports.getMyBookings = async (req, res) => {
             })
                 .populate(
                     "event",
-                    "title date banner location venue price"
+                    "title date time banner location venue price organizer archivedAt"
                 );
 
         res.status(200).json({
             success: true,
-            bookings
+            purchases: await Purchase.find({ user: req.user.id, state: { $ne: 'fulfilled' } }).select('state reason eventSnapshot.title createdAt').sort({ createdAt: -1 }).limit(20),
+            bookings: bookings.map(row => { const value = row.toObject(); return { ...value, event: value.eventSnapshot || value.event }; })
         });
 
     }
@@ -220,7 +73,7 @@ const downloadName = (event, booking) => {
  *
  * 1. The PDF is re-rendered on every request rather than served from disk. It is
  *    a ~50ms render, and it means a pass always reflects the current design and
- *    the organiser's current ticketConfig instead of whatever was emailed months
+ *    the purchased event snapshot rather than later edits made months
  *    ago. It also means a booking whose file was never written (mail delivery
  *    failed) is still downloadable.
  *
@@ -267,10 +120,10 @@ exports.downloadTicket = async (req, res) => {
             });
         }
 
-        if (booking.status === "cancelled") {
+        if (booking.status !== "confirmed") {
             return res.status(409).json({
                 success: false,
-                message: "This booking was cancelled, so it has no valid pass"
+                message: "Only a confirmed booking has a valid pass"
             });
         }
 
@@ -279,7 +132,7 @@ exports.downloadTicket = async (req, res) => {
         // name is better than a failed download.
         const attendee = booking.user || { name: req.user.name, email: req.user.email };
 
-        const filePath = await generateTicketPdf(booking, booking.event, attendee);
+        const filePath = await generateTicketPdf(booking, booking.eventSnapshot || booking.event, booking.attendeeSnapshot || attendee);
 
         res.download(filePath, downloadName(booking.event, booking), (err) => {
             // Headers are already sent by the time a stream error surfaces, so
@@ -331,11 +184,8 @@ const scanBooking = (booking) => ({
  *
  * body: { bookingId?, ticketId?, eventId?, mode?: "preview" | "confirm" }
  *
- * Two-step by design. A scan runs in "preview" mode, which reads the ticket and
- * returns what the door should see without touching it; the operator looks at
- * the name and count, then confirms, which is the only call that checks anyone
- * in. Previously a single scan checked in immediately, so a misread or a
- * curious tap burned a ticket with no way back.
+ * Preview reads the ticket without changing admission. The scanner and roster
+ * explicitly send "confirm" and show success only after admission is saved.
  *
  * mode defaults to "preview": the safe direction to fail, and it means a stray
  * or replayed request cannot admit anyone.
@@ -363,6 +213,7 @@ exports.verifyTicket = async (req, res) => {
     try {
 
         const { bookingId, ticketId, eventId } = req.body;
+        if (eventId && !mongoose.isValidObjectId(eventId)) return res.status(400).json({ success: false, message: 'Invalid event.' });
         const mode = req.body.mode === "confirm" ? "confirm" : "preview";
 
         const verdict = (state, message, booking = null, extra = {}) => {
@@ -441,8 +292,10 @@ exports.verifyTicket = async (req, res) => {
 
         /* ---------------- STATE ---------------- */
 
-        if (booking.status === "cancelled") {
-            return verdict("cancelled", "This booking was cancelled.", booking);
+        if (!booking.event || booking.event.archivedAt || booking.event.status === "rejected") return verdict("unavailable", "This event is not accepting admissions.");
+
+        if (booking.status !== "confirmed") {
+            return verdict(booking.status, "This booking is not confirmed.", booking);
         }
 
         if (booking.checkedIn) {
@@ -465,7 +318,7 @@ exports.verifyTicket = async (req, res) => {
             {
                 _id: booking._id,
                 checkedIn: { $ne: true },
-                status: { $ne: "cancelled" }
+                status: "confirmed"
             },
             { $set: { checkedIn: true, checkedInAt: new Date() } },
             { returnDocument: "after" }
@@ -477,10 +330,13 @@ exports.verifyTicket = async (req, res) => {
             const current = await Booking.findById(booking._id)
                 .populate("user", "name email")
                 .populate("event");
+            if (!current) return verdict("not-found", "No ticket matches that code.");
+            if (current.status !== "confirmed") return verdict(current.status, "This booking is not confirmed.", current);
+            if (!current.checkedIn) return verdict("unavailable", "This pass changed while being checked. Please scan it again.", current);
             return verdict(
                 "checked-in",
                 "Already checked in - someone just scanned this pass.",
-                current || booking
+                current
             );
         }
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useDialogFocus } from "../../lib/useDialogFocus";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   AnimatePresence,
@@ -215,20 +216,20 @@ const sheetItem = {
 };
 
 function MobileSheet({ open, onClose }) {
+  const panelRef = useRef(null);
+  useDialogFocus(open, panelRef, onClose);
   const reduced = useReducedMotion();
   const { isSignedIn, isAdmin, isOrganizer, user, signOut } = useAuth();
 
   useEffect(() => {
     if (!open) return undefined;
-    const onKey = (event) => event.key === "Escape" && onClose();
+
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    document.addEventListener("keydown", onKey);
     return () => {
       document.body.style.overflow = prev;
-      document.removeEventListener("keydown", onKey);
     };
-  }, [open, onClose]);
+  }, [open]);
 
   const extras = [
     ...(isOrganizer
@@ -257,11 +258,15 @@ function MobileSheet({ open, onClose }) {
             animate="show"
             exit="exit"
             onClick={onClose}
+            data-dialog-backdrop=""
+            aria-hidden="true"
             className="fixed inset-0 bg-[rgba(3,3,12,0.7)] backdrop-blur-sm"
             style={{ zIndex: "var(--z-overlay)" }}
           />
 
           <motion.div
+            ref={panelRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
             aria-label="Menu"

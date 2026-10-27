@@ -219,6 +219,7 @@ export default function MyBookings() {
         </Button>
       </header>
 
+      {data?.purchases?.length > 0 && <section className="mt-8 space-y-3" aria-label="Purchase status"><h2 className="font-display text-xl">Pending purchases and refunds</h2>{data.purchases.map(purchase => <GlassCard key={purchase._id} className="flex flex-wrap items-center justify-between gap-4 p-4"><div><p>{purchase.eventSnapshot?.title || 'Event purchase'}</p><p className="text-sm text-[var(--color-fg-muted)]">{purchase.state.replaceAll('_', ' ')}</p></div><Button variant="secondary" size="sm" to={'/booking/success?purchase=' + purchase._id}>Check status</Button></GlassCard>)}</section>}
       {loading ? (
         <div className="mt-12">
           <SkeletonRows count={3} />

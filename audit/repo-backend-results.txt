@@ -1,0 +1,100 @@
+
+> evently@1.0.0 test
+> node --test tests/integration.test.cjs tests/unit.test.cjs tests/mailer.test.cjs tests/webhook-relay.test.cjs
+
+✔ paid direct booking is rejected; free booking succeeds without a provider order (1156.9477ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ signature, account, event, quantity, amount and captured status are enforced (70.7766ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ concurrent replay issues exactly one booking and one seat increment (88.5736ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ last-seat race fulfills one buyer and refunds the other exactly once (112.2953ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ booking insertion failure rolls back reservation and can recover (66.5961ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ recovery finds a captured payment after the browser disappears (45.19ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ required answers are validated before payment and immutable purchase details survive edits (57.9207ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ lost order persistence is recovered by receipt without creating a second order (63.9614ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ a webhook beating the order-create response cannot regress a fulfilled purchase (61.8353ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ status polling and account refresh do not exhaust mutation attempt limits (414.7099ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ provider full refunds revoke passes and release seats only once under concurrent replay (73.3296ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ a payment refunded before fulfillment never issues a pass (30.4824ms)
+✔ archiving an unsold event removes it from public, organizer and admin event lists (29.8989ms)
+✔ rejected, archived and past events cannot be purchased or exposed publicly (24.982ms)
+✔ current account restrictions override previously-issued JWT roles (21.3392ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ admission persists and rejects duplicate, pending and foreign-event scans (78.4196ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ a refund racing with check-in reports cancellation, not an already-used pass (53.6958ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ events with confirmed bookings cannot be deleted and capacity cannot drop below sales (52.437ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ admin responses exclude hashes and reject invalid roles and admin demotion (39.6853ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ foreign images cannot be attached; shared images survive one event removing them (50.6118ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ OTP attempts are capped and a consumed code cannot be replayed (59.5854ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ recovery worker fulfills a captured purchase and retries failed ticket delivery (83.4262ms)
+✔ OAuth state is browser-bound, expires and is consumed only once (18.8227ms)
+(node:16304) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ webhook rejects incorrect signatures and processes a valid captured notification idempotently (51.0803ms)
+✔ search includes later dates and venue-only city matches; archived rows are excluded (26.1066ms)
+✔ SEO returns true unknown-page errors, venue-specific metadata and temporary-error status (19.3968ms)
+MongoDB disconnected
+✔ Brevo receives sender, recipient, text, reply-to and base64 PDF bytes (2.9211ms)
+✔ Brevo failure cannot silently fall back to Gmail or leak provider response data (2.3837ms)
+✔ Brevo key, verified sender configuration and message ID are required (0.3644ms)
+✔ timeouts, invalid recipients and missing attachments are reported without sending another message (3.4227ms)
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:8520) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+✔ money, capacities and content limits reject malformed direct input (10.787ms)
+✔ booking cutoff uses Indian event start time, with end-of-day fallback (1.099ms)
+✔ checkout display agrees with the server cutoff across visitor time zones (4014.0813ms)
+✔ duplicate question keys remain unique and within schema length limits (1.4567ms)
+✔ all registration answer types enforce definitions and required fields (0.5179ms)
+✔ image sniffing rejects a declared MIME type that does not match its bytes (0.1421ms)
+✔ upload batching respects byte and count limits for accepted GIF files (24.8265ms)
+✔ migration cleanup preserves current and historical references and refuses out-of-root targets (0.8646ms)
+✔ upgraded mail transport builds an attachment message without contacting a mail server (43.9616ms)
+✔ public relay exposes only the signed webhook and forwards raw bytes unchanged (58.487ms)
+✔ relay refuses an external forwarding target or absent signing secret (0.8014ms)
+ℹ tests 41
+ℹ suites 0
+ℹ pass 41
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4553.7956

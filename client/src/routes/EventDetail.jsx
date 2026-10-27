@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import {
@@ -21,7 +21,8 @@ import Badge from "../components/ui/Badge";
 import { ErrorState, Loader } from "../components/ui/Feedback";
 import { Reveal } from "../components/ui/Reveal";
 import Seo from "../components/seo/Seo";
-import { events as eventsApi, payments } from "../lib/api";
+import RegistrationFields from "../components/forms/RegistrationFields";
+import { events as eventsApi, bookings as bookingsApi, payments } from "../lib/api";
 import { useApi } from "../lib/useApi";
 import { useAuth } from "../lib/auth";
 import { useToast } from "../lib/toast";
@@ -41,6 +42,7 @@ import {
   formatPrice,
   inferCategory,
   isPastEvent,
+  isBookingClosed,
   MAX_TICKETS_PER_ORDER,
   seatsLeft as computeSeatsLeft,
 } from "../lib/constants";
@@ -114,8 +116,10 @@ function BookingPanel({ event, seatsLeft, onBooked }) {
 
   const [tickets, setTickets] = useState(1);
   const [busy, setBusy] = useState(false);
+  const [answers, setAnswers] = useState({});
+  const checkoutRequest = useRef(null);
 
-  const past = isPastEvent(event);
+  const past = isBookingClosed(event);
   const capped = Math.max(
     1,
     Math.min(MAX_TICKETS_PER_ORDER, seatsLeft > 0 ? seatsLeft : 1)
@@ -125,81 +129,35 @@ function BookingPanel({ event, seatsLeft, onBooked }) {
   const total = unitPrice * tickets;
 
   const book = useCallback(async () => {
-    if (!isSignedIn) {
-      navigate(
-        `/login?mode=login&next=${encodeURIComponent(`/events/${event._id}`)}`
-      );
-      return;
-    }
-
+    if (!isSignedIn) { navigate('/login?mode=login&next=' + encodeURIComponent('/events/' + event._id)); return; }
     setBusy(true);
+    const fingerprint = JSON.stringify([event._id, tickets, answers]);
+    if (checkoutRequest.current?.fingerprint !== fingerprint) checkoutRequest.current = { fingerprint, requestKey: crypto.randomUUID() };
+    const showStatus = result => {
+      onBooked?.();
+      navigate('/booking/success?purchase=' + encodeURIComponent(result.purchaseId), { replace: true });
+    };
     try {
-      // 1. Reserve. The server validates the ticket count and computes the
-      //    amount in paise; the client never sends a price.
-      const order = await payments.createOrder(event._id, tickets);
+      const payload = { eventId: event._id, tickets, answers, requestKey: checkoutRequest.current.requestKey };
+      if (unitPrice === 0) { showStatus(await bookingsApi.create(payload)); return; }
+      const result = await payments.createOrder(event._id, tickets, answers, payload.requestKey);
+      if (result.state === 'fulfilled' || result.state === 'refunded' || result.state === 'refund_pending') { showStatus(result); return; }
       const Razorpay = await loadRazorpay();
-
       const checkout = new Razorpay({
-        key: order.keyId,
-        amount: order.order.amount,
-        currency: "INR",
-        name: "Evently",
-        description: event.title,
-        order_id: order.order.id,
-        prefill: { name: user?.name || "", email: user?.email || "" },
-        theme: RAZORPAY_THEME,
-
-        // 2. Verify server-side. Only the server can check the HMAC signature,
-        //    and only it may create the booking and hold the seats.
-        handler: async (response) => {
-          try {
-            const result = await payments.verify({
-              eventId: event._id,
-              tickets,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-            });
-            toast.success("Payment confirmed. Your ticket is ready.");
-            onBooked?.();
-            navigate("/booking/success", {
-              replace: true,
-              state: {
-                booking: result?.booking ?? null,
-                eventTitle: event.title,
-                tickets,
-              },
-            });
-          } catch (error) {
-            toast.error(
-              error.message ||
-                "We couldn't verify that payment. If you were charged, contact support and we'll sort it out."
-            );
-            setBusy(false);
-          }
+        key: result.keyId, amount: result.order.amount, currency: result.order.currency,
+        name: 'Evently', description: event.title, order_id: result.order.id,
+        prefill: { name: user?.name || '', email: user?.email || '' }, theme: RAZORPAY_THEME,
+        handler: async response => {
+          try { await payments.verify({ eventId: event._id, tickets, ...response }); }
+          catch { toast.info('Payment confirmation is being checked. This page will show the latest status.'); }
+          showStatus(result);
         },
-
-        modal: {
-          // Razorpay's own close button does not tell us anything, so restore
-          // the button here or it stays stuck in its loading state.
-          ondismiss: () => {
-            setBusy(false);
-            toast.info("Checkout closed. Nothing has been charged.");
-          },
-        },
+        modal: { ondismiss: () => { setBusy(false); toast.info('Checkout closed. Check My bookings before paying again if a payment was submitted.'); } },
       });
-
-      checkout.on("payment.failed", () => {
-        toast.error("That payment didn't go through. You can try again.");
-        setBusy(false);
-      });
-
+      checkout.on('payment.failed', () => { setBusy(false); toast.error('Payment was not completed. You can check its status in My bookings.'); });
       checkout.open();
-    } catch (error) {
-      toast.error(error.message || "Couldn't start checkout. Please try again.");
-      setBusy(false);
-    }
-  }, [event, isSignedIn, navigate, onBooked, tickets, toast, user]);
+    } catch (error) { toast.error(error.message || 'Could not start checkout.'); setBusy(false); }
+  }, [event, isSignedIn, navigate, onBooked, tickets, answers, toast, user, unitPrice]);
 
   return (
     <GlassCard
@@ -227,7 +185,7 @@ function BookingPanel({ event, seatsLeft, onBooked }) {
         <div className="mt-6 space-y-4">
           <p className="flex items-start gap-2 text-sm text-[var(--color-fg-muted)]">
             <Info size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-            This event has already happened.
+            Ticket sales for this event have closed.
           </p>
           <Button variant="secondary" fullWidth to="/events">
             Find something coming up
@@ -261,6 +219,8 @@ function BookingPanel({ event, seatsLeft, onBooked }) {
             Up to {capped} per order.
           </p>
 
+          <RegistrationFields fields={event.registrationFields} answers={answers} onChange={setAnswers} disabled={busy} />
+
           <dl className="mt-6 space-y-2 border-t border-[var(--glass-edge)] pt-5 text-sm">
             <div className="flex items-center justify-between gap-4">
               <dt className="text-[var(--color-fg-muted)]">
@@ -291,8 +251,7 @@ function BookingPanel({ event, seatsLeft, onBooked }) {
 
           <p className="mt-4 flex items-start gap-2 text-xs leading-relaxed text-[var(--color-fg-subtle)]">
             <ShieldCheck size={14} className="mt-0.5 shrink-0" aria-hidden="true" />
-            Paid through Razorpay. Your ticket and QR pass arrive as a PDF the
-            moment payment clears.
+            {unitPrice === 0 ? "Free registration. Your pass will appear in My bookings." : "Paid through Razorpay. Your pass appears after payment is confirmed; email delivery may take a few minutes."}
           </p>
         </>
       )}

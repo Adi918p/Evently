@@ -93,8 +93,9 @@ function sanitizeRegistrationFields(input) {
         let key = slug(raw.key) || slug(label) || `field-${fields.length + 1}`;
         if (used.has(key)) {
             let suffix = 2;
-            while (used.has(`${key}-${suffix}`)) suffix += 1;
-            key = `${key}-${suffix}`;
+            const candidate = n => `${key.slice(0, KEY_MAX - String(n).length - 1)}-${n}`;
+            while (used.has(candidate(suffix))) suffix += 1;
+            key = candidate(suffix);
         }
         used.add(key);
 
@@ -124,7 +125,7 @@ function sanitizeRegistrationFields(input) {
 /** Accepts { key: value } or [{ key, value }] - the client may send either. */
 const answerMap = (input) => {
     if (Array.isArray(input)) {
-        const map = {};
+        const map = Object.create(null);
         for (const row of input) {
             if (row && typeof row === "object" && row.key !== undefined) {
                 map[String(row.key)] = row.value;
@@ -165,7 +166,7 @@ function resolveAnswers(fields, input) {
     const errors = [];
 
     for (const def of defs) {
-        const raw = given[def.key];
+        const raw = Object.hasOwn(given, def.key) ? given[def.key] : undefined;
         let value = null;
         let values = null;
 

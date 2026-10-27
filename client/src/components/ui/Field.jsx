@@ -86,7 +86,7 @@ export function Field({
       {children}
 
       {helper && !error ? (
-        <p className="text-xs leading-relaxed text-[var(--color-fg-subtle)]">
+        <p id={htmlFor ? `${htmlFor}-helper` : undefined} className="text-xs leading-relaxed text-[var(--color-fg-subtle)]">
           {helper}
         </p>
       ) : null}
@@ -94,6 +94,8 @@ export function Field({
       <AnimatePresence initial={false}>
         {error ? (
           <motion.p
+            id={htmlFor ? `${htmlFor}-error` : undefined}
+            role="alert"
             variants={respectMotion(errorVariants, reduced)}
             initial="hidden"
             animate="show"
@@ -118,7 +120,7 @@ export function Field({
 function useFieldIds(id, { helper, error }) {
   const auto = useId();
   const controlId = id || auto;
-  const helperId = helper ? `${controlId}-helper` : null;
+  const helperId = helper && !error ? `${controlId}-helper` : null;
   const errorId = error ? `${controlId}-error` : null;
   const describedBy = [errorId, helperId].filter(Boolean).join(" ") || undefined;
   return { controlId, helperId, errorId, describedBy };

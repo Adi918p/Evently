@@ -22,9 +22,9 @@ router.post("/", async (req, res) => {
     } catch (err) {
         console.error(err);
 
-        res.status(500).json({
+        res.status(err.name === "ValidationError" ? 400 : 500).json({
             success: false,
-            message: "Server Error"
+            message: err.name === "ValidationError" ? "Enter a valid name, email, subject and message within the length limits." : "Server Error"
         });
     }
 });

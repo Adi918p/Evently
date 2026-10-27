@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  auth as authApi,
   clearToken,
   decodeToken,
   getToken,
@@ -64,6 +65,17 @@ export function AuthProvider({ children }) {
     });
     return () => setUnauthorizedHandler(null);
   }, []);
+
+  // Refresh visible account details/permissions; the server checks them on every protected request.
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+    const refresh = () => authApi.me().then(({ user: current }) => { if (active) setUser(previous => previous ? { ...previous, ...current, id: current._id } : null); }).catch(() => {});
+    refresh();
+    window.addEventListener('focus', refresh);
+    const timer = window.setInterval(refresh, 60000);
+    return () => { active = false; clearInterval(timer); window.removeEventListener('focus', refresh); };
+  }, [user?.id]);
 
   // Keep tabs in sync: signing out in one tab signs out the others.
   useEffect(() => {

@@ -1,0 +1,77 @@
+
+> evently-client@1.0.0 build
+> vite build
+
+vite v7.3.7 building client environment for production...
+transforming...
+✓ 5926 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                4.41 kB │ gzip:   1.80 kB
+dist/assets/index-ECMHauS8.css                69.28 kB │ gzip:  12.29 kB
+dist/assets/useApi-C_txxXcM.js                 1.04 kB │ gzip:   0.55 kB
+dist/assets/Terms-DDKEmNB4.js                  1.22 kB │ gzip:   0.70 kB
+dist/assets/Reveal-DW8c2TbS.js                 1.24 kB │ gzip:   0.63 kB
+dist/assets/Privacy-BEJZnh7Z.js                1.32 kB │ gzip:   0.74 kB
+dist/assets/ArrowRight.es-BDIhCgOS.js          1.56 kB │ gzip:   0.62 kB
+dist/assets/Plus.es-UzwkNYgU.js                1.56 kB │ gzip:   0.57 kB
+dist/assets/ArrowLeft.es-DC1qGFiz.js           1.57 kB │ gzip:   0.61 kB
+dist/assets/DocPage-BD4Nu98G.js                1.78 kB │ gzip:   0.81 kB
+dist/assets/Clock.es-B2sxi7hP.js               1.82 kB │ gzip:   0.64 kB
+dist/assets/TrendUp.es-BwKRVPfv.js             1.92 kB │ gzip:   0.73 kB
+dist/assets/Prohibit.es-KVYMbypx.js            2.00 kB │ gzip:   0.73 kB
+dist/assets/DownloadSimple.es-DXl6KhBw.js      2.04 kB │ gzip:   0.69 kB
+dist/assets/Envelope.es-C65d1Gi5.js            2.14 kB │ gzip:   0.78 kB
+dist/assets/CalendarBlank.es-1b5-CoO-.js       2.23 kB │ gzip:   0.71 kB
+dist/assets/PencilSimple.es-CynvbQL6.js        2.47 kB │ gzip:   0.89 kB
+dist/assets/UserCircle.es-O8Le6rHv.js          2.56 kB │ gzip:   0.95 kB
+dist/assets/Trash.es-B_50JweL.js               2.57 kB │ gzip:   0.79 kB
+dist/assets/CurrencyInr.es-BfCmYbb8.js         2.62 kB │ gzip:   0.97 kB
+dist/assets/MapPin.es-N1Hoxwue.js              2.92 kB │ gzip:   1.07 kB
+dist/assets/CalendarCheck.es-Bg2N4Srk.js       3.00 kB │ gzip:   0.92 kB
+dist/assets/faqs-DaZfam9L.js                   3.04 kB │ gzip:   1.57 kB
+dist/assets/BookingSuccess-a7XFyEqa.js         3.10 kB │ gzip:   1.30 kB
+dist/assets/Warning.es-dRLuQcGb.js             3.36 kB │ gzip:   1.08 kB
+dist/assets/Clubs-F1ZXofR1.js                  3.42 kB │ gzip:   1.37 kB
+dist/assets/BookingTicket-v9zpvP-O.js          3.53 kB │ gzip:   1.42 kB
+dist/assets/EventCard-Vds8TEXo.js              3.65 kB │ gzip:   1.45 kB
+dist/assets/Crown.es-DfmUeazw.js               4.17 kB │ gzip:   1.32 kB
+dist/assets/clubs-CXyXU9LC.js                  4.28 kB │ gzip:   1.41 kB
+dist/assets/NotFound-mF9V8eP_.js               4.72 kB │ gzip:   1.95 kB
+dist/assets/EditEvent-CVtGN3P3.js              4.83 kB │ gzip:   2.03 kB
+dist/assets/Faq-B4A5snry.js                    4.94 kB │ gzip:   1.95 kB
+dist/assets/Experience-D10_fftf.js             6.01 kB │ gzip:   2.56 kB
+dist/assets/AdminNav-BGiW5HM-.js               6.34 kB │ gzip:   2.33 kB
+dist/assets/MyBookings-Cz-6uKdy.js             6.91 kB │ gzip:   2.68 kB
+dist/assets/ContactForm-rLJdFILT.js            6.98 kB │ gzip:   3.06 kB
+dist/assets/Contact-TDafa24q.js                7.73 kB │ gzip:   3.12 kB
+dist/assets/Seo-VH-MN5Vz.js                    7.98 kB │ gzip:   3.51 kB
+dist/assets/Canvas3D-Lrmm4M4h.js               8.35 kB │ gzip:   3.53 kB
+dist/assets/AdminEvents-3RetQckJ.js            8.55 kB │ gzip:   3.31 kB
+dist/assets/CreateEvent-zkCbvtja.js            9.41 kB │ gzip:   3.56 kB
+dist/assets/Profile-uA0ZPlEA.js                9.88 kB │ gzip:   3.80 kB
+dist/assets/Dashboard-CMSlzb6f.js             10.33 kB │ gzip:   3.66 kB
+dist/assets/EventBookings-DrUGKZcn.js         10.70 kB │ gzip:   3.93 kB
+dist/assets/Events-C3jY-qHn.js                11.27 kB │ gzip:   4.30 kB
+dist/assets/SealCheck.es-2xz1oNed.js          11.55 kB │ gzip:   3.54 kB
+dist/assets/ClubDetail-FFG_jXSy.js            11.91 kB │ gzip:   4.37 kB
+dist/assets/AdminDashboard-D1HGsXA5.js        12.54 kB │ gzip:   4.03 kB
+dist/assets/AdminUsers-CPwl0lBQ.js            12.77 kB │ gzip:   4.89 kB
+dist/assets/Support-z5m2bQqV.js               13.59 kB │ gzip:   4.44 kB
+dist/assets/AdminInbox-B_9JbRlR.js            14.99 kB │ gzip:   5.56 kB
+dist/assets/Login-CUl9ouXC.js                 15.30 kB │ gzip:   5.21 kB
+dist/assets/EventDetail-Ci61ecvI.js           15.82 kB │ gzip:   5.82 kB
+dist/assets/AdminAnalytics-DdB7RwHp.js        18.39 kB │ gzip:   5.88 kB
+dist/assets/format-D9kW6oyL.js                19.53 kB │ gzip:   5.63 kB
+dist/assets/EventForm-CNZMvQ26.js             30.64 kB │ gzip:  10.55 kB
+dist/assets/Scanner-ChmoFYYo.js               32.81 kB │ gzip:   9.67 kB
+dist/assets/Home-CXDr5oXG.js                  39.55 kB │ gzip:  11.65 kB
+dist/assets/motion-DfAIAbLH.js               102.66 kB │ gzip:  34.31 kB
+dist/assets/index-CBW6nAur.js                240.05 kB │ gzip:  69.77 kB
+dist/assets/three-DpQ4uGPj.js              1,076.24 kB │ gzip: 300.10 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 26.74s

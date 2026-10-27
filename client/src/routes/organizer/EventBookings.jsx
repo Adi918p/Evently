@@ -179,7 +179,7 @@ function BookingRow({ booking, onCheckIn, checkingIn }) {
               <Badge tone="info" icon={CheckCircle}>
                 In{checkedInAt ? ` · ${format(checkedInAt, "HH:mm")}` : ""}
               </Badge>
-            ) : cancelled ? null : (
+            ) : booking.status !== "confirmed" ? null : (
               <Button
                 variant="accent"
                 size="sm"
@@ -213,7 +213,7 @@ export default function EventBookings() {
   );
 
   const checkIn = useAction((bookingId) =>
-    bookingsApi.verifyTicket({ bookingId })
+    bookingsApi.verifyTicket({ bookingId, eventId: id, mode: "confirm" })
   );
 
   const event = data?.event || null;
@@ -227,20 +227,20 @@ export default function EventBookings() {
   }, [data]);
 
   const totals = useMemo(() => {
-    const live = all.filter((b) => b.status !== "cancelled");
+    const live = all.filter((b) => b.status === "confirmed");
     return {
       bookings: live.length,
       tickets: live.reduce((sum, b) => sum + (Number(b.tickets) || 0), 0),
       revenue: live.reduce((sum, b) => sum + (Number(b.totalPrice) || 0), 0),
       checkedIn: live.filter((b) => b.checkedIn).length,
-      cancelled: all.length - live.length,
+      cancelled: all.filter(b => b.status === "cancelled").length,
     };
   }, [all]);
 
   const counts = useMemo(
     () => ({
       all: all.length,
-      waiting: all.filter((b) => b.status !== "cancelled" && !b.checkedIn).length,
+      waiting: all.filter((b) => b.status === "confirmed" && !b.checkedIn).length,
       in: all.filter((b) => b.checkedIn).length,
       cancelled: all.filter((b) => b.status === "cancelled").length,
     }),
@@ -253,7 +253,7 @@ export default function EventBookings() {
       if (filter === "in" && !booking.checkedIn) return false;
       if (
         filter === "waiting" &&
-        (booking.checkedIn || booking.status === "cancelled")
+        (booking.checkedIn || booking.status !== "confirmed")
       ) {
         return false;
       }
@@ -274,7 +274,8 @@ export default function EventBookings() {
     setBusyId(booking._id);
     try {
       const result = await checkIn.run(booking._id);
-      const at = result?.booking?.checkedInAt || new Date().toISOString();
+      if (!result.ok || result.state !== 'admitted' || !result.booking?.checkedIn) { reload(); toast.warning(result.message || 'This pass cannot be admitted.'); return; }
+      const at = result.booking.checkedInAt;
       setData((prev) => ({
         ...prev,
         bookings: (prev?.bookings || []).map((row) =>

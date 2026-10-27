@@ -13,7 +13,7 @@ const eventCategories = new Set([
 const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const parseDate = (value, endOfDay = false) => {
     if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return null;
-    const date = new Date(`${value}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}`);
+    const date = new Date(`${value}T${endOfDay ? "23:59:59.999" : "00:00:00.000"}+05:30`);
     return Number.isNaN(date.getTime()) ? null : date;
 };
 
@@ -32,12 +32,12 @@ router.get("/", async (req, res) => {
         const { q = "", city = "", location = "", category = "", type = "", date = "", dateFrom = "", dateTo = "" } = req.query;
         // Older organizer records may still be pending from the previous workflow.
         // Keep them discoverable so existing events do not disappear after creation.
-        const filter = { status: { $in: ["approved", "pending"] } };
+        const filter = { archivedAt: null, status: { $in: ["approved", "pending"] } };
         const search = String(q).trim();
         const citySearch = String(city || location).trim();
         const selectedCategory = String(category || type).trim().toLowerCase();
         const startDate = parseDate(dateFrom || date);
-        const endDate = parseDate(dateTo || date, true);
+        const endDate = parseDate(dateTo, true);
 
         if (search) {
             const pattern = new RegExp(escapeRegex(search), "i");
@@ -50,10 +50,10 @@ router.get("/", async (req, res) => {
                 { category: pattern }
             ];
         }
-        if (citySearch) filter.location = new RegExp(escapeRegex(citySearch), "i");
+        if (citySearch) filter.$and = [{ $or: [{ location: new RegExp(escapeRegex(citySearch), 'i') }, { venue: new RegExp(escapeRegex(citySearch), 'i') }] }];
         if (eventCategories.has(selectedCategory)) {
             if (selectedCategory === "other") {
-                filter.$and = [{ $or: [{ category: "other" }, { category: { $exists: false } }, { category: null }] }];
+                filter.$and = [...(filter.$and || []), { $or: [{ category: "other" }, { category: { $exists: false } }, { category: null }] }];
             } else {
                 filter.category = selectedCategory;
             }
@@ -125,6 +125,14 @@ router.get(
     eventController.getEventBookings
 );
 
+router.get('/:id/manage', authMiddleware.authM, roleMiddleware('organizer', 'admin'), async (req, res) => {
+    try {
+        const event = await Event.findById(req.params.id);
+        if (!event || event.archivedAt) return res.status(404).json({ message: 'Event not found' });
+        if (req.user.role !== 'admin' && String(event.organizer) !== req.user.id) return res.status(403).json({ message: 'Access denied' });
+        res.json({ success: true, event });
+    } catch { res.status(400).json({ message: 'Invalid event' }); }
+});
 router.get("/:id", async (req, res) => {
     try {
         if (!/^[a-f\d]{24}$/i.test(req.params.id)) {
@@ -135,7 +143,7 @@ router.get("/:id", async (req, res) => {
         }
         const event = await Event.findById(req.params.id);
 
-        if (!event) {
+        if (!event || event.archivedAt || !["approved", "pending"].includes(event.status)) {
             return res.status(404).json({
                 message: "Event not found"
             });
