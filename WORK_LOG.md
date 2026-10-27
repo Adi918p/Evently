@@ -46,7 +46,15 @@ Last updated: 2026-10-27 (Asia/Calcutta)
   audit/scanner-invalid-{backend,browser,build}.txt. Actual physical-camera
   decode time and network-dependent valid/unknown Evently checks still vary.
 - No production URLs, database connections, hosting settings or credentials
-  changed. Publication to main and hosted-build confirmation are next.
+  changed. Normal push updated main 78e429b -> 7d6e369 without rewriting history.
+  GitHub Actions run 40495858497 passed all checks for that implementation commit;
+  Vercel Production deployment 7357132541 also succeeded for the same commit.
+  The live scanner bundle Scanner-CCzMyrAw.js matches the tested local bundle
+  byte-for-byte, including the local refusal and uncertain-timeout paths. Public
+  site/API and local frontend return 200. Evidence: audit/scanner-invalid-live.json.
+  No live admission, email or payment was performed. Next: owner refreshes the
+  scanner page and tries their physical invalid QR. This final handoff changes
+  only documentation/evidence after the tested implementation.
 
 ## Previous task — performance and repository publication (2026-10-27)
 
