@@ -55,6 +55,54 @@ async function pageFor(user, viewport = { width: 1365, height: 1000 }) {
   return { page, context };
 }
 
+test('a login remains usable when token persistence is blocked', async () => {
+  const { page, context } = await pageFor(null);
+  const token = jwt.sign({ id: String(buyer._id), role: buyer.role, name: buyer.name, email: buyer.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+  try {
+    await page.route('**/api/auth/login', route => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ token }) }));
+    await page.goto(base + '/login?next=%2Fprofile');
+    await page.evaluate(() => {
+      const original = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (key, value) {
+        if (key === 'token') throw new DOMException('Storage full', 'QuotaExceededError');
+        return original.call(this, key, value);
+      };
+    });
+    await page.getByLabel(/^Email/).fill(buyer.email);
+    await page.getByLabel(/^Password/).fill('FixturePassword1!');
+    await page.getByRole('button', { name: 'Log in', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Profile', exact: true })).toBeVisible();
+    await expect(page.getByText('Email verified', { exact: true })).toBeVisible();
+    assert.equal(await page.evaluate(() => localStorage.getItem('token')), null);
+    await page.getByRole('link', { name: 'My bookings', exact: true }).first().click();
+    await expect(page.getByRole('heading', { name: 'My bookings', exact: true })).toBeVisible();
+    await expect(page).not.toHaveURL(/\/login/);
+  } finally { await context.close(); }
+});
+
+test('an old expiry timer preserves a replacement token before its storage event arrives', async () => {
+  const { page, context } = await pageFor(null);
+  const now = Date.now();
+  const claims = { id: String(buyer._id), role: buyer.role, name: buyer.name, email: buyer.email };
+  const oldToken = jwt.sign({ ...claims, exp: Math.floor(now / 1000) + 60 }, process.env.JWT_SECRET);
+  const newToken = jwt.sign({ ...claims, exp: Math.floor(now / 1000) + 3600 }, process.env.JWT_SECRET);
+  try {
+    await page.clock.install({ time: now });
+    await page.addInitScript(token => localStorage.setItem('token', token), oldToken);
+    await page.goto(base + '/profile');
+    await expect(page.getByText('Email verified', { exact: true })).toBeVisible();
+    // Same-document storage changes do not fire storage events. This models
+    // the interval after another tab's write but before event delivery.
+    await page.evaluate(token => localStorage.setItem('token', token), newToken);
+    await page.clock.fastForward(61000);
+    await expect(page.getByRole('heading', { name: 'Profile', exact: true })).toBeVisible();
+    assert.equal(await page.evaluate(() => localStorage.getItem('token')), newToken);
+    await page.clock.fastForward(3600000);
+    await expect(page).toHaveURL(/\/login/);
+    assert.equal(await page.evaluate(() => localStorage.getItem('token')), null);
+  } finally { await context.close(); }
+});
+
 test('free checkout validates required questions, confirms, survives refresh and downloads PDF', async () => {
   const { page, context } = await pageFor(buyer);
   try {

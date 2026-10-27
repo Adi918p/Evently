@@ -3,6 +3,10 @@
   "framework": "vite",
   "rewrites": [
     {
+      "source": "/assets/:path*",
+      "destination": "/api/static-not-found"
+    },
+    {
       "source": "/api/:path*",
       "destination": "https://api.event-ly.in/api/:path*"
     },
@@ -19,7 +23,7 @@
       "destination": "https://api.event-ly.in/sitemap.xml"
     },
     {
-      "source": "/:path*",
+      "source": "/:path((?!.*\\.(?![hH][tT][mM][lL]$)[^/]+$).*)",
       "has": [
         {
           "type": "header",
@@ -30,7 +34,7 @@
       "destination": "https://api.event-ly.in/seo/render/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!.*\\.(?![hH][tT][mM][lL]$)[^/]+$).*)",
       "destination": "/index.html"
     }
   ],

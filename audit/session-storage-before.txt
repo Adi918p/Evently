@@ -1,0 +1,32 @@
+✖ a blocked token replacement removes the older persisted login when removal is available (1.9992ms)
+✔ fully blocked token storage still permits a tab-local login and logout (0.4319ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 102.7521
+
+✖ failing tests:
+
+test at tests\auth-races.test.cjs:111:1
+✖ a blocked token replacement removes the older persisted login when removal is available (1.9992ms)
+  AssertionError [ERR_ASSERTION]: a reload must not resurrect the previous account
+  + actual - expected
+
+  + 'initial-session'
+  - null
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\auth-races.test.cjs:114:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'initial-session',
+    expected: null,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

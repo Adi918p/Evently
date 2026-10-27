@@ -173,6 +173,19 @@ app.use("/api", (req, res) => {
     });
 });
 
+// A missing resource must not become a successful HTML document. Keep this
+// after real static files (and the API's JSON 404) but before the SPA fallback.
+// Legacy .html links still load React so its compatibility redirects can run.
+app.use((req, res, next) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+    const resourceDirectory = /^\/(?:assets|Media|uploads|tickets)(?:\/|$)/i.test(req.path);
+    const extension = path.extname(req.path).toLowerCase();
+    if (resourceDirectory || (extension && extension !== '.html')) {
+        return res.status(404).set('Cache-Control', 'no-store').type('text/plain').send('Not found');
+    }
+    next();
+});
+
 /* SPA fallback.
    Express 5 moved to path-to-regexp v8, where app.get("*") is a syntax error -
    a wildcard has to be named ("/*splat"). A bare app.use avoids the question

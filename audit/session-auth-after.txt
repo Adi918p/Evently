@@ -1,0 +1,23 @@
+✔ a delayed old-session 401 rejects its caller without clearing the newer login (25.0004ms)
+✔ a 401 for the current session still clears authentication and rejects its caller (0.6626ms)
+✔ a rejected unauthenticated request cannot invalidate a signed-in session (0.4114ms)
+✔ a delayed PDF-download 401 also preserves a newer login (0.7289ms)
+✔ a PDF-download 401 for the current session still signs out (0.6307ms)
+✔ a storage write failure keeps the new session available to protected requests (0.6723ms)
+✔ a transient storage read failure does not discard the last known session (0.2093ms)
+✔ a blocked token replacement removes the older persisted login when removal is available (0.1531ms)
+✔ fully blocked token storage still permits a tab-local login and logout (0.2878ms)
+✔ decoding an expired or malformed supplied token cannot clear a different active login (0.3619ms)
+✔ conditional token invalidation ignores a replaced session but clears the matching session (0.1103ms)
+✔ temporary server and network failures never invalidate the session (1.9443ms)
+✔ a failed storage removal cannot restore a signed-out token (0.242ms)
+✔ a cross-tab sign-out also clears a memory-only login (0.191ms)
+✔ a current expired token is still removed (0.1328ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 132.9455

@@ -13,6 +13,7 @@ import {
   decodeToken,
   getToken,
   setToken as persistToken,
+  syncTokenFromStorage,
   setUnauthorizedHandler,
 } from "./api";
 
@@ -60,7 +61,6 @@ export function AuthProvider({ children }) {
   // than leaving a signed-in shell that every request will bounce.
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      clearToken();
       setUser(null);
     });
     return () => setUnauthorizedHandler(null);
@@ -99,7 +99,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const onStorage = (event) => {
       if (event.key !== null && event.key !== "token") return;
-      setUser(decodeToken(getToken()));
+      setUser(decodeToken(syncTokenFromStorage(event.key === null ? null : event.newValue)));
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -108,16 +108,28 @@ export function AuthProvider({ children }) {
   // Drop the session the moment the token expires while the tab is open.
   useEffect(() => {
     if (!user?.exp) return undefined;
-    const msLeft = user.exp * 1000 - Date.now();
-    if (msLeft <= 0) {
-      clearToken();
+    const expiryToken = getToken();
+    const payload = decodeToken(expiryToken);
+    if (!payload) {
       setUser(null);
       return undefined;
     }
-    const timer = window.setTimeout(() => {
-      clearToken();
-      setUser(null);
-    }, Math.min(msLeft, 2 ** 31 - 1));
+    let timer;
+    const expire = () => {
+      if (getToken() !== expiryToken) {
+        // A cross-tab sign-in may arrive before its storage event. An old
+        // expiry callback must never invalidate the replacement session.
+        setUser(decodeToken());
+        return;
+      }
+      const msLeft = payload.exp * 1000 - Date.now();
+      if (msLeft > 0) {
+        timer = window.setTimeout(expire, Math.min(msLeft, 2 ** 31 - 1));
+      } else if (clearToken(expiryToken)) {
+        setUser(null);
+      }
+    };
+    expire();
     return () => window.clearTimeout(timer);
   }, [user?.exp]);
 

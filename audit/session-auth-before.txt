@@ -1,0 +1,101 @@
+✔ a delayed old-session 401 rejects its caller without clearing the newer login (23.4151ms)
+✔ a 401 for the current session still clears authentication and rejects its caller (0.5307ms)
+✔ a rejected unauthenticated request cannot invalidate a signed-in session (0.4868ms)
+✔ a delayed PDF-download 401 also preserves a newer login (0.6554ms)
+✔ a PDF-download 401 for the current session still signs out (0.6813ms)
+✖ a storage write failure keeps the new session available to protected requests (1.3817ms)
+✖ a transient storage read failure does not discard the last known session (0.4074ms)
+✖ decoding an expired or malformed supplied token cannot clear a different active login (0.5811ms)
+✖ conditional token invalidation ignores a replaced session but clears the matching session (0.3135ms)
+✔ temporary server and network failures never invalidate the session (1.0009ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 6
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 140.1379
+
+✖ failing tests:
+
+test at tests\auth-races.test.cjs:95:1
+✖ a storage write failure keeps the new session available to protected requests (1.3817ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'Bearer initial-session'
+  - 'Bearer memory-session'
+            ^
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\auth-races.test.cjs:100:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'Bearer initial-session',
+    expected: 'Bearer memory-session',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\auth-races.test.cjs:106:1
+✖ a transient storage read failure does not discard the last known session (0.4074ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + null
+  - 'initial-session'
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\auth-races.test.cjs:108:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'initial-session',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\auth-races.test.cjs:111:1
+✖ decoding an expired or malformed supplied token cannot clear a different active login (0.5811ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + null
+  - 'initial-session'
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\auth-races.test.cjs:114:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: null,
+    expected: 'initial-session',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\auth-races.test.cjs:119:1
+✖ conditional token invalidation ignores a replaced session but clears the matching session (0.3135ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + undefined
+  - false
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\auth-races.test.cjs:121:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1306:25)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

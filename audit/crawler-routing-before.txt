@@ -1,0 +1,20 @@
+✖ crawler unknown nested and prefix-lookalike routes are genuine noindex 404s (37.6064ms)
+✖ all account/operator routes including the cash desk are noindex without event data (31.3417ms)
+✔ fixed public pages and curated club metadata remain indexable (14.52ms)
+✖ public event metadata and missing-event status remain distinct (23.4432ms)
+✖ database outages remain retryable uncached 503s rather than missing pages (2.1415ms)
+✖ robots excludes the cash desk without blocking public events; legacy links still redirect (2.5898ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 1
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 608.8352
+✖ failing tests:
+✖ crawler unknown nested and prefix-lookalike routes are genuine noindex 404s (37.6064ms)
+✖ all account/operator routes including the cash desk are noindex without event data (31.3417ms)
+✖ public event metadata and missing-event status remain distinct (23.4432ms)
+✖ database outages remain retryable uncached 503s rather than missing pages (2.1415ms)
+✖ robots excludes the cash desk without blocking public events; legacy links still redirect (2.5898ms)

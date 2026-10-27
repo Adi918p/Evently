@@ -15,7 +15,8 @@
  */
 
 const TOKEN_KEY = "token";
-
+let memoryToken = null;
+let memoryOnly = false;
 
 const API_ORIGIN = ""; // Same-origin API/media proxy also binds OAuth cookies to the browser origin.
 /* ==========================================================================
@@ -23,27 +24,52 @@ const API_ORIGIN = ""; // Same-origin API/media proxy also binds OAuth cookies t
    ========================================================================== */
 
 export const getToken = () => {
+  if (memoryOnly) return memoryToken;
   try {
-    return window.localStorage.getItem(TOKEN_KEY);
+    memoryToken = window.localStorage.getItem(TOKEN_KEY);
   } catch {
-    return null;
+    // A temporary storage failure must not discard a session already in use.
   }
+  return memoryToken;
 };
 
 export const setToken = (token) => {
+  memoryToken = token;
   try {
     window.localStorage.setItem(TOKEN_KEY, token);
+    memoryOnly = false;
   } catch {
-    /* storage blocked - session stays in memory only */
+    // Keep this tab authenticated even if persistence is blocked or full.
+    // Do not fall back to an older token still present in localStorage.
+    memoryOnly = true;
+    try {
+      // Quota failures usually still allow removal. Avoid restoring the
+      // previous account on reload when the replacement could not be saved.
+      window.localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // Fully blocked storage cannot be changed; this tab still uses memory.
+    }
   }
 };
 
-export const clearToken = () => {
+export const clearToken = (expectedToken) => {
+  if (expectedToken !== undefined && getToken() !== expectedToken) return false;
+  memoryToken = null;
   try {
     window.localStorage.removeItem(TOKEN_KEY);
+    memoryOnly = false;
   } catch {
-    /* ignore */
+    // A failed removal must not resurrect the old persisted token in this tab.
+    memoryOnly = true;
   }
+  return true;
+};
+
+/** An explicit sign-in/out in another tab supersedes this tab's fallback. */
+export const syncTokenFromStorage = (value) => {
+  memoryToken = value;
+  memoryOnly = false;
+  return getToken();
 };
 
 /**
@@ -61,13 +87,13 @@ export const decodeToken = (token = getToken()) => {
     const binary = atob(padded);
     const bytes = Uint8Array.from(binary, (c) => c.charCodeAt(0));
     const payload = JSON.parse(new TextDecoder().decode(bytes));
-    if (payload.exp && payload.exp * 1000 < Date.now()) {
-      clearToken();
+    if (payload.exp && payload.exp * 1000 <= Date.now()) {
+      clearToken(token);
       return null;
     }
     return payload;
   } catch {
-    clearToken();
+    clearToken(token);
     return null;
   }
 };
@@ -165,8 +191,7 @@ async function request(
       data,
     });
     // A response for an older session must not sign out a newer login.
-    if (requestToken && getToken() === requestToken) {
-      clearToken();
+    if (requestToken && clearToken(requestToken)) {
       onUnauthorized?.(error);
     }
     throw error;
@@ -261,8 +286,7 @@ async function download(path, { fallbackName = "download" } = {}) {
     }
     if (response.status === 401) {
       const error = new ApiError(message, { status: 401 });
-      if (getToken() === token) {
-        clearToken();
+      if (clearToken(token)) {
         onUnauthorized?.(error);
       }
       throw error;

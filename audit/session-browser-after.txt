@@ -1,0 +1,11 @@
+✔ a login remains usable when token persistence is blocked (3319.2122ms)
+✔ an old expiry timer preserves a replacement token before its storage event arrives (825.0696ms)
+MongoDB disconnected
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14321.929

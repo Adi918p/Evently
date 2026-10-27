@@ -8,10 +8,98 @@ Last updated: 2026-10-27 (Asia/Calcutta)
 - Update this file after each task with changes, checks/results, unresolved issues and next steps.
 - Follow reproduce → implement → test → evaluate → fix/retest when a defect remains. Do not repeat passing checks without a new change or concrete concern.
 - Never describe passing tests as proof that the entire website is bug-free or breach-proof. Record external and untested flows explicitly.
-- Current authorization: fix the audited defects. Razorpay stays in test mode; the owner will switch to live credentials later. Do not replace secrets or change payment environment.
+- Current authorization: the owner reviewed the live audit and said "fix these things also". Implement the reported routing/cache fixes and investigate session loss, then update the same repository under the preceding requested workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and production QA-record cleanup remain separate decisions.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
-## Current task — faster invalid scanner results (2026-10-27)
+## Current task — live audit remediation (2026-10-27)
+
+- Reproduced static fallthrough (HTML 200 for missing files), crawler route
+  classification failures, and independent client storage/stale-expiry session
+  bugs before fixing them. The original observed live logout's exact cause is
+  still unconfirmed; do not present these reproductions as its captured cause.
+- Express now returns uncached resource 404s before SPA fallback. Vercel retains
+  immutable caching for actual build files and uses a small no-store 404 function
+  for asset misses; page rewrites exclude file-like paths. Official routing-utils
+  validates the configuration and preserves filesystem/API/media precedence.
+- Crawler paths now match known public/private routes exactly; invalid nested
+  paths are noindex 404, cash desk is noindex and excluded by robots. Public
+  metadata/legacy redirects and retryable uncached outage 503 behavior remain.
+- Session handling now keeps a tab-local token on storage failures, removes old
+  persisted credentials when possible, and protects new sessions from stale
+  decode/401/expiry actions. Current 401, actual expiry and cross-tab logout remain.
+  Memory-only sessions cannot persist across reload; fully blocked storage
+  cannot be guaranteed cleared across reloads.
+- Final local verification: build passes; 100/100 backend/unit/HTTP regressions,
+  14/14 browser regressions and syntax for 75 JS files pass; whitespace passes.
+  Existing chunk-size/Mongoose warnings remain. Evidence and implementation
+  summary: audit/LIVE_FIXES_2026-10-27.md and audit/live-fixes-*.txt/json.
+- No production bookings, emails, admissions, cancellation, database changes,
+  secrets or payment-setting changes made during this remediation. Earlier QA
+  records remain as described below. Generated browser screenshots are kept in
+  ignored .cache/live-fixes-browser-images, preserving historical audit images.
+- Next: publish reviewed changes, verify CI/deployment and actual hosted routing
+  responses, then record exact release status. No repeat live transaction needed.
+
+## Previous task — live website audit (2026-10-27)
+
+- Owner requested testing on the live website and a bug list, with fixes and
+  repository publication deferred until their next command. Tested event-ly.in
+  and api.event-ly.in; no localhost build/test was counted as live evidence.
+  User session was provided in Chrome; a separate Work profile later supplied
+  the admin account. No application implementation or Git publication occurred.
+- Report: audit/LIVE_REVIEW_2026-10-27.md. Supporting files:
+  audit/live-review-http-2026-10-27.json,
+  audit/live-review-http-summary-2026-10-27.md and
+  audit/live-review-admin-2026-10-27.md. Private screenshots, downloaded PDFs,
+  renders and email evidence remain in ignored .cache/live-review-2026-10-27;
+  the private guest CSV remains in Downloads.
+- Public HTTP audit: 91 bounded GET/HEAD checks, 86 expected outcomes and five
+  deviations grouped into two low-severity issues: missing static paths return
+  HTML 200 (missing assets also get one-year immutable caching); crawler routing
+  makes unknown nested paths and the cash desk indexable. Current referenced
+  assets, 27 media URLs, public filters, invalid IDs and 11 anonymous protected
+  GET checks passed. Exact evidence and limits are in the HTTP report.
+- Observed one unexpected user sign-out; owner confirmed no account switch.
+  Its failing request was not captured, so cause is unconfirmed. Restored/fresh
+  sessions survived subsequent protected navigation, reload and booking tests.
+  Investigate with request/server evidence; do not assume token expiry or a fix.
+- User approved disposable test inventory and exactly two zero-value bookings
+  with their emails. Created QA event 6ae0916e6b6ef540ba900da3 with initial capacity
+  zero, then two. One free user booking and one cash guest booking succeeded;
+  required answers/details, email format, 1–10 limits, remaining capacity,
+  sold-out state, cash recovery and two-row CSV passed. Recovery reused the same
+  cash ticket; no third row/duplicate was observed. No real cash/payment taken.
+- Scanner live manual-input checks: unrelated UPI text -> Invalid ticket with
+  zero requests; plausible unknown ticket -> refused with one verification
+  request (~1.97 seconds including tooling). OK-only acknowledgement held.
+  QA user ticket admitted once, repeated scan refused, reload retained 1/2;
+  roster admission of QA cash ticket produced 2/2. Real attendee records were
+  not admitted or cancelled. Physical camera/audio remain untested.
+- One existing email-failed ticket received exactly the separately approved
+  retry. Failure cleared; actual recipient Gmail showed that retry and both QA
+  booking messages, each with ticket/receipt attachments. Existing downloaded
+  ticket/receipt PDFs were rendered and inspected successfully. No extra send.
+- User/admin browsing, role-denial screens, malformed/missing purchase URLs,
+  profile/bookings, contact validation, historical booking price preservation,
+  mobile ticket/menu/search and five admin pages passed the executed checks.
+  Temporary viewport overrides were removed; original admin/Gmail views restored.
+- Cleanup: hiding the fixture was correctly refused because it has confirmed
+  bookings. Restored price to zero and moved only this QA event to 2026-10-26,
+  with a completed-test description. Live page says finished/sales closed and
+  default upcoming listing again has only the real event. Event plus two checked-in
+  zero-value test records remain (including two extra tickets in metrics); full
+  cancellation/cleanup needs a deliberate support/admin action. No database bypass.
+- Limits: no fresh OAuth/OTP/password flow, real paid sale/refund/webhook,
+  positive-value cash sale, destructive moderation/role changes, physical-camera
+  test, load/fault/concurrency testing or exhaustive ownership audit. Do not claim
+  every edge case or a bug-free site. Prior local suites are not live proof.
+- Next: owner chooses fixes. Address confirmed routing/cache defects and gather
+  session-drop evidence; separately decide on cash/free cancellation and QA
+  cleanup. Preserve domains, database connections, credentials and payment mode.
+  HEAD remains a9ef5143497d56e90cc6488960c9b81792cef9c8; only audit/log files changed.
+  Final git status confirmed that scope and git diff --check passed.
+
+## Previous task — faster invalid scanner results (2026-10-27)
 
 - Owner reported that valid scanning works but invalid QR results take too long,
   and authorized the fix plus publication to the existing GitHub repository.

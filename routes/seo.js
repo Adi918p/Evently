@@ -542,26 +542,28 @@ const EVENT_PATH = /^\/events\/([a-f\d]{24})$/i;
 /**
  * The routes client/public/robots.txt blocks.
  *
- * Kept as a list rather than parsed out of the file: it is nine strings that
- * change roughly never, and reading and interpreting robots syntax at request
- * time to answer "is this private" would be the wrong kind of clever. If a rule
- * is added there, add it here.
+ * Match actual client routes, not arbitrary strings beginning with a private
+ * prefix. Unknown paths still need a 404 even under an account/operator area.
+ * Keep these routes in step with client/src/App.jsx and the robots exclusions.
  */
-const PRIVATE_PREFIXES = [
+const PRIVATE_ROUTES = new Set([
     "/login",
     "/profile",
     "/my-bookings",
-    "/booking/",
+    "/booking/success",
     "/create-event",
     "/dashboard",
     "/scanner",
-    "/admin"
-];
+    "/admin",
+    "/admin/events",
+    "/admin/users",
+    "/admin/inbox",
+    "/admin/analytics"
+]);
+const EVENT_OPERATOR_PATH = /^\/events\/[a-f\d]{24}\/(edit|bookings|cash)$/i;
 
 const isPrivatePath = (pathname) =>
-    PRIVATE_PREFIXES.some(
-        (prefix) => pathname === prefix || pathname.startsWith(prefix)
-    ) || /\/(edit|bookings)$/.test(pathname);
+    PRIVATE_ROUTES.has(pathname) || EVENT_OPERATOR_PATH.test(pathname);
 
 /* ==========================================================================
    Legacy .html URLs
@@ -651,8 +653,9 @@ const render = async (req, res) => {
     if (moved) return res.redirect(301, canonicalUrl(moved));
 
     const eventMatch = EVENT_PATH.exec(pathname);
+    const isDetailPath = /^\/(events|clubs)\/[^/]+$/.test(pathname);
     const notFound = () => res.status(404).type('html').send(renderPage({ title: formatTitle('Page not found'), description: 'This page does not exist.', canonical, image: absoluteUrl(DEFAULT_OG_IMAGE), noindex: true, body: staticBody('Page not found', 'Browse upcoming events instead.', canonicalUrl('/events')) }));
-    if (!PAGES[pathname] && !eventMatch && !CLUB_ROUTES.includes(pathname) && !isPrivatePath(pathname) && !/^\/(events|clubs)\//.test(pathname)) return notFound();
+    if (!PAGES[pathname] && !isDetailPath && !isPrivatePath(pathname)) return notFound();
     if (CLUB_ROUTES.includes(pathname)) {
         const { getClub } = await import('../client/src/data/clubs.js');
         const club = getClub(pathname.split('/').pop());
@@ -718,6 +721,7 @@ const render = async (req, res) => {
                         "This event is no longer listed on Evently. Browse what else is coming up.",
                     canonical: canonicalUrl("/events"),
                     image: absoluteUrl(DEFAULT_OG_IMAGE),
+                    noindex: true,
                     body: staticBody(
                         "Event not found",
                         "This event is no longer listed. Browse what else is coming up.",
@@ -743,14 +747,12 @@ const render = async (req, res) => {
        The one exception is a database outage on a path that *is* a well-formed
        event id: that page probably exists, so 503 asks the crawler to come back
        rather than telling it the event is gone. */
-    const isDetailPath =
-        /^\/events\/[^/]+$/.test(pathname) || /^\/clubs\/[^/]+$/.test(pathname);
-
     if (isDetailPath) {
         if (eventMatch && !isDatabaseReady()) {
             return res
                 .status(503)
                 .set("Retry-After", "300")
+                .set("Cache-Control", "no-store")
                 .type("html")
                 .send(
                     renderPage({
@@ -785,6 +787,7 @@ const render = async (req, res) => {
                     description: blurb,
                     canonical: canonicalUrl(backTo),
                     image: absoluteUrl(DEFAULT_OG_IMAGE),
+                    noindex: true,
                     body: staticBody(heading, blurb, canonicalUrl(backTo))
                 })
             );

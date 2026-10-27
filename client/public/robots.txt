@@ -13,6 +13,7 @@ Disallow: /scanner
 Disallow: /admin
 Disallow: /*/edit
 Disallow: /*/bookings
+Disallow: /events/*/cash
 
 
 Sitemap: https://event-ly.in/sitemap.xml

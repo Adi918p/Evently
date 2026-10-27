@@ -1,0 +1,32 @@
+
+> evently@1.0.0 test:browser
+> node --test tests/browser.test.cjs
+
+✔ a login remains usable when token persistence is blocked (4086.1212ms)
+✔ an old expiry timer preserves a replacement token before its storage event arrives (744.3831ms)
+✔ free checkout validates required questions, confirms, survives refresh and downloads PDF (2948.1147ms)
+(node:10300) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ paid browser checkout completes through bound order verification (2155.3942ms)
+✔ mobile menu traps focus, restores the trigger and does not overflow (1834.7194ms)
+✔ city search waits for submission instead of fetching on every keystroke (1428.8922ms)
+✔ cash desk recovers an interrupted guest booking and provides ticket and receipt on mobile (4412.8106ms)
+(node:10300) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ organizer registration and ticket settings persist through the actual form (1839.3954ms)
+✔ scanner shows an OK-only result, plays supplied audio, persists admission and rejects reuse (3081.0819ms)
+Scanner OK-to-next-request timings (ms): 7, 10
+✔ camera pauses through verification and result, resumes promptly on OK and never overlaps decodes (5468.3759ms)
+✔ scanner recovers from network and invalid QR errors, supports mute and discards a stale camera frame (3269.721ms)
+Invalid camera QR to result (ms): 61
+✔ unrelated camera QR codes are refused promptly without verification or roster requests (3186.2252ms)
+✔ scanner bounds a lost confirmation response and safely retries a committed admission (9809.3046ms)
+✔ browser pages produced no uncaught JavaScript errors (0.2786ms)
+MongoDB disconnected
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 46228.255

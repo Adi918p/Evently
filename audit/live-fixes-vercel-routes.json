@@ -1,0 +1,64 @@
+{
+  "routes": [
+    {
+      "src": "^/assets(?:/(.*))$",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      },
+      "continue": true
+    },
+    {
+      "src": "^/sitemap\\.xml$",
+      "headers": {
+        "Cache-Control": "public, max-age=3600"
+      },
+      "continue": true
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "^/assets(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?$",
+      "dest": "/api/static-not-found?path=$1",
+      "check": true
+    },
+    {
+      "src": "^/api(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?$",
+      "dest": "https://api.event-ly.in/api/$1",
+      "check": true
+    },
+    {
+      "src": "^/Media(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?$",
+      "dest": "https://api.event-ly.in/Media/$1",
+      "check": true
+    },
+    {
+      "src": "^/uploads(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?$",
+      "dest": "https://api.event-ly.in/uploads/$1",
+      "check": true
+    },
+    {
+      "src": "^/sitemap\\.xml$",
+      "dest": "https://api.event-ly.in/sitemap.xml",
+      "check": true
+    },
+    {
+      "src": "^(?:/((?!.*\\.(?![hH][tT][mM][lL]$)[^/]+$).*))$",
+      "dest": "https://api.event-ly.in/seo/render/$1",
+      "check": true,
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": ".*(facebookexternalhit|Facebot|Twitterbot|WhatsApp|LinkedInBot|Slackbot|Slack-ImgProxy|Discordbot|TelegramBot|Pinterest|redditbot|Googlebot|Google-InspectionTool|AdsBot-Google|Storebot-Google|bingbot|BingPreview|DuckDuckBot|YandexBot|Applebot|SkypeUriPreview|vkShare|embedly|Iframely|Mastodon|Bluesky|Yeti|Baiduspider).*"
+        }
+      ]
+    },
+    {
+      "src": "^(?:/((?!.*\\.(?![hH][tT][mM][lL]$)[^/]+$).*))$",
+      "dest": "/index.html",
+      "check": true
+    }
+  ],
+  "error": null
+}
