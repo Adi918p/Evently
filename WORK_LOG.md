@@ -11,7 +11,29 @@ Last updated: 2026-10-27 (Asia/Calcutta)
 - Current authorization: fix the audited defects. Razorpay stays in test mode; the owner will switch to live credentials later. Do not replace secrets or change payment environment.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
-## Current task — real repository implementation and verification (complete)
+## Current task — direct push to main (complete)
+
+- The owner explicitly requested committing and pushing directly to the supplied
+  Adi918p/Evently repository instead of leaving the work in a pull request.
+- Fetched origin and verified main still pointed to 4e6aaf7. Fast-forwarded local
+  main to the existing tested commits b28216d and 02ced98, then successfully pushed
+  main. A fresh remote reference check confirmed origin/main at 02ced98.
+  No force push or rewritten history was used. Saved GitHub authentication worked;
+  no additional API key was needed.
+- GitHub automatically closed PR #1 as merged after the direct push contained its
+  commits. The pull-request workflow is no longer pending user action.
+- Existing GitHub checks at exact pushed commit 02ced98 passed on the branch and
+  pull-request runs (40462904156 and 40462908222): build, syntax, 41 backend and
+  8 Chrome browser tests. The main push also started the same workflow. No code
+  changed this task, so the already-passing local suites were not repeated.
+- Final documentation update is committed directly on main. The checkout is now
+  main. No secrets or local integration data were committed. Hosting may react to
+  a main push automatically; deployed environment settings and end-to-end flows
+  have not been verified in this task. Existing device/deployment limits remain.
+- Next: follow the owner's next requested scope; verify the hosted release and
+  production integration configuration when deployment work is requested.
+
+## Previous completed task — real repository implementation and verification
 
 - Confirmed X:/EVENTLY is the checkout of Adi918p/Evently. GitHub main and local
   HEAD both started at 4e6aaf7; the authorized audit/integration/scanner work was
