@@ -215,6 +215,36 @@ test('admission persists and rejects duplicate, pending and foreign-event scans'
     await Event.updateOne({ _id: event._id }, { organizer: admin._id });
     assert.equal((await request('POST', '/api/bookings/verify-ticket', scan, organizer)).status, 403);
 });
+
+test('a refund racing with check-in reports cancellation, not an already-used pass', async () => {
+    const purchase = await service.createOrder(buyer._id, input());
+    const payment = captured(purchase);
+    await service.fulfill(purchase._id, payment);
+    const booking = await Booking.findOne();
+    const original = Booking.findOneAndUpdate;
+    let intercepted = false;
+    Booking.findOneAndUpdate = function (filter, update, options) {
+        if (!intercepted && update.$set?.checkedIn) {
+            intercepted = true;
+            // Refund commits after the scanner's read but before its conditional admission.
+            return { populate() { return { async populate() {
+                payment.status = 'refunded'; payment.amount_refunded = purchase.amount;
+                await service.reconcile(await Purchase.findById(purchase._id));
+                return original.call(Booking, filter, update, options).populate('user', 'name email').populate('event');
+            } }; } };
+        }
+        return original.call(this, filter, update, options);
+    };
+    try {
+        const result = await request('POST', '/api/bookings/verify-ticket', { bookingId: String(booking._id), eventId: String(event._id), mode: 'confirm' }, organizer);
+        assert.equal(intercepted, true);
+        assert.equal(result.status, 200);
+        assert.equal(result.body.ok, false);
+        assert.equal(result.body.state, 'cancelled');
+        assert.equal(result.body.booking.checkedIn, false);
+        assert.equal((await Event.findById(event._id)).ticketsSold, 0);
+    } finally { Booking.findOneAndUpdate = original; }
+});
 test('events with confirmed bookings cannot be deleted and capacity cannot drop below sales', async () => {
     const purchase = await service.createOrder(buyer._id, input({ tickets: 2 })); await service.fulfill(purchase._id, captured(purchase));
     assert.equal((await request('DELETE', `/api/events/${event._id}`, undefined, organizer)).status, 409);

@@ -225,11 +225,8 @@ const scanBooking = (booking) => {
  *
  * body: { bookingId?, ticketId?, eventId?, mode?: "preview" | "confirm" }
  *
- * Two-step by design. A scan runs in "preview" mode, which reads the ticket and
- * returns what the door should see without touching it; the operator looks at
- * the name and count, then confirms, which is the only call that checks anyone
- * in. Previously a single scan checked in immediately, so a misread or a
- * curious tap burned a ticket with no way back.
+ * Preview reads the ticket without changing admission. The scanner and roster
+ * explicitly send "confirm" and show success only after admission is saved.
  *
  * mode defaults to "preview": the safe direction to fail, and it means a stray
  * or replayed request cannot admit anyone.
@@ -374,10 +371,13 @@ exports.verifyTicket = async (req, res) => {
             const current = await Booking.findById(booking._id)
                 .populate("user", "name email")
                 .populate("event");
+            if (!current) return verdict("not-found", "No ticket matches that code.");
+            if (current.status !== "confirmed") return verdict(current.status, "This booking is not confirmed.", current);
+            if (!current.checkedIn) return verdict("unavailable", "This pass changed while being checked. Please scan it again.", current);
             return verdict(
                 "checked-in",
                 "Already checked in - someone just scanned this pass.",
-                current || booking
+                current
             );
         }
 

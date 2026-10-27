@@ -14,3 +14,11 @@ Screenshots show isolated fixtures, not production users.
 Read `WORK_LOG.md` and the remediation matrix in `AUDIT.md` for current scope,
 results, and external checks still required. Baseline source line links may have
 moved as the implementation changed.
+
+The real-repository verification is recorded in `repo-backend-results.txt`
+(41 passing checks), `repo-browser-results.txt` (8 passing checks),
+`repo-build-results.txt` and `repo-syntax-results.txt`. `repo-race-before.txt`
+records the newly reproduced refund/check-in race before its fix; the passing
+regression is included in the backend results. Provider account evidence
+(`brevo-smoke`, `google-live-status`, `local-*`, `razorpay-*`) and the local
+integration setup notes are intentionally kept out of version control.

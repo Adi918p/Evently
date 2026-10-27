@@ -1,0 +1,53 @@
+name: Evently checks
+
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+      - name: Install backend and test dependencies
+        run: npm ci
+      - name: Build frontend from its lockfile
+        run: npm run build
+      - name: Check JavaScript syntax
+        run: npm run test:syntax
+      - name: Run isolated backend regressions
+        run: npm test
+      - name: Install Chrome for browser regressions
+        run: npx playwright install --with-deps chrome
+      - name: Run checkout, scanner and mobile browser regressions
+        run: npm run test:browser
+      - name: Save fixture screenshots
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-fixture-screenshots
+          path: |
+            audit/checkout-desktop.png
+            audit/menu-mobile.png
+            audit/scanner-success-desktop.png
+            audit/scanner-error-mobile.png
+          if-no-files-found: ignore
+          retention-days: 7

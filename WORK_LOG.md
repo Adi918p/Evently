@@ -175,7 +175,77 @@ Last updated: 2026-10-27 (Asia/Calcutta)
   user's requested project work; the isolated app was running at this handoff
   and has since been replaced by the frontend proxy described above.
 
-## Current task — scanner result popup and supplied sounds (complete locally)
+## Previous task — direct push to main (complete)
+
+- The owner explicitly requested committing and pushing directly to the supplied
+  Adi918p/Evently repository instead of leaving the work in a pull request.
+- Fetched origin and verified main still pointed to 4e6aaf7. Fast-forwarded local
+  main to the existing tested commits b28216d and 02ced98, then successfully pushed
+  main. A fresh remote reference check confirmed origin/main at 02ced98.
+  No force push or rewritten history was used. Saved GitHub authentication worked;
+  no additional API key was needed.
+- GitHub automatically closed PR #1 as merged after the direct push contained its
+  commits. The pull-request workflow is no longer pending user action.
+- Existing GitHub checks at exact pushed commit 02ced98 passed on the branch and
+  pull-request runs (40462904156 and 40462908222): build, syntax, 41 backend and
+  8 Chrome browser tests. The main push also started the same workflow. No code
+  changed this task, so the already-passing local suites were not repeated.
+- Final documentation update is committed directly on main. The checkout is now
+  main. No secrets or local integration data were committed. Hosting may react to
+  a main push automatically; deployed environment settings and end-to-end flows
+  have not been verified in this task. Existing device/deployment limits remain.
+- Next: follow the owner's next requested scope; verify the hosted release and
+  production integration configuration when deployment work is requested.
+
+## Previous completed task — real repository implementation and verification
+
+- Confirmed X:/EVENTLY is the checkout of Adi918p/Evently. GitHub main and local
+  HEAD both started at 4e6aaf7; the authorized audit/integration/scanner work was
+  present only as uncommitted changes. Committed the implementation as b28216d
+  on codex/evently-audit-scanner-fixes and pushed it to the real repository.
+  Draft pull request: https://github.com/Adi918p/Evently/pull/1 (attached to chat).
+- Reproduced an additional check-in/refund race: a refund committed between the
+  ticket read and conditional admission returned checked-in instead of cancelled.
+  The controller now reports the freshly loaded status and handles a missing or
+  otherwise changed pass. The regression injects a real transactional refund in
+  that interval, checks denial/cancellation and confirms the seat is released.
+- Added a GitHub workflow for lockfile installs, production build, syntax checks,
+  isolated backend tests and Chrome checkout/scanner/mobile regressions. Added
+  local setup/testing instructions to the previously empty README.
+- Fresh local checks: 41 backend tests pass after the fix (the new regression
+  failed beforehand); all 8 browser tests pass; production build passes. The
+  browser suite verified the existing scanner/UI implementation; the new backend
+  race is verified separately by its HTTP/database regression. Existing Three.js
+  bundle-size and Mongoose deprecation warnings remain non-failing.
+- Initial restricted execution could not connect to temporary MongoDB on
+  localhost; rerunning with local-process access passed. Evidence:
+  audit/repo-backend-results.txt, audit/repo-browser-results.txt,
+  audit/repo-build-results.txt and audit/repo-race-before.txt.
+- Excluded local account evidence, integration setup notes and loose duplicate
+  MP3s from version control. Bundled source MP3s remain included. Account-specific
+  evidence referenced in historical entries is available only in the local copy.
+- Current parser/media inventory passes (147 script/modules, 20 inline scripts,
+  16 JSON and 11 CSS files); JavaScript syntax and compiled stylesheet checks
+  pass. Checked 104 staged added/modified files against local credential values
+  and common secret patterns: no matches. Removed whitespace from the captured
+  failing-test log; no application behavior changed in these final checks.
+- GitHub clean Ubuntu checks PASS for implementation b28216d on both push and
+  pull-request runs: lockfile installation, build, syntax, all 41 backend checks
+  and all 8 Chrome checks. Runs: 40462447322 and 40462608799. Fixture screenshot
+  artifacts were produced. The changes have not been merged into main.
+- In response to the owner's database question, a fresh read-only ping using the
+  configured hosted MONGO_URI passed. Its selected database is named `test`.
+  This proves hosted connectivity, not a deployed end-to-end acceptance test.
+  Local port 5173 is currently unreachable and the recorded local integration
+  process is stopped; the older handoff's running-process note is superseded.
+  The regression suites used their own temporary databases. No hosted records
+  were read or changed; the connection was closed after ping.
+- No production data, credentials, payment mode or hosting configuration changed.
+  Next: review/merge the PR when requested, then perform any separately requested
+  deployment and device acceptance. Physical-device and deployed integration
+  checks remain subject to the requirements below.
+
+## Previous completed task — scanner result popup and supplied sounds
 
 - User requested a scan-result popup, with the next scan allowed only after OK,
   and the supplied success.mp3/error.mp3 with responsive, smooth operation.

@@ -1,0 +1,34 @@
+(node:29856) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✖ a refund racing with check-in reports cancellation, not an already-used pass (1325.4732ms)
+MongoDB disconnected
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2384.8153
+
+✖ failing tests:
+
+test at tests\integration.test.cjs:219:1
+✖ a refund racing with check-in reports cancellation, not an already-used pass (1325.4732ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+
+  + 'checked-in'
+  - 'cancelled'
+
+      at TestContext.<anonymous> (X:\EVENTLY\tests\integration.test.cjs:243:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async Test.run (node:internal/test_runner/test:1113:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:358:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 'checked-in',
+    expected: 'cancelled',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
