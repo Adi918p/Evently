@@ -11,12 +11,13 @@ Last updated: 2026-10-27 (Asia/Calcutta)
 - Current authorization: fix the audited defects. Razorpay stays in test mode; the owner will switch to live credentials later. Do not replace secrets or change payment environment.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
-## Current task — publish and verify the real repository
+## Current task — real repository implementation and verification (complete)
 
 - Confirmed X:/EVENTLY is the checkout of Adi918p/Evently. GitHub main and local
   HEAD both started at 4e6aaf7; the authorized audit/integration/scanner work was
-  present only as uncommitted changes. Preparing it together on
-  codex/evently-audit-scanner-fixes for a reviewable GitHub pull request.
+  present only as uncommitted changes. Committed the implementation as b28216d
+  on codex/evently-audit-scanner-fixes and pushed it to the real repository.
+  Draft pull request: https://github.com/Adi918p/Evently/pull/1 (attached to chat).
 - Reproduced an additional check-in/refund race: a refund committed between the
   ticket read and conditional admission returned checked-in instead of cancelled.
   The controller now reports the freshly loaded status and handles a missing or
@@ -42,10 +43,21 @@ Last updated: 2026-10-27 (Asia/Calcutta)
   pass. Checked 104 staged added/modified files against local credential values
   and common secret patterns: no matches. Removed whitespace from the captured
   failing-test log; no application behavior changed in these final checks.
+- GitHub clean Ubuntu checks PASS for implementation b28216d on both push and
+  pull-request runs: lockfile installation, build, syntax, all 41 backend checks
+  and all 8 Chrome checks. Runs: 40462447322 and 40462608799. Fixture screenshot
+  artifacts were produced. The changes have not been merged into main.
+- In response to the owner's database question, a fresh read-only ping using the
+  configured hosted MONGO_URI passed. Its selected database is named `test`.
+  This proves hosted connectivity, not a deployed end-to-end acceptance test.
+  Local port 5173 is currently unreachable and the recorded local integration
+  process is stopped; the older handoff's running-process note is superseded.
+  The regression suites used their own temporary databases. No hosted records
+  were read or changed; the connection was closed after ping.
 - No production data, credentials, payment mode or hosting configuration changed.
-  Next: complete static checks, publish the branch/PR, inspect GitHub check results
-  and record the final outcome. Physical-device and deployed acceptance checks
-  remain subject to the requirements below.
+  Next: review/merge the PR when requested, then perform any separately requested
+  deployment and device acceptance. Physical-device and deployed integration
+  checks remain subject to the requirements below.
 
 ## Previous completed task — scanner result popup and supplied sounds
 
