@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-27",
+  "commit": "e85a9965b73e3a8355233efd88d56f821b76d23e",
+  "site": "https://event-ly.in",
+  "scope": "Read-only Chrome check using the owner's existing signed-in user session after production deployment. No login-storage modifications, bookings, email or admissions.",
+  "steps": [
+    { "action": "Open a fresh profile tab", "result": "Profile visible and email-verified state present", "pass": true },
+    { "action": "Navigate to My bookings", "result": "Protected page and ticket controls loaded", "pass": true },
+    { "action": "Reload My bookings", "result": "Protected page and ticket controls remained available", "pass": true },
+    { "action": "Return to Profile", "result": "Profile visible and email-verified state retained", "pass": true }
+  ],
+  "capturedConsoleWarningsAndErrors": [],
+  "limitations": "The earlier unexpected sign-out was not reproduced in this live session. Storage-failure and stale-expiry regressions were reproduced and verified with isolated local browser fixtures, without altering the live user's credentials."
+}

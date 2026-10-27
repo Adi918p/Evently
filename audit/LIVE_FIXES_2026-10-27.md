@@ -48,6 +48,12 @@ The existing build chunk-size and Mongoose deprecation warnings remain non-faili
 
 ## Publication and live checks
 
-Pending publication at the time of the implementation commit. Check GitHub CI and deployed responses before treating the hosted defects as resolved. Verify missing asset/media responses, an actual hashed asset, unknown nested crawler URLs, cash-desk noindex, public metadata and the new client bundle. Do not trigger new live bookings or email merely to check this release.
+Published implementation commit [`e85a996`](https://github.com/Adi918p/Evently/commit/e85a9965b73e3a8355233efd88d56f821b76d23e) to `main` with a normal push. [GitHub Actions run 40512622703](https://github.com/Adi918p/Evently/actions/runs/40512622703) completed successfully for that exact commit. Vercel Production deployment `7359796613` also succeeded. Status evidence: [publication record](live-fixes-publication.json).
+
+**22/22 deployed HTTP checks passed** on both public hosts. Missing assets/media/uploads now return 404 with no-store; uppercase resource paths also return 404 (Vercel uses revalidation for its native root-file miss). Invalid nested crawler routes are noindex404, cash desk is noindex, and robots excludes it. A real event retains its correct public metadata and logo. Live JS and CSS match the tested local build byte-for-byte and retain immutable caching. Evidence: [live HTTP verification](live-fixes-live-http.json).
+
+The existing Chrome user session passed Profile → My bookings → reload → Profile with verified state retained and no captured console warnings/errors. Evidence: [live browser verification](live-fixes-live-browser.json). This does not establish the earlier sign-out's cause; the fault scenarios were exercised in isolated browser tests instead.
+
+The final documentation commit records this verification without further application changes. No live financial/email transaction was needed for this release.
 
 The earlier QA event and its two zero-value issued bookings remain as documented in the live audit. Cash/free cancellation and direct database cleanup are separate operations and were not included in these three fixes.

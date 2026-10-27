@@ -1,0 +1,782 @@
+{
+  "startedAt": "2026-10-27T13:34:09.302Z",
+  "scope": "Bounded sequential read-only public GET/HEAD live deployment verification. No credentials, mutations, database direct access, transactions or messages.",
+  "expectedCommit": "e85a9965b73e3a8355233efd88d56f821b76d23e",
+  "announcedFrontendDeployment": "7359796613",
+  "localBuild": {
+    "js": "/assets/index-CwbTMbv4.js",
+    "css": "/assets/index-ijVbjpjz.css"
+  },
+  "checks": [
+    {
+      "name": "frontend home and entry fingerprint",
+      "checkedAt": "2026-10-27T13:34:09.660Z",
+      "method": "GET",
+      "url": "https://event-ly.in/",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 200,
+        "js": "/assets/index-CwbTMbv4.js",
+        "css": "/assets/index-ijVbjpjz.css"
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "x-vercel-cache": "MISS",
+          "age": "0",
+          "etag": "W/\"5eb5cb851bf7d7410573d4a49c2b13fd\""
+        },
+        "bytes": 4258,
+        "ms": 506,
+        "hasAppRoot": true,
+        "title": "Evently — Book Events, Club Nights &amp; Concerts",
+        "robots": "index, follow, max-image-preview:large",
+        "canonical": "https://event-ly.in/",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status200": true,
+        "sameJsReference": true,
+        "sameCssReference": true
+      },
+      "passed": true
+    },
+    {
+      "name": "genuine frontend js",
+      "checkedAt": "2026-10-27T13:34:10.526Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/index-CwbTMbv4.js",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 200,
+        "cache": "public, max-age=31536000, immutable",
+        "matchesLocalBytes": true
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "application/javascript; charset=utf-8",
+          "cache-control": "public, max-age=31536000, immutable",
+          "x-vercel-cache": "HIT",
+          "age": "142",
+          "etag": "W/\"1d57e59d6272e6350eae3e7b5f8f6d4d\""
+        },
+        "bytes": 536963,
+        "ms": 100,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status200": true,
+        "correctMime": true,
+        "immutable": true,
+        "sameBytes": true
+      },
+      "passed": true
+    },
+    {
+      "name": "genuine frontend css",
+      "checkedAt": "2026-10-27T13:34:10.987Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/index-ijVbjpjz.css",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 200,
+        "cache": "public, max-age=31536000, immutable",
+        "matchesLocalBytes": true
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/css; charset=utf-8",
+          "cache-control": "public, max-age=31536000, immutable",
+          "x-vercel-cache": "MISS",
+          "age": "0",
+          "etag": "W/\"25456eb6de594069003a060698f897cb\""
+        },
+        "bytes": 69755,
+        "ms": 294,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status200": true,
+        "correctMime": true,
+        "immutable": true,
+        "sameBytes": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend missing assets",
+      "checkedAt": "2026-10-27T13:34:11.632Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/evently-audit-nonexistent.js",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store"
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-vercel-cache": "MISS",
+          "age": "0",
+          "x-content-type-options": "nosniff"
+        },
+        "bytes": 9,
+        "ms": 363,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend missing Media",
+      "checkedAt": "2026-10-27T13:34:12.356Z",
+      "method": "GET",
+      "url": "https://event-ly.in/Media/evently-audit-nonexistent.png",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store"
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Accept-Encoding"
+        },
+        "bytes": 9,
+        "ms": 836,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend missing uploads",
+      "checkedAt": "2026-10-27T13:34:13.554Z",
+      "method": "GET",
+      "url": "https://event-ly.in/uploads/evently-audit-nonexistent.webp",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store"
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Accept-Encoding"
+        },
+        "bytes": 9,
+        "ms": 389,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend uppercase root resource",
+      "checkedAt": "2026-10-27T13:34:14.299Z",
+      "method": "GET",
+      "url": "https://event-ly.in/EVENTLY-AUDIT-NONEXISTENT.PNG",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=0, must-revalidate"
+        },
+        "bytes": 79,
+        "ms": 49,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend missing assets",
+      "checkedAt": "2026-10-27T13:34:14.708Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/assets/evently-audit-nonexistent.js",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store"
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Accept-Encoding"
+        },
+        "bytes": 9,
+        "ms": 475,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend missing Media",
+      "checkedAt": "2026-10-27T13:34:15.540Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/Media/evently-audit-nonexistent.png",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store"
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Accept-Encoding"
+        },
+        "bytes": 9,
+        "ms": 347,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend missing uploads",
+      "checkedAt": "2026-10-27T13:34:16.245Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/uploads/evently-audit-nonexistent.webp",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store"
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Accept-Encoding"
+        },
+        "bytes": 9,
+        "ms": 465,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend uppercase root resource",
+      "checkedAt": "2026-10-27T13:34:17.062Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/EVENTLY-AUDIT-NONEXISTENT.PNG",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Accept-Encoding"
+        },
+        "bytes": 9,
+        "ms": 980,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend missing asset HEAD",
+      "checkedAt": "2026-10-27T13:34:18.398Z",
+      "method": "HEAD",
+      "url": "https://event-ly.in/assets/evently-audit-nonexistent.js",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 404,
+        "appShell": false,
+        "immutable": false,
+        "cache": "no-store",
+        "bodyBytes": 0
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "no-store",
+          "x-vercel-cache": "MISS",
+          "age": "0",
+          "x-content-type-options": "nosniff"
+        },
+        "bytes": 0,
+        "ms": 461,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status404": true,
+        "noAppShell": true,
+        "noImmutable": true,
+        "noStore": true,
+        "emptyBody": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend invalid nested events",
+      "checkedAt": "2026-10-27T13:34:19.219Z",
+      "method": "GET",
+      "url": "https://event-ly.in/events/000000000000000000000000/not-a-real-route",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 404,
+        "robots": "noindex",
+        "appShell": false
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"680-CeSkp70kca8UkG9zoMfEqBpqyhM\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 1664,
+        "ms": 448,
+        "hasAppRoot": false,
+        "title": "Page not found | Evently",
+        "robots": "noindex, follow",
+        "canonical": "https://event-ly.in/events/000000000000000000000000/not-a-real-route",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status404": true,
+        "noindex": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend invalid nested clubs",
+      "checkedAt": "2026-10-27T13:34:20.022Z",
+      "method": "GET",
+      "url": "https://event-ly.in/clubs/1/not-a-real-route",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 404,
+        "robots": "noindex",
+        "appShell": false
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"650-rBW8L29yr4rAD45khLjhsYrTFaM\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 1616,
+        "ms": 370,
+        "hasAppRoot": false,
+        "title": "Page not found | Evently",
+        "robots": "noindex, follow",
+        "canonical": "https://event-ly.in/clubs/1/not-a-real-route",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status404": true,
+        "noindex": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend cash indexing",
+      "checkedAt": "2026-10-27T13:34:20.749Z",
+      "method": "GET",
+      "url": "https://event-ly.in/events/6a8584c3a89d30e7b03930f4/cash",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 200,
+        "robots": "noindex",
+        "appShell": false
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"8d9-eVyiv6eAOX97kTL7kUVZ6p5z6HI\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 2265,
+        "ms": 315,
+        "hasAppRoot": false,
+        "title": "Evently — Book Events, Club Nights &amp; Concerts",
+        "robots": "noindex, follow",
+        "canonical": "https://event-ly.in/events/6a8584c3a89d30e7b03930f4/cash",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status200": true,
+        "noindex": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend renderer invalid nested events",
+      "checkedAt": "2026-10-27T13:34:21.421Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/seo/render/events/000000000000000000000000/not-a-real-route",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 404,
+        "robots": "noindex",
+        "appShell": false
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"680-CeSkp70kca8UkG9zoMfEqBpqyhM\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 1664,
+        "ms": 314,
+        "hasAppRoot": false,
+        "title": "Page not found | Evently",
+        "robots": "noindex, follow",
+        "canonical": "https://event-ly.in/events/000000000000000000000000/not-a-real-route",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status404": true,
+        "noindex": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend renderer invalid nested clubs",
+      "checkedAt": "2026-10-27T13:34:22.093Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/seo/render/clubs/1/not-a-real-route",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 404,
+        "robots": "noindex",
+        "appShell": false
+      },
+      "actual": {
+        "status": 404,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"650-rBW8L29yr4rAD45khLjhsYrTFaM\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 1616,
+        "ms": 328,
+        "hasAppRoot": false,
+        "title": "Page not found | Evently",
+        "robots": "noindex, follow",
+        "canonical": "https://event-ly.in/clubs/1/not-a-real-route",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status404": true,
+        "noindex": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend renderer cash indexing",
+      "checkedAt": "2026-10-27T13:34:22.778Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/seo/render/events/6a8584c3a89d30e7b03930f4/cash",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 200,
+        "robots": "noindex",
+        "appShell": false
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"8d9-eVyiv6eAOX97kTL7kUVZ6p5z6HI\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 2265,
+        "ms": 355,
+        "hasAppRoot": false,
+        "title": "Evently — Book Events, Club Nights &amp; Concerts",
+        "robots": "noindex, follow",
+        "canonical": "https://event-ly.in/events/6a8584c3a89d30e7b03930f4/cash",
+        "hasJsonLd": false
+      },
+      "assertions": {
+        "status200": true,
+        "noindex": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "frontend robots cash exclusion",
+      "checkedAt": "2026-10-27T13:34:23.489Z",
+      "method": "GET",
+      "url": "https://event-ly.in/robots.txt",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 200,
+        "cashDisallow": "/events/*/cash"
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "x-vercel-cache": "MISS",
+          "age": "0",
+          "etag": "\"bc4995f6dd855f4a8b55d2acd83c1194\""
+        },
+        "bytes": 295,
+        "ms": 293,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status200": true,
+        "cashDisallow": true,
+        "sitemapPreserved": true
+      },
+      "passed": true
+    },
+    {
+      "name": "backend robots remains private",
+      "checkedAt": "2026-10-27T13:34:24.135Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/robots.txt",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 200,
+        "disallow": "/"
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "cache-control": "public, max-age=86400",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"94-3yvsvcBWqRHoc+jCGW3ryUNCeac\"",
+          "x-content-type-options": "nosniff",
+          "vary": "Host, Accept-Encoding"
+        },
+        "bytes": 148,
+        "ms": 322,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status200": true,
+        "disallowAll": true
+      },
+      "passed": true
+    },
+    {
+      "name": "genuine public event crawler metadata",
+      "checkedAt": "2026-10-27T13:34:24.814Z",
+      "method": "GET",
+      "url": "https://event-ly.in/events/6a8584c3a89d30e7b03930f4",
+      "userAgent": "Googlebot",
+      "expected": {
+        "status": 200,
+        "eventTitle": "Big Fish Pool 2027",
+        "canonical": "https://event-ly.in/events/6a8584c3a89d30e7b03930f4",
+        "indexed": true,
+        "jsonLd": true
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "public, max-age=300, s-maxage=600",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"1558-EWuBpgslaIotEp9uTVIbjV/WvWk\"",
+          "x-content-type-options": "nosniff",
+          "vary": "User-Agent, Accept-Encoding"
+        },
+        "bytes": 5464,
+        "ms": 704,
+        "hasAppRoot": false,
+        "title": "Big Fish Pool 2027 — CT University, Ludhiana, Punjab | Evently",
+        "robots": "index, follow, max-image-preview:large",
+        "canonical": "https://event-ly.in/events/6a8584c3a89d30e7b03930f4",
+        "hasJsonLd": true
+      },
+      "assertions": {
+        "status200": true,
+        "eventTitle": true,
+        "canonical": true,
+        "indexable": true,
+        "jsonLd": true,
+        "noAppShell": true
+      },
+      "passed": true
+    },
+    {
+      "name": "genuine logo media",
+      "checkedAt": "2026-10-27T13:34:25.884Z",
+      "method": "HEAD",
+      "url": "https://event-ly.in/Media/Png/logo.jpg",
+      "userAgent": "Evently release verification",
+      "expected": {
+        "status": 200,
+        "contentType": "image/jpeg"
+      },
+      "actual": {
+        "status": 200,
+        "headers": {
+          "content-type": "image/jpeg",
+          "cache-control": "public, max-age=86400",
+          "x-vercel-cache": "MISS",
+          "x-render-origin-server": "Render",
+          "etag": "W/\"133e85-1a17d8eada8\"",
+          "x-content-type-options": "nosniff"
+        },
+        "bytes": 0,
+        "ms": 448,
+        "hasAppRoot": false
+      },
+      "assertions": {
+        "status200": true,
+        "correctMime": true
+      },
+      "passed": true
+    }
+  ],
+  "liveBuild": {
+    "js": "/assets/index-CwbTMbv4.js",
+    "css": "/assets/index-ijVbjpjz.css"
+  },
+  "buildHashes": {
+    "js": {
+      "localSha256": "1ddf4823028e4786c244cf53c0a5260b09fcf22f28398b19bec6242cd230f4f9",
+      "liveSha256": "1ddf4823028e4786c244cf53c0a5260b09fcf22f28398b19bec6242cd230f4f9"
+    },
+    "css": {
+      "localSha256": "dca910aed655f221b195debadaba19e4ebf09d75eead8cda5406e5c8755a3415",
+      "liveSha256": "dca910aed655f221b195debadaba19e4ebf09d75eead8cda5406e5c8755a3415"
+    }
+  },
+  "completedAt": "2026-10-27T13:34:26.333Z",
+  "summary": {
+    "total": 22,
+    "passed": 22,
+    "failed": []
+  }
+}

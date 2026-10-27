@@ -37,8 +37,21 @@ Last updated: 2026-10-27 (Asia/Calcutta)
   secrets or payment-setting changes made during this remediation. Earlier QA
   records remain as described below. Generated browser screenshots are kept in
   ignored .cache/live-fixes-browser-images, preserving historical audit images.
-- Next: publish reviewed changes, verify CI/deployment and actual hosted routing
-  responses, then record exact release status. No repeat live transaction needed.
+- Publication complete: normal push of e85a996 to main. GitHub Actions run
+  40512622703 passed for e85a9965b73e3a8355233efd88d56f821b76d23e, and Vercel
+  Production deployment 7359796613 succeeded. Both backend/frontend behavior
+  verified live: 22/22 bounded HTTP checks pass; exact JS/CSS bytes match local
+  build and retain immutable caching. Missing resources return 404, unknown
+  crawler paths return 404/noindex and cash desk is noindex with robots exclusion;
+  real metadata remains healthy.
+  Evidence: audit/live-fixes-live-http.json and live-fixes-publication.json.
+- Live Chrome user Profile → My bookings → reload → Profile passed with verified
+  state retained and no captured console warnings/errors; evidence:
+  audit/live-fixes-live-browser.json. No fault injection into the real session.
+- Final follow-up commit records release evidence only. Remaining limitation:
+  original logout cause is unconfirmed despite reproduced fixes and passing
+  live smoke. Next work is owner-directed; QA cancellation/cleanup and broader
+  untested provider/device/load scenarios remain separate from this release.
 
 ## Previous task — live website audit (2026-10-27)
 
