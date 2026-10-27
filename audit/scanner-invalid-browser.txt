@@ -1,0 +1,30 @@
+
+> evently@1.0.0 test:browser
+> node --test tests/browser.test.cjs
+
+✔ free checkout validates required questions, confirms, survives refresh and downloads PDF (4539.8823ms)
+(node:16284) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ paid browser checkout completes through bound order verification (1646.8971ms)
+✔ mobile menu traps focus, restores the trigger and does not overflow (1403.842ms)
+✔ city search waits for submission instead of fetching on every keystroke (1444.2072ms)
+✔ cash desk recovers an interrupted guest booking and provides ticket and receipt on mobile (3896.5383ms)
+(node:16284) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ organizer registration and ticket settings persist through the actual form (908.6743ms)
+✔ scanner shows an OK-only result, plays supplied audio, persists admission and rejects reuse (2997.2248ms)
+Scanner OK-to-next-request timings (ms): 12, 10
+✔ camera pauses through verification and result, resumes promptly on OK and never overlaps decodes (5337.6503ms)
+✔ scanner recovers from network and invalid QR errors, supports mute and discards a stale camera frame (2447.9772ms)
+Invalid camera QR to result (ms): 64
+✔ unrelated camera QR codes are refused promptly without verification or roster requests (3256.4876ms)
+✔ scanner bounds a lost confirmation response and safely retries a committed admission (9876.0653ms)
+✔ browser pages produced no uncaught JavaScript errors (0.323ms)
+MongoDB disconnected
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 39236.3307

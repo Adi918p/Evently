@@ -423,4 +423,119 @@ test('scanner recovers from network and invalid QR errors, supports mute and dis
     assert.equal(await page.evaluate(() => window.__camera.track.readyState), 'ended');
   } finally { await context.close(); }
 });
+test('unrelated camera QR codes are refused promptly without verification or roster requests', async () => {
+  const { page, context } = await pageFor(organizer, { width: 390, height: 844 });
+  let releaseRequest;
+  try {
+    await observeScannerAudio(page); await controllableCamera(page);
+    let requests = 0;
+    const heldRequest = new Promise(resolve => { releaseRequest = resolve; });
+    await page.route('**/api/bookings/verify-ticket', async route => {
+      requests++; await heldRequest;
+      await route.abort().catch(() => {});
+    });
+    await page.goto(base + '/scanner');
+    await page.getByLabel('Which door').selectOption(String(freeEvent._id));
+    await expect(page.getByText('Loading guest list')).not.toBeVisible();
+    const rosterRequests = [];
+    page.on('request', request => {
+      if (new URL(request.url()).pathname === `/api/events/${freeEvent._id}/bookings`) rosterRequests.push(request.url());
+    });
+    await page.getByRole('button', { name: 'Start camera', exact: true }).click();
+    await page.evaluate(() => {
+      window.__invalidStarted = performance.now();
+      window.__camera.value = 'upi://pay?pa=fixture@example.invalid&pn=Fixture';
+    });
+    const dialog = page.getByRole('dialog', { name: 'Invalid ticket', exact: true });
+    await expect(dialog).toBeVisible({ timeout: 1200 });
+    const elapsed = await page.evaluate(() => performance.now() - window.__invalidStarted);
+    console.log('Invalid camera QR to result (ms):', Math.round(elapsed));
+    assert.equal(requests, 0, 'Unrelated QR must not wait on the server');
+    await expect.poll(() => page.evaluate(() => window.__sounds.length)).toBe(1);
+    assert.equal(await page.evaluate(() => window.__sounds[0].hash), soundHash('error'));
+    const calls = await page.evaluate(() => window.__camera.calls);
+    await page.waitForTimeout(250);
+    assert.equal(await page.evaluate(() => window.__camera.calls), calls, 'Invalid result still pauses scanning until OK');
+    await page.evaluate(() => { window.__camera.value = ''; });
+    await dialog.getByRole('button', { name: 'OK', exact: true }).click();
+    await page.getByRole('button', { name: 'Stop camera', exact: true }).click();
+    for (const value of ['https://example.invalid/qr', '{"ticketId":{}}', '{broken-json']) {
+      await page.getByLabel('Or enter a ticket ID').fill(value);
+      await page.getByRole('button', { name: 'Check in', exact: true }).first().click();
+      await expect(dialog).toBeVisible({ timeout: 1000 });
+      await dialog.getByRole('button', { name: 'OK', exact: true }).click();
+    }
+    assert.equal(requests, 0);
+    assert.equal(rosterRequests.length, 0);
+    await page.unroute('**/api/bookings/verify-ticket');
+    await page.route('**/api/bookings/verify-ticket', route => { requests++; return route.continue(); });
+    // A plausible ticket still needs the authoritative server verdict, even
+    // when it is absent from the roster loaded when the scanner opened.
+    await page.getByLabel('Or enter a ticket ID').fill('EVT-000000000000000000000000');
+    await page.getByRole('button', { name: 'Check in', exact: true }).first().click();
+    await expect(page.getByRole('dialog', { name: 'Entry refused' })).toBeVisible();
+    assert.equal(requests, 1);
+    assert.equal(rosterRequests.length, 0, 'Unknown tickets must not reload the roster');
+    await page.getByRole('button', { name: 'OK', exact: true }).click();
+    const legacyIds = ['EVLT-123456789ABC', 'EVT-1700000000000-7'];
+    for (const ticketId of legacyIds) {
+      const booking = await Booking.create({ user: buyer._id, event: freeEvent._id, ticketId, tickets: 1, totalPrice: 0, status: 'confirmed' });
+      await page.getByLabel('Or enter a ticket ID').fill(ticketId.startsWith('EVLT') ? ticketId : JSON.stringify({ ticketId, eventId: String(freeEvent._id) }));
+      await page.getByRole('button', { name: 'Check in', exact: true }).first().click();
+      await expect(page.getByRole('dialog', { name: 'Let 1 guest in' })).toBeVisible();
+      assert.equal((await Booking.findById(booking._id)).checkedIn, true);
+      await page.getByRole('button', { name: 'OK', exact: true }).click();
+    }
+    const counts = page.locator('p').filter({ hasText: 'bookings scanned' });
+    const before = (await counts.innerText()).match(/(\d+) of (\d+) bookings scanned/);
+    assert.ok(before);
+    const elsewhere = await Booking.create({ user: buyer._id, event: freeEvent._id, ticketId: 'EVT-ADMITTED-ELSEWHERE', tickets: 1, totalPrice: 0, status: 'confirmed', checkedIn: true, checkedInAt: new Date() });
+    await page.getByLabel('Or enter a ticket ID').fill(elsewhere.ticketId);
+    await page.getByRole('button', { name: 'Check in', exact: true }).first().click();
+    await expect(page.getByRole('dialog', { name: 'Already used' })).toBeVisible();
+    await expect(counts).toContainText(`${Number(before[1]) + 1} of ${Number(before[2]) + 1} bookings scanned`);
+    assert.equal(rosterRequests.length, 0, 'Authoritative state for a new booking is merged without a full roster fetch');
+  } finally { releaseRequest?.(); await context.close(); }
+});
+
+test('scanner bounds a lost confirmation response and safely retries a committed admission', async () => {
+  const { page, context } = await pageFor(organizer);
+  let releaseRequest;
+  try {
+    await page.clock.install();
+    const booking = await scannerTicket();
+    let requests = 0; let committed = false;
+    const heldRequest = new Promise(resolve => { releaseRequest = resolve; });
+    await page.route('**/api/bookings/verify-ticket', async route => {
+      requests++;
+      if (requests > 1) return route.continue();
+      const response = await route.fetch(); committed = true;
+      await heldRequest;
+      await route.fulfill({ response }).catch(() => {});
+    });
+    await page.goto(base + '/scanner');
+    await page.getByLabel('Which door').selectOption(String(freeEvent._id));
+    await page.getByLabel('Or enter a ticket ID').fill(booking.ticketId);
+    await page.getByRole('button', { name: 'Check in', exact: true }).first().click();
+    await expect.poll(() => committed).toBe(true);
+    const saved = await Booking.findById(booking._id);
+    assert.equal(saved.checkedIn, true);
+    await expect(page.getByText('Checking ticket…', { exact: true })).toBeVisible();
+    await page.clock.fastForward(8100);
+    const dialog = page.getByRole('dialog', { name: 'Check-in not confirmed', exact: true });
+    await expect(dialog).toBeVisible();
+    await expect(dialog).toContainText('Keep this guest waiting');
+    await expect(page.getByLabel('Or enter a ticket ID')).toBeDisabled();
+    releaseRequest();
+    await page.waitForTimeout(100);
+    await expect(dialog).toBeVisible();
+    await dialog.getByRole('button', { name: 'OK', exact: true }).click();
+    await page.getByLabel('Or enter a ticket ID').fill(booking.ticketId);
+    await page.getByRole('button', { name: 'Check in', exact: true }).first().click();
+    await expect(page.getByRole('dialog', { name: 'Already used' })).toBeVisible();
+    assert.equal(requests, 2);
+    assert.equal((await Booking.findById(booking._id)).checkedInAt.getTime(), saved.checkedInAt.getTime());
+  } finally { releaseRequest?.(); await context.close(); }
+});
+
 test('browser pages produced no uncaught JavaScript errors', () => assert.deepEqual(browserErrors, []));

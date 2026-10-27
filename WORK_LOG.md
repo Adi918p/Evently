@@ -11,7 +11,44 @@ Last updated: 2026-10-27 (Asia/Calcutta)
 - Current authorization: fix the audited defects. Razorpay stays in test mode; the owner will switch to live credentials later. Do not replace secrets or change payment environment.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
-## Current task — performance and repository publication (2026-10-27)
+## Current task — faster invalid scanner results (2026-10-27)
+
+- Owner reported that valid scanning works but invalid QR results take too long,
+  and authorized the fix plus publication to the existing GitHub repository.
+- Reproduced with a UPI QR and a held verification response: the old scanner sent
+  the unrelated code to the API and remained on Checking ticket instead of
+  displaying Invalid ticket. The new browser regression failed before the fix;
+  evidence: audit/scanner-invalid-before.txt. Read-only database inspection found
+  the unique ticketId index already present; indexed misses examined zero records
+  and three query round trips took 35–40 ms. No database/index writes were made.
+- Added a bounded payload parser that rejects unrelated URLs/payment/WiFi/text,
+  malformed JSON, invalid field types and oversized payloads immediately on the
+  device. Preserved current EVT IDs, legacy EVT timestamp IDs, legacy EVLT IDs
+  and structured booking IDs. A plausible ticket always goes to the server;
+  missing from the loaded roster is never grounds for rejection. QR event/user
+  fields cannot change the selected door, authorization or admission decision.
+- Scanner verification now has an eight-second response deadline and aborts on
+  unmount. A timeout says Check-in not confirmed and keeps the guest waiting;
+  it never declares a ticket invalid or successfully admitted. Server-side
+  admission may already have committed. The regression holds a committed
+  response, triggers the deadline, retries and verifies Already used with the
+  original admission timestamp unchanged. The OK-only gate and sounds remain.
+- Removed unnecessary full-roster reloads on unknown-ticket refusals. Returned
+  state for a known ticket is merged in place; valid admissions still update
+  the roster immediately, including tickets bought after the page opened. Review
+  caught and fixed a map-only update dropping a newly seen Already used pass;
+  returned bookings now insert if absent, with browser coverage for counts.
+- Verification: production build, syntax and whitespace checks pass; 80/80
+  backend/unit tests and 12/12 browser scenarios pass. New camera invalid-QR
+  result measured 64 ms with zero verification or roster requests in controlled
+  mobile Chrome. Covers legacy admission, plausible unknown IDs, error sound,
+  acknowledgement lock, stale frames and lost-response retry. Evidence:
+  audit/scanner-invalid-{backend,browser,build}.txt. Actual physical-camera
+  decode time and network-dependent valid/unknown Evently checks still vary.
+- No production URLs, database connections, hosting settings or credentials
+  changed. Publication to main and hosted-build confirmation are next.
+
+## Previous task — performance and repository publication (2026-10-27)
 
 - Owner requested faster pages/processes and publication to Adi918p/Evently,
   explicitly preserving event-ly.in, api.event-ly.in and existing database/hosting

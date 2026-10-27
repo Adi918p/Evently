@@ -485,11 +485,12 @@ export const bookings = {
    * -> { mode, ok, state, message, booking, display }
    *    state: valid | admitted | checked-in | cancelled | wrong-event | not-found
    */
-  verifyTicket: ({ bookingId, ticketId, eventId, mode = "preview" } = {}) =>
+  verifyTicket: ({ bookingId, ticketId, eventId, mode = "preview" } = {}, signal) =>
     request("/api/bookings/verify-ticket", {
       method: "POST",
       body: { bookingId, ticketId, eventId, mode },
       auth: true,
+      signal,
     }),
 };
 

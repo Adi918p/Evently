@@ -26,6 +26,7 @@ import { Reveal } from "../../components/ui/Reveal";
 import Seo from "../../components/seo/Seo";
 import { useApi } from "../../lib/useApi";
 import { useScannerSounds } from "../../lib/useScannerSounds";
+import { readScannerPayload } from "../../lib/scannerPayload";
 import {
   events as eventsApi,
   bookings as bookingsApi,
@@ -52,34 +53,8 @@ function buzz(ok) {
   }
 }
 
-/* ==========================================================================
-   Payload parsing
-   ========================================================================== */
-
-/**
- * Accepts a raw QR string or a hand-typed ticket id and returns whatever
- * identifiers it can find. Nothing here trusts the payload - it is only used to
- * ask the server to validate the pass.
- */
-function readPayload(raw) {
-  const text = String(raw || "").trim();
-  if (!text) return { ticketId: null, bookingId: null, eventId: null };
-
-  if (text.startsWith("{")) {
-    try {
-      const parsed = JSON.parse(text);
-      return {
-        ticketId: parsed.ticketId ? String(parsed.ticketId) : null,
-        bookingId: parsed.bookingId ? String(parsed.bookingId) : null,
-        eventId: parsed.eventId ? String(parsed.eventId) : null,
-      };
-    } catch {
-      /* not JSON after all - treat the whole thing as a ticket id */
-    }
-  }
-
-  return { ticketId: text, bookingId: null, eventId: null };
-}
+// A lost response is uncertain: the server may already have saved admission.
+const VERIFICATION_TIMEOUT_MS = 8000;
 
 /* ==========================================================================
    Result dialog
@@ -166,6 +141,7 @@ export default function Scanner() {
   const scanLocked = useRef(false);
   const frameVersion = useRef(0);
   const cameraVersion = useRef(0);
+  const verificationController = useRef(null);
   const mounted = useRef(true);
   const locked = busy || Boolean(result);
 
@@ -252,19 +228,34 @@ export default function Scanner() {
     scanLocked.current = true;
     frameVersion.current += 1;
     if (sound) unlockSound();
-    const { ticketId, bookingId } = readPayload(raw);
-    if (!ticketId && !bookingId) {
-      say('bad', 'Invalid ticket', 'This QR code does not contain a ticket ID.');
+    const payload = readScannerPayload(raw);
+    if (!payload) {
+      say('bad', 'Invalid ticket', 'This is not an Evently ticket QR. Scan the QR on the Evently pass.');
       return;
     }
+    const { ticketId, bookingId } = payload;
+    const controller = new AbortController();
+    verificationController.current = controller;
+    let timedOut = false;
+    const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, VERIFICATION_TIMEOUT_MS);
     setBusy(true);
     try {
-      const response = await bookingsApi.verifyTicket({ bookingId, ticketId, eventId: selectedEvent._id, mode: 'confirm' });
+      const response = await bookingsApi.verifyTicket({ bookingId, ticketId, eventId: selectedEvent._id, mode: 'confirm' }, controller.signal);
       if (!mounted.current) return;
       const booking = response.booking;
       if (!response.ok || response.state !== 'admitted' || !booking?.checkedIn) {
         say(response.state === 'checked-in' ? 'warn' : 'bad', response.state === 'checked-in' ? 'Already used' : 'Entry refused', response.message || 'This pass cannot be admitted.');
-        roster.reload();
+        // A refusal with no booking changes nothing in the guest list. Avoid a
+        // full roster download for each unknown QR; refresh known state in place.
+        if (booking?.event?._id === selectedEvent._id) {
+          roster.setData(previous => {
+            const rows = previous?.bookings || [];
+            const exists = rows.some(row => row._id === booking._id);
+            return { ...previous, bookings: exists
+              ? rows.map(row => row._id === booking._id ? { ...row, ...booking } : row)
+              : [...rows, booking] };
+          });
+        }
         return;
       }
       roster.setData(previous => ({ ...previous, bookings: [...(previous?.bookings || []).filter(row => row._id !== booking._id), booking] }));
@@ -273,12 +264,16 @@ export default function Scanner() {
       const details = (response.display || []).map(row => row.label + ': ' + row.value).join(' · ');
       say('ok', 'Let ' + heads + (heads === 1 ? ' guest in' : ' guests in'), details || booking.user?.name || 'Admission saved.');
     } catch (error) {
-      if (mounted.current) say('bad', 'Check-in failed', error.message || 'Try again.');
+      if (mounted.current) say('bad', timedOut ? 'Check-in not confirmed' : 'Check-in failed', timedOut
+        ? 'The server took too long to respond. Keep this guest waiting and scan again when connected. The first check may already have saved admission; do not admit them based on this message.'
+        : error.message || 'Try again.');
     } finally {
+      window.clearTimeout(timeout);
+      if (verificationController.current === controller) verificationController.current = null;
       if (mounted.current) setBusy(false);
       // Stay locked through success AND failure until the operator presses OK.
     }
-  }, [selectedEvent, roster.setData, roster.reload, say, sound, unlockSound]);
+  }, [selectedEvent, roster.setData, say, sound, unlockSound]);
 
   // The decode loop reads the latest `admit` through a ref. Depending on it
   // directly would tear down and restart requestAnimationFrame on every render
@@ -391,7 +386,7 @@ export default function Scanner() {
   // keeps the indicator light on, which reads as the page spying.
   useEffect(() => {
     mounted.current = true;
-    return () => { mounted.current = false; stopCamera(); };
+    return () => { mounted.current = false; verificationController.current?.abort(); stopCamera(); };
   }, [stopCamera]);
   useEffect(() => {
     setResult(null);

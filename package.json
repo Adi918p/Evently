@@ -10,7 +10,7 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "test": "node --test tests/integration.test.cjs tests/unit.test.cjs tests/mailer.test.cjs tests/webhook-relay.test.cjs tests/email-signup.test.cjs tests/ticket-delivery.test.cjs tests/receipt.test.cjs tests/cash-bookings.test.cjs tests/performance-api.test.cjs tests/auth-races.test.cjs",
+    "test": "node --test tests/integration.test.cjs tests/unit.test.cjs tests/mailer.test.cjs tests/webhook-relay.test.cjs tests/email-signup.test.cjs tests/ticket-delivery.test.cjs tests/receipt.test.cjs tests/cash-bookings.test.cjs tests/performance-api.test.cjs tests/auth-races.test.cjs tests/scanner-payload.test.cjs",
     "start": "node scripts/start.js",
     "serve": "node server.js",
     "build": "npm --prefix client ci --include=dev && npm --prefix client run build",

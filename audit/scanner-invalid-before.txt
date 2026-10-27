@@ -1,0 +1,32 @@
+✖ unrelated camera QR codes are refused promptly without verification or roster requests (4342.198ms)
+MongoDB disconnected
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5892.9312
+
+✖ failing tests:
+
+test at tests\browser.test.cjs:426:1
+✖ unrelated camera QR codes are refused promptly without verification or roster requests (4342.198ms)
+  Error: expect(locator).toBeVisible() failed
+
+  Locator: getByRole('dialog', { name: 'Invalid ticket', exact: true })
+  Expected: visible
+  Timeout: 1200ms
+  Error: element(s) not found
+
+  Call log:
+    - Expect "toBeVisible" getByRole('dialog', { name: 'Invalid ticket', exact: true }) with timeout 1200ms
+    - waiting for getByRole('dialog', { name: 'Invalid ticket', exact: true })
+
+      at captureRawStack (C:\Users\Acer\Downloads\EVENTLY\node_modules\playwright-core\lib\coreBundle.js:9282:17)
+      at callMatcherAsStep (C:\Users\Acer\Downloads\EVENTLY\node_modules\playwright\lib\matchers\expect.js:13316:57)
+      at Object.toBeVisible (C:\Users\Acer\Downloads\EVENTLY\node_modules\playwright\lib\matchers\expect.js:13308:23)
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\browser.test.cjs:450:26) {
+    matcherResult: { message: `expect(locator).toBeVisible() failed\n\nLocator: getByRole('dialog', { name: 'Invalid ticket', exact: true })\nExpected: visible\nTimeout: 1200ms\nError: element(s) not found\n\nCall log:\n  - Expect "toBeVisible" getByRole('dialog', { name: 'Invalid ticket', exact: true }) with timeout 1200ms\n  - waiting for getByRole('dialog', { name: 'Invalid ticket', exact: true })\n`, pass: false, actual: undefined, name: 'toBeVisible', expected: 'visible', log: [ `  - Expect "toBeVisible" getByRole('dialog', { name: 'Invalid ticket', exact: true }) with timeout 1200ms`, "  - waiting for getByRole('dialog', { name: 'Invalid ticket', exact: true })" ], timeout: 1200, ariaSnapshot: `- link "Skip to main content":\n  - /url: "#main"\n- banner:\n  - link "Evently home":\n    - /url: /\n  - button "Search events"\n  - link "Create":\n    - /url: /create-event\n  - button\n  - button "Open menu"\n- main:\n  - link "Back to dashboard":\n    - /url: /dashboard\n  - paragraph: On the door\n  - heading "Ticket scanner" [level=1]\n  - paragraph: Scan a QR, type a ticket ID, or just tap a name. Each booking admits once.\n  - text: Which door\n  - combobox "Which door" [disabled]:\n    - option "Paid browser event — 1 Jan"\n    - option "Free browser event — 1 Jan" [selected]\n  - paragraph: Only bookings for this event will be admitted.\n  - button "Stop camera"\n  - button "Sound on" [pressed]\n  - status: Checking ticket…\n  - text: Or enter a ticket ID\n  - textbox "Or enter a ticket ID" [disabled]:\n    - /placeholder: EVLT-… or EVT-…\n  - paragraph: It's printed on the ticket PDF and shown in the guest's bookings.\n  - button "Check in" [disabled]\n  - heading "Door count" [level=2]\n  - paragraph: 0 / 0\n  - paragraph: people in · 0 of 0 bookings scanned\n  - progressbar "Guests admitted"\n  - link "Full guest list":\n    - /url: /events/6ae0881a1d8e91374b26ecec/bookings\n  - heading "Still to arrive" [level=2]\n  - text: "0"\n  - paragraph: Nobody has booked this one yet.\n- contentinfo:\n  - paragraph: Got something planned?\n  - heading "Put your night on the map." [level=2]\n  - paragraph: List an event in a few minutes, sell tickets, and scan people in at the door. No spreadsheets.\n  - link "Create an event":\n    - /url: /create-event\n  - link "Talk to us":\n    - /url: /support\n  - link "Evently":\n    - /url: /\n  - paragraph: Events, clubs, concerts and parties near you — found, booked and scanned in one place.\n  - list:\n    - listitem:\n      - link "Evently on Instagram":\n        - /url: https://www.instagram.com/evently_hub\n    - listitem:\n      - link "support@event-ly.in":\n        - /url: mailto:support@event-ly.in\n  - navigation "Discover":\n    - heading "Discover" [level=3]\n    - list:\n      - listitem:\n        - link "All events":\n          - /url: /events\n      - listitem:\n        - link "Club guide":\n          - /url: /clubs\n      - listitem:\n        - link "Experiences":\n          - /url: /experience\n      - listitem:\n        - link "List your event":\n          - /url: /create-event\n  - navigation "Account":\n    - heading "Account" [level=3]\n    - list:\n      - listitem:\n        - link "My bookings":\n          - /url: /my-bookings\n      - listitem:\n        - link "Profile":\n          - /url: /profile\n      - listitem:\n        - link "Organizer dashboard":\n          - /url: /dashboard\n  - navigation "Help":\n    - heading "Help" [level=3]\n    - list:\n      - listitem:\n        - link "FAQ":\n          - /url: /faq\n      - listitem:\n        - link "Support":\n          - /url: /support\n      - listitem:\n        - link "Contact us":\n          - /url: /contact\n  - navigation "Legal":\n    - heading "Legal" [level=3]\n    - list:\n      - listitem:\n        - link "Privacy policy":\n          - /url: /privacy\n      - listitem:\n        - link "Terms & conditions":\n          - /url: /terms\n  - paragraph: © 2026 Evently. All rights reserved.\n  - paragraph: Built in Ludhiana, for anywhere.` }
+  }
