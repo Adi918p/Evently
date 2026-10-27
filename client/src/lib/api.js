@@ -17,7 +17,7 @@
 const TOKEN_KEY = "token";
 
 
-const API_ORIGIN = import.meta.env.VITE_API_ORIGIN || "";
+const API_ORIGIN = ""; // Same-origin API/media proxy also binds OAuth cookies to the browser origin.
 /* ==========================================================================
    Token handling
    ========================================================================== */
@@ -107,6 +107,7 @@ async function request(
 ) {
   const finalHeaders = { ...headers };
   let payload;
+  let requestToken = null;
 
   if (body !== undefined) {
     finalHeaders["Content-Type"] = "application/json";
@@ -114,13 +115,13 @@ async function request(
   }
 
   if (auth) {
-    const token = getToken();
-    if (!token) {
+    requestToken = getToken();
+    if (!requestToken) {
       const error = new ApiError("Please sign in to continue.", { status: 401 });
       onUnauthorized?.(error);
       throw error;
     }
-    finalHeaders.Authorization = `Bearer ${token}`;
+    finalHeaders.Authorization = `Bearer ${requestToken}`;
   }
 
   let response;
@@ -163,8 +164,11 @@ async function request(
       status: 401,
       data,
     });
-    clearToken();
-    onUnauthorized?.(error);
+    // A response for an older session must not sign out a newer login.
+    if (requestToken && getToken() === requestToken) {
+      clearToken();
+      onUnauthorized?.(error);
+    }
     throw error;
   }
 
@@ -256,9 +260,11 @@ async function download(path, { fallbackName = "download" } = {}) {
       /* keep the status message */
     }
     if (response.status === 401) {
-      clearToken();
       const error = new ApiError(message, { status: 401 });
-      onUnauthorized?.(error);
+      if (getToken() === token) {
+        clearToken();
+        onUnauthorized?.(error);
+      }
       throw error;
     }
     throw new ApiError(message, { status: response.status });
@@ -325,7 +331,7 @@ export const auth = {
    * is a URL rather than a request. Absolute when VITE_API_ORIGIN is set; see
    * the note on API_ORIGIN for why this one call skips the proxy.
    */
-  googleUrl: () => `${API_ORIGIN}/api/auth/google`
+  exchangeGoogle: () => request("/api/auth/google/exchange", { method: "POST", body: {} })
 };
 
 /* ==========================================================================
@@ -333,7 +339,7 @@ export const auth = {
    ========================================================================== */
 
 /** Server accepts q, city, category and date (plus dateFrom/dateTo aliases). */
-const eventQuery = ({ query, city, category, date, dateFrom, dateTo } = {}) => {
+const eventQuery = ({ query, city, category, date, dateFrom, dateTo, summary } = {}) => {
   const params = new URLSearchParams();
   if (query) params.set("q", query);
   if (city) params.set("city", city);
@@ -341,18 +347,21 @@ const eventQuery = ({ query, city, category, date, dateFrom, dateTo } = {}) => {
   if (date) params.set("date", date);
   if (dateFrom) params.set("dateFrom", dateFrom);
   if (dateTo) params.set("dateTo", dateTo);
+  if (summary) params.set("summary", "1");
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 };
 
 export const events = {
-  /** -> Event[] (bare array, not wrapped) */
+  /** -> Event card summaries (bare array); get() loads full event details. */
   list: (filters, signal) =>
-    request(`/api/events${eventQuery(filters)}`, { signal }),
+    request(`/api/events${eventQuery({ ...filters, summary: true })}`, { signal }),
 
   /** -> { success, event, seatsLeft } */
   get: (id, signal) =>
     request(`/api/events/${encodeURIComponent(id)}`, { signal }),
+
+  manage: (id, signal) => request(`/api/events/${encodeURIComponent(id)}/manage`, { auth: true, signal }),
 
   /** Organizer's own events. */
   mine: (signal) => request("/api/events/my", { auth: true, signal }),
@@ -402,10 +411,11 @@ export const events = {
 
 export const payments = {
   /** -> { success, order, keyId } - keyId is the public Razorpay key. */
-  createOrder: (eventId, tickets) =>
+  status: (id, signal) => request(`/api/payments/purchases/${encodeURIComponent(id)}`, { auth: true, signal }),
+  createOrder: (eventId, tickets, answers, requestKey) =>
     request("/api/payments/create-order", {
       method: "POST",
-      body: { eventId, tickets },
+      body: { eventId, tickets, answers, requestKey },
       auth: true,
     }),
 
@@ -437,6 +447,11 @@ export const bookings = {
   create: (payload) =>
     request("/api/bookings", { method: "POST", body: payload, auth: true }),
 
+  cash: (payload) =>
+    request("/api/bookings/cash", { method: "POST", body: payload, auth: true }),
+
+  retryEmail: (id) => request(`/api/bookings/${encodeURIComponent(id)}/email/retry`, { method: "POST", body: {}, auth: true }),
+
   mine: (signal) => request("/api/bookings/my", { auth: true, signal }),
 
   /**
@@ -448,6 +463,11 @@ export const bookings = {
   downloadTicket: (id, ticketId) =>
     download(`/api/bookings/${encodeURIComponent(id)}/ticket`, {
       fallbackName: `Evently-${ticketId || "ticket"}.pdf`,
+    }),
+
+  downloadReceipt: (id, ticketId) =>
+    download(`/api/bookings/${encodeURIComponent(id)}/receipt`, {
+      fallbackName: `Evently-receipt-${ticketId || "booking"}.pdf`,
     }),
 
   /**

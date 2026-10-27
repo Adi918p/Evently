@@ -10,13 +10,17 @@
     "node": ">=22.12.0"
   },
   "scripts": {
-    "test": "node scripts/check-js.js",
+    "test": "node --test tests/integration.test.cjs tests/unit.test.cjs tests/mailer.test.cjs tests/webhook-relay.test.cjs tests/email-signup.test.cjs tests/ticket-delivery.test.cjs tests/receipt.test.cjs tests/cash-bookings.test.cjs tests/performance-api.test.cjs tests/auth-races.test.cjs",
     "start": "node scripts/start.js",
     "serve": "node server.js",
     "build": "npm --prefix client ci --include=dev && npm --prefix client run build",
     "dev": "nodemon server.js",
     "dev:client": "npm --prefix client run dev",
-    "client": "npm --prefix client run"
+    "client": "npm --prefix client run",
+    "test:syntax": "node scripts/check-js.js",
+    "test:browser": "node --test tests/browser.test.cjs",
+    "test:local": "node scripts/local-integration.cjs",
+    "check:email": "node scripts/check-email.cjs"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
@@ -26,16 +30,17 @@
     "express-rate-limit": "^8.6.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.6.3",
-    "nodemailer": "^9.0.0",
+    "nodemailer": "^10.2.1",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pdfkit": "^0.19.1",
     "qrcode": "^1.5.4",
-    "razorpay": "^2.9.6",
-    "resend": "^6.20.0"
+    "razorpay": "^2.9.6"
   },
   "keywords": [],
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "mongodb-memory-server": "^11.3.0",
     "nodemon": "^3.1.14"
   }
 }

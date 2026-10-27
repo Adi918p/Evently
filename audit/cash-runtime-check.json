@@ -1,0 +1,28 @@
+{
+  "checkedAt": "2026-10-27T09:31:26.764Z",
+  "checks": [
+    {
+      "path": "/",
+      "status": 200
+    },
+    {
+      "path": "/api/events",
+      "status": 200
+    },
+    {
+      "path": "/api/bookings/cash",
+      "status": 401
+    },
+    {
+      "path": "/api/bookings/000000000000000000000000/receipt",
+      "status": 401
+    },
+    {
+      "path": "/api/bookings/000000000000000000000000/email/retry",
+      "status": 401
+    }
+  ],
+  "databaseWrites": false,
+  "cashIdempotencyIndex": true,
+  "indexVerifiedAt": "2026-10-27T09:34:17.565Z"
+}

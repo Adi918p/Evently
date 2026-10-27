@@ -1,26 +1,40 @@
-import { Canvas } from "@react-three/fiber";
-import { AdaptiveDpr, PerformanceMonitor } from "@react-three/drei";
-import { useState } from "react";
+import { Canvas, useThree } from "@react-three/fiber";
+import { useEffect, useState } from "react";
 import AmbientScene from "./AmbientScene";
 
 /**
- * Isolated so React.lazy can split three.js, R3F and drei into their own chunk.
+ * Isolated so React.lazy can split three.js and R3F into their own chunk.
  *
- * The canvas is decorative: pointer events off, hidden from assistive tech by
- * its wrapper, and the frameloop switches to "demand" under reduced motion so
- * the scene renders exactly one frame and then stops burning GPU.
+ * Render the decoration at most 30 frames/second while visible, leaving the
+ * browser/GPU time for input and scrolling. Hidden tabs stop the timer entirely.
  */
-export default function Canvas3D({ quality }) {
-  const [degraded, setDegraded] = useState(false);
+function SceneFrames({ animate }) {
+  const invalidate = useThree(state => state.invalidate);
+  useEffect(() => {
+    invalidate();
+    if (!animate) return undefined;
+    const timer = window.setInterval(invalidate, 1000 / 30);
+    return () => window.clearInterval(timer);
+  }, [animate, invalidate]);
+  return null;
+}
 
+export default function Canvas3D({ quality }) {
+  const [visible, setVisible] = useState(() => document.visibilityState !== "hidden");
+  useEffect(() => {
+    const changed = () => setVisible(document.visibilityState !== "hidden");
+    document.addEventListener("visibilitychange", changed);
+    return () => document.removeEventListener("visibilitychange", changed);
+  }, []);
+  const animate = quality.animate && visible;
   return (
     <Canvas
       dpr={quality.dpr}
-      frameloop={quality.animate ? "always" : "demand"}
+      frameloop="demand"
       gl={{
-        antialias: quality.tier === "high",
+        antialias: false,
         alpha: true,
-        powerPreference: "high-performance",
+        powerPreference: "low-power",
         // No depth buffer readback or stencil needed for a decorative scene.
         stencil: false,
         failIfMajorPerformanceCaveat: true,
@@ -28,17 +42,8 @@ export default function Canvas3D({ quality }) {
       camera={{ position: [0, 0, 12], fov: 62, near: 0.1, far: 90 }}
       style={{ pointerEvents: "none" }}
     >
-      {/* Drops resolution instead of frames when the GPU falls behind. */}
-      <PerformanceMonitor onDecline={() => setDegraded(true)} />
-      <AdaptiveDpr pixelated />
-
-      <AmbientScene
-        quality={
-          degraded
-            ? { ...quality, particles: Math.round(quality.particles * 0.45), shards: Math.min(quality.shards, 10) }
-            : quality
-        }
-      />
+      <SceneFrames animate={animate} />
+      <AmbientScene quality={{ ...quality, animate }} />
     </Canvas>
   );
 }

@@ -24,15 +24,8 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
-    // Three.js is heavy and only the immersive scenes need it; keeping it in
-    // its own chunk stops it blocking first paint on the lighter pages.
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          three: ["three", "@react-three/fiber", "@react-three/drei"],
-          motion: ["motion"],
-        },
-      },
-    },
+    // Let the dynamic Canvas3D import own its dependency chunk. A manual Three
+    // chunk also hoists shared React dependencies, making the entry preload
+    // the entire renderer even on pages and phones that never mount it.
   },
 });

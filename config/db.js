@@ -1,4 +1,11 @@
 const mongoose = require("mongoose");
+const dns = require("node:dns");
+
+// Explicit local override for networks whose DNS cannot resolve Atlas SRV/TXT.
+// This affects this Node process only; system DNS and TLS validation are unchanged.
+if (process.env.EVENTLY_DNS_SERVERS) {
+    dns.setServers(process.env.EVENTLY_DNS_SERVERS.split(',').map(value => value.trim()).filter(Boolean));
+}
 
 // Fail fast when MongoDB is offline. Mongoose's default buffering turns a
 // connection outage into a confusing ten-second `findOne()` timeout.

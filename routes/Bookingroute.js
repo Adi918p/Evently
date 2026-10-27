@@ -2,8 +2,11 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/authMiddleware");
 const bookingController = require("../Controllers/bookingController");
+const limits = require('../middleware/limits');
 
 router.post('/',auth.authM,bookingController.createBooking);
+
+router.post('/cash', auth.authM, bookingController.createCashBooking);
 
 router.get('/my',auth.authM,bookingController.getMyBookings);
 
@@ -15,6 +18,9 @@ router.get(
     auth.authM,
     bookingController.downloadTicket
 );
+
+router.get('/:id/receipt', auth.authM, bookingController.downloadReceipt);
+router.post('/:id/email/retry', auth.authM, limits.email, bookingController.retryTicketEmail);
 
 router.post(
     "/verify-ticket",

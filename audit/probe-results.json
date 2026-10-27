@@ -1,0 +1,96 @@
+{
+  "date": "2026-10-26",
+  "scope": "isolated defect reproductions, not end-to-end tests",
+  "results": [
+    {
+      "id": "F01",
+      "title": "Paid event gets a confirmed booking without payment",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F02",
+      "title": "Valid payment signature accepts unrelated event/quantity without provider lookup",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F03",
+      "title": "Check-in request without mode previews without persisting admission",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F04",
+      "title": "JWT auth trusts stale roles without loading current account status",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F05",
+      "title": "Required registration fields block requests produced by current checkout",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F06",
+      "title": "Free checkout sends a zero amount to payment provider",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F07",
+      "title": "Past rejected event can be booked directly",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F08",
+      "title": "Removing reused image deletes it without checking owner or other event references",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F09",
+      "title": "Event schema accepts negative price and fractional capacity",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F10",
+      "title": "A booking survives when seat reservation throws after insertion",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F11",
+      "title": "Pending booking is treated as a valid pass",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F12",
+      "title": "Duplicate maximum-length question keys exceed schema maximum",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F13",
+      "title": "Payment replay returns another account booking without ownership validation",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F14",
+      "title": "OAuth callback resolves to HTTP behind an untrusted TLS-terminating proxy",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    },
+    {
+      "id": "F15",
+      "title": "Google sign-in accepts an existing suspended account and has no state option",
+      "result": "REPRODUCED",
+      "isolation": "mocked dependencies; no external effects"
+    }
+  ]
+}

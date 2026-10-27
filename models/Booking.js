@@ -37,10 +37,25 @@ const bookingAnswerSchema = new mongoose.Schema({
 }, { _id: false });
 
 const bookingSchema = new mongoose.Schema({
+    purchase: { type: mongoose.Schema.Types.ObjectId, ref: 'Purchase', unique: true, sparse: true },
+    paymentMethod: { type: String, enum: ['cash', 'online', 'free'], immutable: true },
+    collectedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', immutable: true, required() { return this.paymentMethod === 'cash'; } },
+    collectedAt: { type: Date, immutable: true, required() { return this.paymentMethod === 'cash'; } },
+    cashRequestKey: { type: String, maxlength: 100, immutable: true, required() { return this.paymentMethod === 'cash'; } },
+    eventSnapshot: mongoose.Schema.Types.Mixed,
+    attendeeSnapshot: mongoose.Schema.Types.Mixed,
+    deliveryStatus: { type: String, enum: ['pending', 'sent', 'failed'], default: 'pending' },
+    deliveryErrorCode: String,
+    deliveryMessageId: String,
+    deliveryAttempts: { type: Number, default: 0 },
+    deliveryLeaseUntil: Date,
+    nextDeliveryAt: { type: Date, default: Date.now },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        // Walk-in cash attendees do not need an Evently account. Their contact
+        // details belong to attendeeSnapshot; the collecting operator is separate.
+        required() { return this.paymentMethod !== 'cash'; }
     },
 
     event: {
@@ -51,7 +66,7 @@ const bookingSchema = new mongoose.Schema({
 
     tickets: {
         type: Number,
-        default: 1
+        default: 1, min: 1, max: 10, validate: Number.isInteger
     },
 
     totalPrice: {
@@ -106,6 +121,11 @@ const bookingSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+});
+
+bookingSchema.index({ collectedBy: 1, cashRequestKey: 1 }, {
+    unique: true,
+    partialFilterExpression: { paymentMethod: 'cash' }
 });
 
 module.exports = mongoose.model('Booking', bookingSchema);

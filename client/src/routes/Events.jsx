@@ -70,17 +70,19 @@ function sortEvents(list, sort) {
    Filter bar
    ========================================================================== */
 
-function FilterBar({ params, setParam, clearAll, activeCount }) {
+function FilterBar({ params, setParam, setSearch, clearAll, activeCount }) {
   const reduced = useReducedMotion();
   const [draft, setDraft] = useState(params.q);
+  const [cityDraft, setCityDraft] = useState(params.city);
 
   // Keep the text box in step when the URL changes from elsewhere (nav search
   // overlay, back button) without fighting the user mid-type.
   useEffect(() => setDraft(params.q), [params.q]);
+  useEffect(() => setCityDraft(params.city), [params.city]);
 
   const submit = (event) => {
     event.preventDefault();
-    setParam("q", draft.trim());
+    setSearch(draft.trim(), cityDraft.trim());
   };
 
   return (
@@ -111,8 +113,8 @@ function FilterBar({ params, setParam, clearAll, activeCount }) {
             id="city-filter"
             name="city"
             list="cities"
-            value={params.city}
-            onChange={(e) => setParam("city", e.target.value)}
+            value={cityDraft}
+            onChange={(e) => setCityDraft(e.target.value)}
             placeholder="Anywhere"
             autoComplete="address-level2"
             className="w-full min-h-12 rounded-[var(--radius-md)] border border-[var(--glass-edge)] bg-[rgba(255,255,255,0.04)] px-4 text-base text-[var(--color-fg)] placeholder:text-[var(--color-fg-subtle)] hover:border-[var(--glass-edge-strong)] focus:border-[var(--color-violet-bright)] focus:shadow-[0_0_0_3px_color-mix(in_srgb,var(--color-violet)_28%,transparent)]"
@@ -177,7 +179,7 @@ function FilterBar({ params, setParam, clearAll, activeCount }) {
                 <span className="tnum">{activeCount}</span> filter
                 {activeCount === 1 ? "" : "s"} applied
               </p>
-              <Button variant="ghost" size="sm" onClick={clearAll}>
+              <Button variant="ghost" size="sm" onClick={() => { setDraft(""); setCityDraft(""); clearAll(); }}>
                 <X size={14} weight="bold" aria-hidden="true" />
                 Clear all
               </Button>
@@ -228,6 +230,15 @@ export default function Events() {
     () => setSearchParams(new URLSearchParams(), { replace: true }),
     [setSearchParams]
   );
+
+  const setSearch = useCallback((query, city) => {
+    setSearchParams(previous => {
+      const next = new URLSearchParams(previous);
+      if (query) next.set('q', query); else next.delete('q');
+      if (city) next.set('city', city); else next.delete('city');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams]);
 
   const activeCount = useMemo(
     () => Object.values(params).filter(Boolean).length,
@@ -319,8 +330,8 @@ export default function Events() {
           )}
         </h1>
         <p className="text-md leading-relaxed text-[var(--color-fg-muted)]">
-          Filter by city, category or date. The URL updates as you go, so you
-          can send this exact view to someone else.
+          Filter by city, category or date. Apply your search, then share the
+          link to send this exact view to someone else.
         </p>
       </header>
 
@@ -328,6 +339,7 @@ export default function Events() {
         <FilterBar
           params={params}
           setParam={setParam}
+          setSearch={setSearch}
           clearAll={clearAll}
           activeCount={activeCount}
         />

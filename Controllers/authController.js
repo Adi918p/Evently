@@ -3,7 +3,7 @@ exports.getMe = async (req, res) => {
     try {
 
         const user = await User.findById(req.user.id)
-            .select("-password");
+            .select("name email avatar role status isEmailVerified createdAt");
 
         if (!user) {
             return res.status(404).json({

@@ -1,0 +1,90 @@
+{
+  "checkedAt": "2026-10-27T09:55:43.088Z",
+  "scope": "Built app, local static server, fixed event API, cold contexts, headless Chrome. Relative comparison, not a real-phone/network benchmark.",
+  "samples": [
+    {
+      "device": "desktop",
+      "route": "/",
+      "canvasCount": 1,
+      "scriptRequests": 17,
+      "scriptBytes": 1519701,
+      "threeRequested": true,
+      "longTasks": 3,
+      "longTaskMs": 332,
+      "fcpMs": 332,
+      "idleMainThreadMs": 135,
+      "navigationMs": 304,
+      "errors": []
+    },
+    {
+      "device": "desktop",
+      "route": "/events",
+      "canvasCount": 1,
+      "scriptRequests": 13,
+      "scriptBytes": 1479534,
+      "threeRequested": true,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 156,
+      "idleMainThreadMs": 127,
+      "navigationMs": null,
+      "errors": []
+    },
+    {
+      "device": "desktop",
+      "route": "/login",
+      "canvasCount": 1,
+      "scriptRequests": 8,
+      "scriptBytes": 1454815,
+      "threeRequested": true,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 172,
+      "idleMainThreadMs": 123,
+      "navigationMs": null,
+      "errors": []
+    },
+    {
+      "device": "mobile",
+      "route": "/",
+      "canvasCount": 1,
+      "scriptRequests": 17,
+      "scriptBytes": 1519701,
+      "threeRequested": true,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 164,
+      "idleMainThreadMs": 76,
+      "navigationMs": 309,
+      "errors": []
+    },
+    {
+      "device": "mobile",
+      "route": "/events",
+      "canvasCount": 1,
+      "scriptRequests": 13,
+      "scriptBytes": 1479534,
+      "threeRequested": true,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 192,
+      "idleMainThreadMs": 70,
+      "navigationMs": null,
+      "errors": []
+    },
+    {
+      "device": "mobile",
+      "route": "/login",
+      "canvasCount": 1,
+      "scriptRequests": 8,
+      "scriptBytes": 1454815,
+      "threeRequested": true,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 172,
+      "idleMainThreadMs": 83,
+      "navigationMs": null,
+      "errors": []
+    }
+  ]
+}

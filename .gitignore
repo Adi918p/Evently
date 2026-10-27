@@ -83,3 +83,17 @@ temp/
 # =========================
 *.bak
 *.old
+/.npm-cache/
+/.cache/
+
+# Local account evidence and duplicate originals of bundled sounds
+/INTEGRATION_SETUP.md
+/audit/brevo-smoke.json
+/audit/google-live-status.json
+/audit/local-*.json
+/audit/razorpay-*.json
+/audit/razorpay-test-*.png
+/audit/razorpay-test-*.pdf
+/audit/email-*.json
+/success.mp3
+/error.mp3

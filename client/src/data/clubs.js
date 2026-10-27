@@ -90,7 +90,6 @@ export const CLUBS = {
       "/Media/AfterHour/1.webp",
       "/Media/AfterHour/2.webp",
       "/Media/AfterHour/3.webp",
-      "/Media/AfterHour/4.webp",
     ],
     tickets: { general: "₹499", vip: "₹999", vvip: "₹1999" },
   },

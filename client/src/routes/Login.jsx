@@ -476,8 +476,11 @@ export default function Login() {
   const reduced = useReducedMotion();
 
   const mode = searchParams.get("mode") === "signup" ? "signup" : "login";
-  const next = searchParams.get("next");
-  const handoffToken = searchParams.get("token");
+  const nextPath = searchParams.get("next");
+  const next = nextPath?.startsWith("/") && !nextPath.startsWith("//") && !nextPath.includes("\\") ? nextPath : null;
+  const handoffToken = searchParams.get("oauth") === "complete";
+  const exchanged = useRef(false);
+  const [oauthError, setOauthError] = useState(searchParams.get("oauth") === "failed" ? "Google sign-in was not completed. Please try again." : "");
 
   const finish = useCallback(
     (token) => {
@@ -488,21 +491,12 @@ export default function Login() {
     [navigate, next, signIn]
   );
 
-  // Google OAuth handoff. routes/auth.js redirects to
-  // `${FRONTEND_URL}/login.html?token=<jwt>`, which legacy.jsx rewrites to
-  // /login?token=<jwt>. Consume it, then get it out of the URL so the token is
-  // not left sitting in history.
   useEffect(() => {
-    if (!handoffToken) return;
-    setSearchParams(
-      (prev) => {
-        const params = new URLSearchParams(prev);
-        params.delete("token");
-        return params;
-      },
-      { replace: true }
-    );
-    finish(handoffToken);
+    if (!handoffToken || exchanged.current) return;
+    exchanged.current = true;
+    authApi.exchangeGoogle().then(data => finish(data.token)).catch(error => setOauthError(error.message)).finally(() => {
+      setSearchParams(previous => { const params = new URLSearchParams(previous); params.delete('oauth'); params.delete('token'); return params; }, { replace: true });
+    });
   }, [handoffToken, finish, setSearchParams]);
 
   // Already signed in and arriving here directly: send them on.
@@ -601,6 +595,7 @@ export default function Login() {
             </div>
 
             {/* A real link, not fetch: Passport needs a full page navigation. */}
+            {oauthError && <p role="alert" className="text-sm text-[#fca5a5]">{oauthError}</p>}
             <Button
               variant="secondary"
               size="lg"

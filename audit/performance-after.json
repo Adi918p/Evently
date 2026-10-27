@@ -1,0 +1,90 @@
+{
+  "checkedAt": "2026-10-27T10:03:08.434Z",
+  "scope": "Built app, local static server, fixed event API, cold contexts, headless Chrome. Relative comparison, not a real-phone/network benchmark.",
+  "samples": [
+    {
+      "device": "desktop",
+      "route": "/",
+      "canvasCount": 1,
+      "scriptRequests": 15,
+      "scriptBytes": 1514478,
+      "threeRequested": true,
+      "longTasks": 2,
+      "longTaskMs": 195,
+      "fcpMs": 272,
+      "idleMainThreadMs": 175,
+      "navigationMs": 62,
+      "errors": []
+    },
+    {
+      "device": "desktop",
+      "route": "/events",
+      "canvasCount": 0,
+      "scriptRequests": 10,
+      "scriptBytes": 588328,
+      "threeRequested": false,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 148,
+      "idleMainThreadMs": 1,
+      "navigationMs": null,
+      "errors": []
+    },
+    {
+      "device": "desktop",
+      "route": "/login",
+      "canvasCount": 0,
+      "scriptRequests": 5,
+      "scriptBytes": 563445,
+      "threeRequested": false,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 140,
+      "idleMainThreadMs": 1,
+      "navigationMs": null,
+      "errors": []
+    },
+    {
+      "device": "mobile",
+      "route": "/",
+      "canvasCount": 0,
+      "scriptRequests": 14,
+      "scriptBytes": 628613,
+      "threeRequested": false,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 124,
+      "idleMainThreadMs": 147,
+      "navigationMs": 54,
+      "errors": []
+    },
+    {
+      "device": "mobile",
+      "route": "/events",
+      "canvasCount": 0,
+      "scriptRequests": 10,
+      "scriptBytes": 588328,
+      "threeRequested": false,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 132,
+      "idleMainThreadMs": 0,
+      "navigationMs": null,
+      "errors": []
+    },
+    {
+      "device": "mobile",
+      "route": "/login",
+      "canvasCount": 0,
+      "scriptRequests": 5,
+      "scriptBytes": 563445,
+      "threeRequested": false,
+      "longTasks": 0,
+      "longTaskMs": 0,
+      "fcpMs": 128,
+      "idleMainThreadMs": 1,
+      "navigationMs": null,
+      "errors": []
+    }
+  ]
+}

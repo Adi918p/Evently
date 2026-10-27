@@ -1,0 +1,133 @@
+{
+  "ticket": [
+    {
+      "key": "attendee.name",
+      "label": "Attendee"
+    },
+    {
+      "key": "attendee.email",
+      "label": "Email"
+    },
+    {
+      "key": "ticketId",
+      "label": "Ticket ID"
+    },
+    {
+      "key": "tickets",
+      "label": "Tickets"
+    },
+    {
+      "key": "amount",
+      "label": "Amount paid"
+    },
+    {
+      "key": "event.date",
+      "label": "Date"
+    },
+    {
+      "key": "event.time",
+      "label": "Doors"
+    },
+    {
+      "key": "event.venue",
+      "label": "Venue"
+    },
+    {
+      "key": "event.location",
+      "label": "City"
+    },
+    {
+      "key": "event.category",
+      "label": "Category"
+    },
+    {
+      "key": "event.agelim",
+      "label": "Age limit"
+    },
+    {
+      "key": "bookedAt",
+      "label": "Booked"
+    },
+    {
+      "key": "paymentId",
+      "label": "Payment ID"
+    }
+  ],
+  "scan": [
+    {
+      "key": "attendee.name",
+      "label": "Attendee"
+    },
+    {
+      "key": "attendee.email",
+      "label": "Email"
+    },
+    {
+      "key": "ticketId",
+      "label": "Ticket ID"
+    },
+    {
+      "key": "tickets",
+      "label": "Tickets"
+    },
+    {
+      "key": "amount",
+      "label": "Amount paid"
+    },
+    {
+      "key": "event.date",
+      "label": "Date"
+    },
+    {
+      "key": "event.time",
+      "label": "Doors"
+    },
+    {
+      "key": "event.venue",
+      "label": "Venue"
+    },
+    {
+      "key": "event.location",
+      "label": "City"
+    },
+    {
+      "key": "event.category",
+      "label": "Category"
+    },
+    {
+      "key": "event.agelim",
+      "label": "Age limit"
+    },
+    {
+      "key": "bookedAt",
+      "label": "Booked"
+    },
+    {
+      "key": "paymentId",
+      "label": "Payment ID"
+    },
+    {
+      "key": "status",
+      "label": "Status"
+    },
+    {
+      "key": "checkedInAt",
+      "label": "Checked in"
+    }
+  ],
+  "ticketDefaults": [
+    "attendee.name",
+    "ticketId",
+    "event.date",
+    "event.venue",
+    "tickets",
+    "amount"
+  ],
+  "scanDefaults": [
+    "attendee.name",
+    "tickets",
+    "ticketId",
+    "attendee.email",
+    "status"
+  ]
+}

@@ -125,20 +125,14 @@ export const liftable = {
 /* ---- route transitions -------------------------------------------------- */
 
 /**
- * Forward navigation rises, backward sinks (navigation-direction rule).
- * Exit is deliberately quicker than enter so the next page feels immediate.
+ * Destinations mount immediately; only their short entrance fade animates.
+ * Waiting for an outgoing page delays route loading and its API requests.
  */
 export const pageTransition = {
-  initial: { opacity: 0, y: 16 },
+  initial: { opacity: 0 },
   animate: {
     opacity: 1,
-    y: 0,
-    transition: { duration: duration.slow, ease: ease.outQuint },
-  },
-  exit: {
-    opacity: 0,
-    y: -8,
-    transition: { duration: exitDuration(duration.slow), ease: ease.outQuint },
+    transition: { duration: duration.fast, ease: ease.outQuint },
   },
 };
 

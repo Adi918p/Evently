@@ -1,169 +1,32 @@
 const mongoose = require("mongoose");
-const QRCode = require("qrcode");
+const fs = require('node:fs');
 
 const Booking = require('../models/Booking');
 const Event = require('../models/Events');
+const Purchase = require('../models/Purchase');
 const generateTicketPdf = require("../utils/generateTicketPdf");
 const { buildTicketView } = require("../utils/ticketFields");
-const { resolveAnswers } = require("../utils/registrationFields");
 
+const purchases = require('../services/purchases');
+const cashBookings = require('../services/cashBookings');
+const { respondError, HttpError } = require('../utils/httpError');
 exports.createBooking = async (req, res) => {
-
     try {
-
-        const { eventId, tickets } = req.body;
-        const ticketCount = Number(tickets);
-
-        /* ---------------- FIND EVENT ---------------- */
-
-        const event = await Event.findById(eventId);
-
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: "Event not found"
-            });
-        }
-
-        /* ---------------- VALIDATE TICKETS ---------------- */
-
-        if (
-            !Number.isInteger(ticketCount) ||
-            ticketCount <= 0 ||
-            ticketCount > 10
-        ) {
-            return res.status(400).json({
-                success: false,
-                message: "Invalid ticket count"
-            });
-        }
-
-        /* ---------------- AVAILABLE SEATS ---------------- */
-
-        const availableSeats = Math.max(
-            Number(event.seats || 0) - Number(event.ticketsSold || 0),
-            0
-        );
-
-        if (ticketCount > availableSeats) {
-
-            return res.status(409).json({
-                success: false,
-                message: `Only ${availableSeats} seats left`
-            });
-
-        }
-
-        /* ---------------- TOTAL PRICE ---------------- */
-
-        const totalPrice =
-            event.price * ticketCount;
-
-        /* ---------------- ORGANISER'S OWN QUESTIONS ---------------- */
-
-        // Nothing has been written yet, so this path can still refuse: a missing
-        // required answer comes back as a 400 the booking form can show against
-        // the field. The paid path cannot do that - see paymentController.
-        const { answers, errors } = resolveAnswers(event.registrationFields, req.body.answers);
-
-        if (errors.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: errors[0],
-                errors
-            });
-        }
-
-        /* ---------------- TICKET ID ---------------- */
-
-        const ticketId =
-            "EVT-" +
-            Date.now() +
-            "-" +
-            Math.floor(Math.random() * 1000);
-
-        const qrData = JSON.stringify({
-            ticketId,
-            eventId,
-            userId: req.user.id
-        });
-
-        const qrCode = await QRCode.toDataURL(qrData);
-
-        /* ---------------- CREATE BOOKING ---------------- */
-
-        const booking =
-            await Booking.create({
-
-                user: req.user.id,
-
-                event: eventId,
-
-                tickets: ticketCount,
-
-                totalPrice,
-
-                ticketId,
-
-                qrCode,
-
-                answers,
-
-                status: "confirmed"
-
-            });
-
-        /* ---------------- UPDATE SOLD TICKETS ---------------- */
-
-        const updatedEvent = await Event.findOneAndUpdate(
-            {
-                _id: eventId,
-                $expr: {
-                    $lte: [
-                        { $add: ["$ticketsSold", ticketCount] },
-                        "$seats"
-                    ]
-                }
-            },
-            { $inc: { ticketsSold: ticketCount } },
-            { returnDocument: "after" }
-        );
-
-        if (!updatedEvent) {
-            await Booking.findByIdAndDelete(booking._id);
-            return res.status(409).json({
-                success: false,
-                message: "Those seats were just taken. Please try again."
-            });
-        }
-
-        /* ---------------- RESPONSE ---------------- */
-
-        res.status(201).json({
-
-            success: true,
-
-            booking,
-
-            ticketId
-
-        });
-
-    }
-    catch (err) {
-
-        res.status(500).json({
-
-            success: false,
-
-            message: err.message
-
-        });
-
-    }
-
+        const purchase = await purchases.prepare(req.user.id, req.body, true);
+        const completed = await purchases.fulfill(purchase._id);
+        if (completed.state === 'failed') throw new HttpError(409, completed.reason);
+        return res.status(201).json(await purchases.present(completed));
+    } catch (error) { return respondError(res, error); }
 };
 
+exports.createCashBooking = async (req, res) => {
+    try {
+        const { booking, replayed } = await cashBookings.createCashBooking(req.user, req.body);
+        const value = booking.toObject();
+        delete value.cashRequestKey;
+        return res.status(replayed ? 200 : 201).json({ success: true, booking: value, emailed: booking.deliveryStatus === 'sent' });
+    } catch (error) { return respondError(res, error); }
+};
 
 exports.getMyBookings = async (req, res) => {
 
@@ -175,12 +38,13 @@ exports.getMyBookings = async (req, res) => {
             })
                 .populate(
                     "event",
-                    "title date banner location venue price"
+                    "title date time banner location venue price organizer archivedAt"
                 );
 
         res.status(200).json({
             success: true,
-            bookings
+            purchases: await Purchase.find({ user: req.user.id, state: { $ne: 'fulfilled' } }).select('state reason eventSnapshot.title createdAt').sort({ createdAt: -1 }).limit(20),
+            bookings: bookings.map(row => { const value = row.toObject(); return { ...value, event: value.eventSnapshot || value.event }; })
         });
 
     }
@@ -220,7 +84,7 @@ const downloadName = (event, booking) => {
  *
  * 1. The PDF is re-rendered on every request rather than served from disk. It is
  *    a ~50ms render, and it means a pass always reflects the current design and
- *    the organiser's current ticketConfig instead of whatever was emailed months
+ *    the purchased event snapshot rather than later edits made months
  *    ago. It also means a booking whose file was never written (mail delivery
  *    failed) is still downloadable.
  *
@@ -232,7 +96,7 @@ const downloadName = (event, booking) => {
  *    admin. Nobody else, because the pass carries the attendee's name and email
  *    and the QR that admits them.
  */
-exports.downloadTicket = async (req, res) => {
+const downloadBookingDocument = (render, suffix = '', removeAfterDownload = false) => async (req, res) => {
 
     try {
 
@@ -267,10 +131,10 @@ exports.downloadTicket = async (req, res) => {
             });
         }
 
-        if (booking.status === "cancelled") {
+        if (booking.status !== "confirmed") {
             return res.status(409).json({
                 success: false,
-                message: "This booking was cancelled, so it has no valid pass"
+                message: "Only a confirmed booking has a valid pass"
             });
         }
 
@@ -279,9 +143,10 @@ exports.downloadTicket = async (req, res) => {
         // name is better than a failed download.
         const attendee = booking.user || { name: req.user.name, email: req.user.email };
 
-        const filePath = await generateTicketPdf(booking, booking.event, attendee);
+        const filePath = await render(booking, booking.eventSnapshot || booking.event, booking.attendeeSnapshot || attendee);
 
-        res.download(filePath, downloadName(booking.event, booking), (err) => {
+        res.download(filePath, downloadName(booking.event, booking).replace(/\.pdf$/, `${suffix}.pdf`), (err) => {
+            if (removeAfterDownload) fs.promises.unlink(filePath).catch(() => {});
             // Headers are already sent by the time a stream error surfaces, so
             // there is nothing to answer with - just do not crash the process.
             if (err && !res.headersSent) {
@@ -306,12 +171,39 @@ exports.downloadTicket = async (req, res) => {
 
 };
 
+exports.downloadTicket = downloadBookingDocument(generateTicketPdf);
+exports.downloadReceipt = downloadBookingDocument((...args) => require('../utils/generateReceiptPdf')(...args), '-receipt', true);
+
+exports.retryTicketEmail = async (req, res) => {
+    try {
+        if (!mongoose.isValidObjectId(req.params.id)) throw new HttpError(404, 'Booking not found.');
+        const booking = await Booking.findById(req.params.id).populate('event', 'organizer');
+        if (!booking) throw new HttpError(404, 'Booking not found.');
+        const isOwner = String(booking.user || '') === req.user.id;
+        const isOrganizer = String(booking.event?.organizer || '') === req.user.id;
+        if (!isOwner && !isOrganizer && req.user.role !== 'admin') throw new HttpError(403, 'This booking is not yours to manage.');
+        if (booking.status !== 'confirmed') throw new HttpError(409, 'Only confirmed bookings can receive ticket email.');
+        if (!booking.purchase && booking.paymentMethod !== 'cash') throw new HttpError(409, 'This older booking needs support review before email can be retried.');
+        const queued = await Booking.findOneAndUpdate({
+            _id: booking._id, status: 'confirmed', deliveryStatus: 'failed',
+            $or: [{ deliveryLeaseUntil: null }, { deliveryLeaseUntil: { $lt: new Date() } }]
+        }, {
+            $set: { deliveryStatus: 'pending', deliveryAttempts: 0, nextDeliveryAt: new Date() },
+            $unset: { deliveryErrorCode: 1 }
+        }, { returnDocument: 'after' });
+        if (!queued) throw new HttpError(409, 'Email is already sent, queued or being processed.');
+        return res.json({ success: true, deliveryStatus: queued.deliveryStatus, message: 'Ticket email has been queued for another attempt.' });
+    } catch (error) { return respondError(res, error); }
+};
+
 /* ==========================================================================
    Door check-in
    ========================================================================== */
 
 /** The subset of a booking the door screen is allowed to see. */
-const scanBooking = (booking) => ({
+const scanBooking = (booking) => {
+    const attendee = booking.attendeeSnapshot || booking.user;
+    return ({
     _id: booking._id,
     ticketId: booking.ticketId,
     tickets: booking.tickets,
@@ -321,10 +213,12 @@ const scanBooking = (booking) => ({
     event: booking.event
         ? { _id: booking.event._id, title: booking.event.title }
         : null,
-    user: booking.user
-        ? { name: booking.user.name, email: booking.user.email }
+    paymentMethod: booking.paymentMethod,
+    user: attendee
+        ? { name: attendee.name, email: attendee.email, phone: attendee.phone }
         : null
-});
+    });
+};
 
 /**
  * POST /api/bookings/verify-ticket
@@ -363,6 +257,7 @@ exports.verifyTicket = async (req, res) => {
     try {
 
         const { bookingId, ticketId, eventId } = req.body;
+        if (eventId && !mongoose.isValidObjectId(eventId)) return res.status(400).json({ success: false, message: 'Invalid event.' });
         const mode = req.body.mode === "confirm" ? "confirm" : "preview";
 
         const verdict = (state, message, booking = null, extra = {}) => {
@@ -379,8 +274,8 @@ exports.verifyTicket = async (req, res) => {
                 payload.booking = scanBooking(booking);
                 payload.display = buildTicketView({
                     booking,
-                    event: booking.event,
-                    attendee: booking.user,
+                    event: booking.eventSnapshot || booking.event,
+                    attendee: booking.attendeeSnapshot || booking.user,
                     where: "scan"
                 }).fields;
             }
@@ -441,8 +336,10 @@ exports.verifyTicket = async (req, res) => {
 
         /* ---------------- STATE ---------------- */
 
-        if (booking.status === "cancelled") {
-            return verdict("cancelled", "This booking was cancelled.", booking);
+        if (!booking.event || booking.event.archivedAt || booking.event.status === "rejected") return verdict("unavailable", "This event is not accepting admissions.");
+
+        if (booking.status !== "confirmed") {
+            return verdict(booking.status, "This booking is not confirmed.", booking);
         }
 
         if (booking.checkedIn) {
@@ -465,7 +362,7 @@ exports.verifyTicket = async (req, res) => {
             {
                 _id: booking._id,
                 checkedIn: { $ne: true },
-                status: { $ne: "cancelled" }
+                status: "confirmed"
             },
             { $set: { checkedIn: true, checkedInAt: new Date() } },
             { returnDocument: "after" }

@@ -1,0 +1,21 @@
+✔ free checkout validates required questions, confirms, survives refresh and downloads PDF (15477.019ms)
+(node:22612) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ paid browser checkout completes through bound order verification (3821.1233ms)
+✔ mobile menu traps focus, restores the trigger and does not overflow (4621.388ms)
+(node:22612) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ organizer registration and ticket settings persist through the actual form (2465.1745ms)
+✔ scanner shows an OK-only result, plays supplied audio, persists admission and rejects reuse (8750.6992ms)
+Scanner OK-to-next-request timings (ms): 25, 34
+✔ camera pauses through verification and result, resumes promptly on OK and never overlaps decodes (8955.9733ms)
+✔ scanner recovers from network and invalid QR errors, supports mute and discards a stale camera frame (5469.4379ms)
+✔ browser pages produced no uncaught JavaScript errors (1.4448ms)
+MongoDB disconnected
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 57653.4308

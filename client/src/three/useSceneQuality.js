@@ -6,10 +6,9 @@ import { useMediaQuery } from "../lib/useMediaQuery";
  * Decides how much scene the device can afford.
  *
  * The ambient WebGL layer is decoration, so it must never be the reason a page
- * feels slow. Three signals drive the tier:
- *   - WebGL availability at all (fall back to CSS gradients if absent)
- *   - core count / device memory as a rough GPU proxy
- *   - coarse pointer, which correlates well enough with phones
+ * feels slow. Phones, smaller/low-memory devices, data-saving and reduced-motion
+ * sessions use the CSS backdrop. Eligible desktop showcase routes probe WebGL
+ * only after the page has had time to paint and fetch its data.
  *
  * prefers-reduced-motion is read through Motion's hook so an OS change mid
  * session takes effect without a reload (reduced-motion rule).
@@ -35,57 +34,56 @@ function detectWebgl() {
   return webglSupport;
 }
 
-/** Fires once the browser is idle, so the canvas never competes with first paint. */
-export function useDeferredMount(delay = 180) {
+/** Wait through initial rendering, then ask for idle time before loading decoration. */
+export function useDeferredMount(delay = 1000, enabled = true) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    let timer;
-    const start = () => setReady(true);
+    setReady(false);
+    if (!enabled) return undefined;
+    let idle;
+    const timer = window.setTimeout(() => {
+      if ("requestIdleCallback" in window) {
+        idle = window.requestIdleCallback(() => setReady(true), { timeout: 2000 });
+      } else setReady(true);
+    }, delay);
+    return () => {
+      window.clearTimeout(timer);
+      if (idle !== undefined) window.cancelIdleCallback(idle);
+    };
+  }, [delay, enabled]);
 
-    if ("requestIdleCallback" in window) {
-      const id = window.requestIdleCallback(start, { timeout: 1200 });
-      return () => window.cancelIdleCallback(id);
-    }
-    timer = window.setTimeout(start, delay);
-    return () => window.clearTimeout(timer);
-  }, [delay]);
-
-  return ready;
+  return enabled && ready;
 }
 
-export function useSceneQuality() {
+export function useSceneQuality(showcase = false) {
   const reduced = useReducedMotion();
   const coarse = useMediaQuery("(pointer: coarse)");
-  const narrow = useMediaQuery("(max-width: 767px)");
+  const narrow = useMediaQuery("(max-width: 1023px)");
   const saveData =
     typeof navigator !== "undefined" && navigator.connection?.saveData === true;
 
+  const cores = typeof navigator !== "undefined" ? navigator.hardwareConcurrency || 4 : 4;
+  const memory = typeof navigator !== "undefined" ? navigator.deviceMemory ?? 4 : 4;
+  const eligible = showcase && !reduced && !coarse && !narrow && !saveData && cores > 4 && memory > 4;
+  const idle = useDeferredMount(1000, eligible);
+  const [supported, setSupported] = useState(false);
+  useEffect(() => {
+    if (idle && eligible) setSupported(detectWebgl());
+  }, [idle, eligible]);
+
   return useMemo(() => {
-    const supported = detectWebgl();
-
-    // Heuristic tier. deviceMemory is Chromium-only; absence is treated as mid.
-    const cores = navigator.hardwareConcurrency || 4;
-    const memory = navigator.deviceMemory ?? 4;
-    const weak = cores <= 4 || memory <= 4 || coarse || narrow;
-
-    const tier = !supported || saveData ? "none" : weak ? "low" : "high";
-
+    const enabled = eligible && idle && supported;
     return {
-      /** Mount the canvas at all? */
-      enabled: tier !== "none",
-      tier,
+      enabled,
+      tier: enabled ? "high" : "none",
       reduced: Boolean(reduced),
-      /** Cap the pixel ratio - retina at 3x is wasted on a blurred backdrop. */
-      dpr: tier === "high" ? [1, 1.75] : [1, 1.25],
-      /* Counts are set by legibility, not by what the GPU can survive. 1500
-         points and 30 shards both ran at 60fps; they also buried the copy. */
-      particles: tier === "high" ? 700 : 300,
-      shards: tier === "high" ? 18 : 8,
-      /** Reduced motion keeps the scene but freezes it after one frame. */
-      animate: tier !== "none" && !reduced,
-      /** Only the high tier gets the extra additive bloom sprites. */
-      orbs: tier === "high" ? 3 : 2,
+      // A soft decorative scene does not need retina-sized render targets.
+      dpr: [1, 1.25],
+      particles: 450,
+      shards: 12,
+      animate: enabled,
+      orbs: 3,
     };
-  }, [reduced, coarse, narrow, saveData]);
+  }, [eligible, idle, supported, reduced]);
 }

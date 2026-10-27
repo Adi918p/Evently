@@ -219,6 +219,10 @@ function EventRow({ event, onDelete }) {
                 <Users size={15} aria-hidden="true" />
                 Bookings
               </Button>
+              <Button variant="secondary" size="sm" to={`/events/${event._id}/cash`}>
+                <CurrencyInr size={15} aria-hidden="true" />
+                Cash desk
+              </Button>
               <Button variant="ghost" size="sm" to={`/events/${event._id}/edit`}>
                 <PencilSimple size={15} aria-hidden="true" />
                 Edit

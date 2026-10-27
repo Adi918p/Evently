@@ -26,6 +26,7 @@ const IMAGE_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif
 const UNCLAIMED_MS = 24 * 60 * 60 * 1000;
 
 const eventImageSchema = new mongoose.Schema({
+    referenceVersion: { type: Number, default: 0 },
     /**
      * The public identifier, 16 random bytes as hex.
      *

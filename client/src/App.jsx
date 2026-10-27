@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import Nav from "./components/layout/Nav";
 import Footer from "./components/layout/Footer";
 import SearchOverlay from "./components/search/SearchOverlay";
@@ -38,6 +38,7 @@ const Dashboard = lazy(() => import("./routes/organizer/Dashboard"));
 const CreateEvent = lazy(() => import("./routes/organizer/CreateEvent"));
 const EditEvent = lazy(() => import("./routes/organizer/EditEvent"));
 const EventBookings = lazy(() => import("./routes/organizer/EventBookings"));
+const CashBooking = lazy(() => import("./routes/organizer/CashBooking"));
 const Scanner = lazy(() => import("./routes/organizer/Scanner"));
 
 const AdminDashboard = lazy(() => import("./routes/admin/AdminDashboard"));
@@ -87,14 +88,12 @@ function PageFrame() {
   const reduced = useReducedMotion();
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
       <motion.main
         key={location.pathname}
         id="main"
         tabIndex={-1}
-        initial={reduced ? { opacity: 0 } : pageTransition.initial}
+        initial={reduced ? false : pageTransition.initial}
         animate={reduced ? { opacity: 1 } : pageTransition.animate}
-        exit={reduced ? { opacity: 0 } : pageTransition.exit}
         className="relative"
         style={{ zIndex: "var(--z-content)" }}
       >
@@ -189,6 +188,14 @@ function PageFrame() {
                 }
               />
               <Route
+                path="/events/:id/cash"
+                element={
+                  <RequireRole roles={["organizer", "admin"]}>
+                    <CashBooking />
+                  </RequireRole>
+                }
+              />
+              <Route
                 path="/scanner"
                 element={
                   <RequireRole roles={["organizer", "admin"]}>
@@ -243,7 +250,6 @@ function PageFrame() {
           </Suspense>
         </ErrorBoundary>
       </motion.main>
-    </AnimatePresence>
   );
 }
 

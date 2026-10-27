@@ -45,11 +45,15 @@ const CONTENT_TYPES = new Map([
     [".gif", "image/gif"]
 ]);
 
+const deletionCandidates = new Set();
 const stats = { events: 0, images: 0, reused: 0, missing: 0, removed: 0, failed: 0 };
 
 /** Imports one file, or returns the path of an identical one already imported. */
 async function importFile(imageUrl, owner) {
-    const filePath = path.join(PUBLIC_DIR, imageUrl.replace(/^\//, ""));
+    const filePath = path.resolve(PUBLIC_DIR, imageUrl.replace(/^\//, ''));
+    const uploadRoot = path.resolve(PUBLIC_DIR, 'uploads') + path.sep;
+    if (!filePath.startsWith(uploadRoot)) throw new Error('Migration path is outside the uploads directory.');
+    if (deleteFiles) deletionCandidates.add(imageUrl);
 
     let data;
     try {
@@ -98,10 +102,7 @@ async function importFile(imageUrl, owner) {
 
     stats.images += 1;
 
-    if (deleteFiles) {
-        await fs.promises.unlink(filePath).catch(() => {});
-        stats.removed += 1;
-    }
+
 
     return imagePath(created.key);
 }
@@ -168,6 +169,7 @@ async function main() {
         }
     }
 
+    if (commit && deleteFiles) stats.removed += await require('../utils/migrationCleanup').cleanupLegacyFiles({ candidates: deletionCandidates, publicDir: PUBLIC_DIR, Event, Booking: require('../models/Booking'), Purchase: require('../models/Purchase') });
     console.log("");
     console.log(`events touched : ${stats.events}`);
     console.log(`images stored  : ${stats.images}`);

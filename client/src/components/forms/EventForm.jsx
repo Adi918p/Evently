@@ -1,3 +1,5 @@
+import RegistrationEditor from "./RegistrationEditor";
+import TicketSettings from "./TicketSettings";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
@@ -80,6 +82,7 @@ const EMPTY = {
   maploc: "",
   gallery: [],
   lineup: [],
+  registrationFields: [], ticketConfig: {},
   status: "approved",
 };
 
@@ -118,6 +121,7 @@ export function eventToForm(event) {
           image: act?.image || "",
         }))
       : [],
+    registrationFields: event.registrationFields || [], ticketConfig: event.ticketConfig || {},
     status: event.status || "approved",
   };
 }
@@ -179,6 +183,12 @@ function validate(values, { ticketsSold = 0, isNew = true }) {
     if (!act.name.trim()) errors[`lineup-${index}`] = "Name this act, or remove the row.";
   });
 
+  for (const row of values.registrationFields || []) {
+    if (!row.label?.trim()) errors.registrationFields = 'Every question needs a label.';
+    if (['select', 'multiselect'].includes(row.type) && !(row.options || []).some(option => option.trim())) errors.registrationFields = 'Choice questions need at least one option.';
+  }
+  if (values.time && !/^([01]\d|2[0-3]):[0-5]\d$/.test(values.time)) errors.time = 'Use a 24-hour start time, such as 18:30.';
+  if (values.price !== '' && Math.abs(Number(values.price) * 100 - Math.round(Number(values.price) * 100)) > 0.000001) errors.price = 'Use at most two decimal places.';
   return errors;
 }
 
@@ -198,6 +208,7 @@ function toPayload(values, { canSetStatus }) {
     seats: values.seats === "" ? 0 : Number(values.seats),
     banner: values.banner || "",
     maploc: values.maploc.trim(),
+    registrationFields: values.registrationFields || [], ticketConfig: values.ticketConfig || {},
     gallery: values.gallery.filter(Boolean),
     lineup: values.lineup
       .filter((act) => act.name.trim())
@@ -570,7 +581,7 @@ export default function EventForm({
             type="number"
             inputMode="numeric"
             min="0"
-            step="1"
+            step="0.01"
             label="Price per ticket"
             required
             icon={CurrencyInr}
@@ -596,6 +607,14 @@ export default function EventForm({
       </Section>
 
       {/* ---------- Images ---------- */}
+      <Section title="Registration questions" description="Ask guests for the information you need before checkout.">
+        <RegistrationEditor value={values.registrationFields} onChange={rows => set('registrationFields', rows)} />
+        {shown('registrationFields') && <p id="event-registrationFields" tabIndex={-1} role="alert" className="text-sm text-[#fca5a5]">{shown('registrationFields')}</p>}
+      </Section>
+      <Section title="Ticket settings" description="Choose the information shown on PDF passes and at the door.">
+        <TicketSettings value={values.ticketConfig} onChange={value => set('ticketConfig', value)} />
+      </Section>
+
       <Section
         title="Images"
         description="Uploads are resized in your browser before they're sent, so a photo straight off a phone is fine."
@@ -785,7 +804,7 @@ export default function EventForm({
       {canSetStatus ? (
         <Section
           title="Moderation"
-          description="Admin only. Rejected and pending events stay hidden from the public listing."
+          description="Admin only. Rejected events stay hidden. Existing pending listings remain public."
         >
           <Select
             {...field("status")}

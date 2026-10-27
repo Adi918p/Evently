@@ -8,6 +8,7 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import {
+  auth as authApi,
   clearToken,
   decodeToken,
   getToken,
@@ -64,6 +65,35 @@ export function AuthProvider({ children }) {
     });
     return () => setUnauthorizedHandler(null);
   }, []);
+
+  // Refresh visible account details/permissions; the server checks them on every protected request.
+  useEffect(() => {
+    if (!user?.id) return;
+    let active = true;
+    let inFlight = false;
+    const controller = new AbortController();
+    const refresh = async () => {
+      if (document.hidden || inFlight) return;
+      inFlight = true;
+      const refreshToken = getToken();
+      try {
+        const { user: current } = await authApi.me(controller.signal);
+        if (active && current) setUser(previous => {
+          if (!active || !previous || previous.id !== current._id || getToken() !== refreshToken) return previous;
+          // Keep the context stable when nothing changed, so a background
+          // permissions check does not redraw every signed-in page.
+          if (previous.id === current._id && Object.entries(current).every(([key, value]) => previous[key] === value)) return previous;
+          return { ...previous, ...current, id: current._id };
+        });
+      } catch { /* API authentication failures still clear the session centrally. */ }
+      finally { inFlight = false; }
+    };
+    refresh();
+    window.addEventListener('focus', refresh);
+    document.addEventListener('visibilitychange', refresh);
+    const timer = window.setInterval(refresh, 60000);
+    return () => { active = false; controller.abort(); clearInterval(timer); window.removeEventListener('focus', refresh); document.removeEventListener('visibilitychange', refresh); };
+  }, [user?.id]);
 
   // Keep tabs in sync: signing out in one tab signs out the others.
   useEffect(() => {

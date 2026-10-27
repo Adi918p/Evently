@@ -1,0 +1,10 @@
+{
+  "checkedAt": "2026-10-27T09:34:17.565Z",
+  "addedIndexes": [
+    "purchase_1",
+    "collectedBy_1_cashRequestKey_1"
+  ],
+  "cashIdempotencyIndex": true,
+  "recordsModified": 0,
+  "indexesDropped": 0
+}

@@ -21,6 +21,7 @@ import GlassCard from "../../components/ui/GlassCard";
 import Button from "../../components/ui/Button";
 import Badge, { Chip, StatusBadge } from "../../components/ui/Badge";
 import { Input } from "../../components/ui/Field";
+import { TicketModal } from "../../components/bookings/BookingTicket";
 import {
   EmptyState,
   ErrorState,
@@ -108,9 +109,9 @@ function Stat({ icon: Icon, label, value }) {
   );
 }
 
-function BookingRow({ booking, onCheckIn, checkingIn }) {
+function BookingRow({ booking, onCheckIn, checkingIn, onTicket }) {
   const reduced = useReducedMotion();
-  const guest = booking.user;
+  const guest = booking.attendeeSnapshot || booking.user;
   const cancelled = booking.status === "cancelled";
   const bookedAt = booking.bookedAt ? new Date(booking.bookedAt) : null;
   const checkedInAt = booking.checkedInAt ? new Date(booking.checkedInAt) : null;
@@ -147,6 +148,7 @@ function BookingRow({ booking, onCheckIn, checkingIn }) {
               <p className="tnum wrap-anywhere mt-1 text-xs text-[var(--color-fg-subtle)]">
                 {booking.ticketId || booking._id}
               </p>
+              {guest?.phone && <p className="mt-1 text-sm text-[var(--color-fg-muted)]">{guest.phone}</p>}
             </div>
           </div>
 
@@ -175,11 +177,14 @@ function BookingRow({ booking, onCheckIn, checkingIn }) {
           {/* Status + action */}
           <div className="flex shrink-0 flex-wrap items-center gap-2 lg:justify-end">
             <StatusBadge status={booking.status} />
+            <Badge tone={booking.paymentMethod === "cash" ? "info" : "neutral"}>{booking.paymentMethod === "cash" ? "Cash" : Number(booking.totalPrice) === 0 ? "Free" : "Online"}</Badge>
+            {booking.status === "confirmed" && <Button size="sm" onClick={() => onTicket(booking)}>Ticket & receipt</Button>}
+            {booking.deliveryStatus === "failed" && <Badge tone="warning">Email failed</Badge>}
             {booking.checkedIn ? (
               <Badge tone="info" icon={CheckCircle}>
                 In{checkedInAt ? ` · ${format(checkedInAt, "HH:mm")}` : ""}
               </Badge>
-            ) : cancelled ? null : (
+            ) : booking.status !== "confirmed" ? null : (
               <Button
                 variant="accent"
                 size="sm"
@@ -201,6 +206,7 @@ function BookingRow({ booking, onCheckIn, checkingIn }) {
    ========================================================================== */
 
 export default function EventBookings() {
+  const [selectedTicket, setSelectedTicket] = useState(null);
   const { id } = useParams();
   const toast = useToast();
   const [query, setQuery] = useState("");
@@ -213,7 +219,7 @@ export default function EventBookings() {
   );
 
   const checkIn = useAction((bookingId) =>
-    bookingsApi.verifyTicket({ bookingId })
+    bookingsApi.verifyTicket({ bookingId, eventId: id, mode: "confirm" })
   );
 
   const event = data?.event || null;
@@ -227,20 +233,21 @@ export default function EventBookings() {
   }, [data]);
 
   const totals = useMemo(() => {
-    const live = all.filter((b) => b.status !== "cancelled");
+    const live = all.filter((b) => b.status === "confirmed");
     return {
       bookings: live.length,
       tickets: live.reduce((sum, b) => sum + (Number(b.tickets) || 0), 0),
       revenue: live.reduce((sum, b) => sum + (Number(b.totalPrice) || 0), 0),
+      cash: live.filter(b => b.paymentMethod === "cash").reduce((sum, b) => sum + Number(b.totalPrice || 0), 0),
       checkedIn: live.filter((b) => b.checkedIn).length,
-      cancelled: all.length - live.length,
+      cancelled: all.filter(b => b.status === "cancelled").length,
     };
   }, [all]);
 
   const counts = useMemo(
     () => ({
       all: all.length,
-      waiting: all.filter((b) => b.status !== "cancelled" && !b.checkedIn).length,
+      waiting: all.filter((b) => b.status === "confirmed" && !b.checkedIn).length,
       in: all.filter((b) => b.checkedIn).length,
       cancelled: all.filter((b) => b.status === "cancelled").length,
     }),
@@ -253,15 +260,16 @@ export default function EventBookings() {
       if (filter === "in" && !booking.checkedIn) return false;
       if (
         filter === "waiting" &&
-        (booking.checkedIn || booking.status === "cancelled")
+        (booking.checkedIn || booking.status !== "confirmed")
       ) {
         return false;
       }
       if (filter === "cancelled" && booking.status !== "cancelled") return false;
       if (!needle) return true;
       return [
-        booking.user?.name,
-        booking.user?.email,
+        (booking.attendeeSnapshot || booking.user)?.name,
+        (booking.attendeeSnapshot || booking.user)?.email,
+        booking.attendeeSnapshot?.phone,
         booking.ticketId,
         booking.paymentId,
       ]
@@ -274,7 +282,8 @@ export default function EventBookings() {
     setBusyId(booking._id);
     try {
       const result = await checkIn.run(booking._id);
-      const at = result?.booking?.checkedInAt || new Date().toISOString();
+      if (!result.ok || result.state !== 'admitted' || !result.booking?.checkedIn) { reload(); toast.warning(result.message || 'This pass cannot be admitted.'); return; }
+      const at = result.booking.checkedInAt;
       setData((prev) => ({
         ...prev,
         bookings: (prev?.bookings || []).map((row) =>
@@ -283,7 +292,7 @@ export default function EventBookings() {
             : row
         ),
       }));
-      toast.success(`${booking.user?.name || "Guest"} is in.`);
+      toast.success(`${(booking.attendeeSnapshot || booking.user)?.name || "Guest"} is in.`);
     } catch (err) {
       // "Already checked in" is a 400. It means the list is stale rather than
       // that anything went wrong, so reflect it instead of just complaining.
@@ -308,6 +317,8 @@ export default function EventBookings() {
       [
         "Name",
         "Email",
+        "Phone",
+        "Payment method",
         "Ticket ID",
         "Tickets",
         "Amount",
@@ -317,8 +328,10 @@ export default function EventBookings() {
         "Booked at",
       ],
       ...shown.map((booking) => [
-        booking.user?.name || "",
-        booking.user?.email || "",
+        (booking.attendeeSnapshot || booking.user)?.name || "",
+        (booking.attendeeSnapshot || booking.user)?.email || "",
+        booking.attendeeSnapshot?.phone || "",
+        booking.paymentMethod === "cash" ? "cash" : Number(booking.totalPrice) === 0 ? "free" : "online",
         booking.ticketId || booking._id,
         booking.tickets ?? 1,
         booking.totalPrice ?? 0,
@@ -402,6 +415,7 @@ export default function EventBookings() {
           </div>
 
           <div className="flex flex-wrap gap-3">
+            <Button variant="secondary" to={`/events/${id}/cash`}>Cash desk</Button>
             <Button variant="secondary" to="/scanner">
               <QrCode size={17} aria-hidden="true" />
               Scanner
@@ -426,6 +440,8 @@ export default function EventBookings() {
         <Stat icon={TrendUp} label="Revenue" value={formatPrice(totals.revenue)} />
       </RevealGroup>
 
+      <p className="mt-4 text-sm text-[var(--color-fg-muted)]">Cash collected: {formatPrice(totals.cash)} · Other payments: {formatPrice(totals.revenue - totals.cash)}</p>
+
       {totals.cancelled > 0 ? (
         <p className="mt-4 text-xs text-[var(--color-fg-subtle)]">
           Totals exclude{" "}
@@ -442,7 +458,7 @@ export default function EventBookings() {
               label="Find a guest"
               type="search"
               icon={MagnifyingGlass}
-              placeholder="Name, email or ticket ID"
+              placeholder="Name, email, phone or ticket ID"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoComplete="off"
@@ -512,6 +528,7 @@ export default function EventBookings() {
                 booking={booking}
                 onCheckIn={handleCheckIn}
                 checkingIn={busyId === booking._id}
+                onTicket={setSelectedTicket}
               />
             ))}
           </RevealGroup>
@@ -529,6 +546,7 @@ export default function EventBookings() {
           </GlassCard>
         </Reveal>
       ) : null}
+      {selectedTicket && <TicketModal open onClose={() => setSelectedTicket(null)} booking={selectedTicket} event={event} />}
     </div>
   );
 }

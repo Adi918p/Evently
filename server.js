@@ -1,4 +1,4 @@
-require("dotenv").config()
+if (process.env.NODE_ENV !== "test") require("dotenv").config({ quiet: true });
 require("./config/passport");
 const express = require("express");
 const { connectDB, isDatabaseReady } = require("./config/db");
@@ -19,10 +19,17 @@ const imageRoutes = require("./routes/images");
 const seo = require("./routes/seo");
 
 
-connectDB();
+const limits = require('./middleware/limits');
+app.disable('x-powered-by');
+if (process.env.TRUST_PROXY) app.set('trust proxy', process.env.TRUST_PROXY === '1' ? 1 : process.env.TRUST_PROXY);
+app.use((req, res, next) => {
+    res.set({ 'X-Content-Type-Options': 'nosniff', 'Referrer-Policy': 'strict-origin-when-cross-origin', 'X-Frame-Options': 'DENY' });
+    if (/^\/api\/(auth|profile|bookings|payments|admin)/.test(req.path)) res.set('Cache-Control', 'no-store');
+    next();
+});
 
 app.use(passport.initialize());
-app.use(express.json({ limit: "12mb" }));
+
 
 // Keep API failures immediate and actionable while the database is offline.
 // Static pages still load so the app can display the recovery message.
@@ -39,6 +46,18 @@ app.use("/api", (req, res, next) => {
             message: "Evently can't reach its database right now. Please try again in a moment."
         });
     }
+    next();
+});
+app.post('/api/payments/webhook', express.raw({ type: 'application/json', limit: '1mb' }), require('./Controllers/paymentController').webhook);
+app.use('/api/events/uploads', express.json({ limit: '12mb' }), limits.upload);
+app.use(express.json({ limit: '100kb' }));
+app.use('/api', limits.api);
+app.use('/api/payments', (req, res, next) => req.method === 'POST' ? limits.purchase(req, res, next) : next());
+app.use('/api/bookings', (req, res, next) => req.method === 'POST' && req.path === '/' ? limits.purchase(req, res, next) : next());
+app.use('/api/contact', limits.contact);
+app.use('/api', (req, res, next) => {
+    if (req.body === undefined) req.body = {};
+    if (['POST', 'PUT', 'PATCH'].includes(req.method) && (req.body === null || typeof req.body !== 'object' || Array.isArray(req.body))) return res.status(400).json({ success: false, message: 'A JSON object is required.' });
     next();
 });
 app.use("/api/auth", auth);
@@ -183,10 +202,14 @@ app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && req.is("application/json")) {
         return res.status(400).json({ success: false, message: "Invalid JSON payload" });
     }
-    return next(err);
+    console.error('Unhandled request error:', err.message);
+    return res.status(err.status || 500).json({ success: false, message: err.status === 404 ? 'Not found' : 'The request could not be completed.' });
 });
 
-app.listen(PORT, () => {
+function startServer() {
+connectDB();
+require('./services/recovery').startRecovery();
+return app.listen(PORT, () => {
     console.log(`Server running on ${PORT}`);
     if (!hasClientBuild) {
         console.warn(
@@ -195,3 +218,6 @@ app.listen(PORT, () => {
         );
     }
 });
+}
+module.exports = { app, startServer };
+if (require.main === module) startServer();

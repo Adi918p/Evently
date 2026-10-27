@@ -1,15 +1,16 @@
 import { lazy, Suspense } from "react";
+import { useLocation } from "react-router-dom";
 import ErrorBoundary from "../components/ErrorBoundary";
-import { useDeferredMount, useSceneQuality } from "./useSceneQuality";
+import { useSceneQuality } from "./useSceneQuality";
 
 /**
  * The fixed ambient backdrop that sits behind every page.
  *
  * Three things matter here:
  *   1. three.js is code-split behind React.lazy, so the first paint never waits
- *      on ~600kb of WebGL (bundle-splitting).
- *   2. The canvas mounts only after the browser goes idle, and only on devices
- *      that can afford it. Everything degrades to the CSS wash below.
+ *      for the WebGL bundle.
+ *   2. The canvas mounts after initial rendering/idle only on capable desktop
+ *      home/experience pages. Other routes and devices use the CSS wash below.
  *   3. The CSS wash renders unconditionally, so there is no frame where the
  *      page is a flat void - and no-WebGL browsers still get the art direction.
  */
@@ -38,14 +39,15 @@ function CssWash() {
 }
 
 export default function SceneLayer() {
-  const quality = useSceneQuality();
-  const idle = useDeferredMount();
+  const { pathname } = useLocation();
+  // Booking, account and door workflows have no decorative GPU work or 3D download.
+  const quality = useSceneQuality(pathname === "/" || pathname === "/experience");
 
   return (
     <>
       <CssWash />
 
-      {quality.enabled && idle ? (
+      {quality.enabled ? (
         <div aria-hidden="true" className="scene-layer">
           {/* A lost WebGL context or a failed chunk load just leaves the CSS
               wash in place - it must never blank the page. */}

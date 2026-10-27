@@ -1,0 +1,22 @@
+{
+  "checkedAt": "2026-10-27T10:05:05.546Z",
+  "stage": "before-publication",
+  "checks": [
+    {
+      "url": "https://event-ly.in/",
+      "status": 200,
+      "bytes": 4411,
+      "script": "/assets/index-CByFj7OD.js"
+    },
+    {
+      "url": "https://event-ly.in/api/events",
+      "status": 200,
+      "bytes": 2324
+    },
+    {
+      "url": "https://api.event-ly.in/api/events",
+      "status": 200,
+      "bytes": 2324
+    }
+  ]
+}

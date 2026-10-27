@@ -144,30 +144,31 @@ const registrationFieldSchema = new mongoose.Schema({
 
 
 const eventSchema = new mongoose.Schema({
+    archivedAt: { type: Date, default: null },
 
     title: {
         type: String,
-        required: true
+        required: true, trim: true, maxlength: 120
     },
 
     description: {
         type: String,
-        required: true
+        required: true, trim: true, maxlength: 5000
     },
 
     about: {
         type: String,
-        default: ""
+        default: "", maxlength: 20000
     },
 
     venue: {
         type: String,
-        required: true
+        required: true, trim: true, maxlength: 200
     },
 
     location: {
         type: String,
-        default: ""
+        default: "", trim: true, maxlength: 120
     },
 
     category: {
@@ -198,12 +199,13 @@ const eventSchema = new mongoose.Schema({
 
     time: {
         type: String,
-        default: ""
+        default: "", match: /^$|^([01]\d|2[0-3]):[0-5]\d$/
     },
 
     price: {
         type: Number,
-        required: true
+        required: true, min: 0, max: 10000000,
+        validate: value => Number.isFinite(value) && Math.abs(value * 100 - Math.round(value * 100)) < 0.000001
     },
 
     agelim: {
@@ -213,7 +215,7 @@ const eventSchema = new mongoose.Schema({
 
     seats: {
         type: Number,
-        default: 0
+        default: 0, min: 0, max: 1000000, validate: Number.isInteger
     },
 
     banner: {
@@ -231,12 +233,12 @@ const eventSchema = new mongoose.Schema({
     gallery: {
         type: [String],
         default: [],
-        validate: { validator: (images) => Array.isArray(images) && images.every(localImagePath), message: imagePathMessage }
+        validate: { validator: (images) => Array.isArray(images) && images.length <= 12 && images.every(localImagePath), message: imagePathMessage }
     },
 
     lineup: {
         type: [lineupSchema],
-        default: []
+        default: [], validate: rows => rows.length <= 20
     },
 
     stats: {

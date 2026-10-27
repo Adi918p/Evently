@@ -67,7 +67,7 @@ exports.getDashboardStats = async (req, res) => {
 exports.getAllEvents = async (req, res) => {
     try {
 
-        const events = await Event.find()
+        const events = await Event.find({ archivedAt: null })
             .populate("organizer", "name email")
             .sort({ createdAt: -1 });
 
@@ -85,34 +85,7 @@ exports.getAllEvents = async (req, res) => {
 
     }
 };
-exports.deleteEvent = async (req, res) => {
-    try {
-
-        const { id } = req.params;
-
-        const deletedEvent = await Event.findByIdAndDelete(id);
-
-        if (!deletedEvent) {
-            return res.status(404).json({
-                success: false,
-                message: "Event not found"
-            });
-        }
-
-        res.json({
-            success: true,
-            message: "Event deleted successfully"
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-};
+exports.deleteEvent = require('./eventController').deleteEvent;
 exports.getAllMessages = async (req, res) => {
     try {
 
@@ -147,7 +120,7 @@ exports.getAllUsers = async (req, res) => {
     try {
 
         const users = await Userr.find()
-            .select("-password")
+            .select("name email avatar role status isEmailVerified createdAt")
             .sort({ createdAt: -1 });
 
         res.json({
@@ -165,63 +138,29 @@ exports.getAllUsers = async (req, res) => {
     }
 
 };
+const { respondError, HttpError } = require('../utils/httpError');
+const safeUser = user => ({ _id: user._id, name: user.name, email: user.email, avatar: user.avatar, role: user.role, status: user.status, isEmailVerified: user.isEmailVerified, createdAt: user.createdAt });
 exports.updateUserRole = async (req, res) => {
-
-    const { id } = req.params;
-    const { role } = req.body;
-
-    const user = await User.findByIdAndUpdate(
-        id,
-        { role },
-        { new: true }
-    );
-
-    res.json({
-        success: true,
-        user
-    });
+    try {
+        if (!['user', 'organizer', 'admin'].includes(req.body.role)) throw new HttpError(400, 'Invalid role.');
+        const user = await User.findById(req.params.id);
+        if (!user) throw new HttpError(404, 'User not found.');
+        if (user.role === 'admin' && req.body.role !== 'admin') throw new HttpError(409, 'Administrator demotion requires an owner-reviewed maintenance operation.');
+        const updated = await User.findOneAndUpdate({ _id: user._id, role: user.role }, { $set: { role: req.body.role } }, { new: true, runValidators: true });
+        if (!updated) throw new HttpError(409, 'The account changed. Refresh and retry.');
+        res.json({ success: true, user: safeUser(updated) });
+    } catch (err) { respondError(res, err); }
 };
 exports.updateUserStatus = async (req, res) => {
-
     try {
-
-        const { id } = req.params;
-        const { status } = req.body;
-
-        const user = await User.findById(id);
-
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: "User not found"
-            });
-        }
-
-        if (user.role === "admin") {
-            return res.status(400).json({
-                success: false,
-                message: "Admin accounts cannot be suspended"
-            });
-        }
-
-        user.status = status;
-
-        await user.save();
-
-        res.json({
-            success: true,
-            user
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-
+        if (!['active', 'suspended', 'banned'].includes(req.body.status)) throw new HttpError(400, 'Invalid account status.');
+        const user = await User.findById(req.params.id);
+        if (!user) throw new HttpError(404, 'User not found.');
+        if (user.role === 'admin') throw new HttpError(409, 'Administrator accounts cannot be suspended or banned here.');
+        const updated = await User.findOneAndUpdate({ _id: user._id, role: { $ne: 'admin' } }, { $set: { status: req.body.status } }, { new: true, runValidators: true });
+        if (!updated) throw new HttpError(409, 'The account changed. Refresh and retry.');
+        res.json({ success: true, user: safeUser(updated) });
+    } catch (err) { respondError(res, err); }
 };
 exports.getStats = async (req, res) => {
     try {
@@ -317,80 +256,8 @@ exports.getStats = async (req, res) => {
         });
     }
 };
-exports.approveEvent = async (req, res) => {
-
-    try {
-
-        const event =
-            await Event.findByIdAndUpdate(
-                req.params.id,
-                {
-                    status: "approved"
-                },
-                {
-                    new: true
-                }
-            );
-
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: "Event not found"
-            });
-        }
-
-        res.json({
-            success: true,
-            message: "Event approved"
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-
-};
-exports.rejectEvent = async (req, res) => {
-
-    try {
-
-        const event =
-            await Event.findByIdAndUpdate(
-                req.params.id,
-                {
-                    status: "rejected"
-                },
-                {
-                    new: true
-                }
-            );
-
-        if (!event) {
-            return res.status(404).json({
-                success: false,
-                message: "Event not found"
-            });
-        }
-
-        res.json({
-            success: true,
-            message: "Event rejected"
-        });
-
-    } catch (err) {
-
-        res.status(500).json({
-            success: false,
-            message: err.message
-        });
-
-    }
-
-};
+exports.approveEvent = (req, res) => { req.body = { status: 'approved' }; return require('./eventController').updateEvent(req, res); };
+exports.rejectEvent = (req, res) => { req.body = { status: 'rejected' }; return require('./eventController').updateEvent(req, res); };
 exports.getPendingEvents = async (req,res) => {
 
     try {

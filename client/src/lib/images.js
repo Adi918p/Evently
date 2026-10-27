@@ -19,6 +19,7 @@
  * rejected outright if they are over the server's limit.
  */
 
+import { partitionUploads } from "./uploadBatches";
 import { events as eventsApi } from "./api";
 
 /** Long-edge ceiling. Banners render at most ~1600px wide on a 2x display. */
@@ -36,7 +37,7 @@ export const ACCEPT_ATTR = "image/jpeg,image/png,image/webp,image/gif";
 const SERVER_MAX_BYTES = 4 * 1024 * 1024;
 
 /** Upload in small batches so one oversized set cannot trip the 8 MB rule. */
-const BATCH_SIZE = 4;
+
 
 /* ==========================================================================
    Encoding support
@@ -204,8 +205,7 @@ export async function uploadImages(fileList, { onProgress } = {}) {
   }
 
   const paths = [];
-  for (let i = 0; i < prepared.length; i += BATCH_SIZE) {
-    const batch = prepared.slice(i, i + BATCH_SIZE);
+  for (const batch of partitionUploads(prepared)) {
     const response = await eventsApi.uploadImages({
       files: batch.map(({ type, data }) => ({ type, data })),
     });

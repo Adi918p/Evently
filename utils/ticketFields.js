@@ -22,7 +22,7 @@ const money = (value) => {
   const amount = Number(value);
   if (!Number.isFinite(amount)) return null;
   // Indian grouping, no decimals: prices in this app are whole rupees.
-  return `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
+  return `₹${amount.toLocaleString("en-IN", { maximumFractionDigits: 2 })}`;
 };
 
 const day = (value) => {

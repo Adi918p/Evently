@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { AdditiveBlending, Color, MathUtils } from "three";
 
 /**
@@ -97,6 +97,7 @@ export default function Particles({
   opacity = 0.5,
 }) {
   const materialRef = useRef(null);
+  const dpr = useThree(state => state.viewport.dpr);
 
   const { positions, sizes, phases, colors } = useMemo(() => {
     const positions = new Float32Array(count * 3);
@@ -132,11 +133,11 @@ export default function Particles({
   const uniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uPixelRatio: { value: Math.min(window.devicePixelRatio || 1, 2) },
+      uPixelRatio: { value: dpr },
       uDrift: { value: drift },
       uOpacity: { value: opacity },
     }),
-    [drift, opacity]
+    [drift, opacity, dpr]
   );
 
   useFrame((_, delta) => {
