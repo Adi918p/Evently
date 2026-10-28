@@ -8,7 +8,7 @@ Last updated: 2026-10-28 (Asia/Calcutta)
 - Update this file after each task with changes, checks/results, unresolved issues and next steps.
 - Follow reproduce → implement → test → evaluate → fix/retest when a defect remains. Do not repeat passing checks without a new change or concrete concern.
 - Never describe passing tests as proof that the entire website is bug-free or breach-proof. Record external and untested flows explicitly.
-- Current authorization: restore collapsible Experience sections, opening the first on each visit and allowing only one expanded section at a time. Continue the existing repository publication workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and unrelated production QA-record cleanup remain separate decisions.
+- Current authorization: restore collapsible Experience sections, opening the first on each visit and allowing only one expanded section at a time; the owner then requested smooth opening transitions. Continue the existing repository publication workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and unrelated production QA-record cleanup remain separate decisions.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
 ## Current task — Experience accordion (2026-10-28)
@@ -28,6 +28,15 @@ Last updated: 2026-10-28 (Asia/Calcutta)
   build-overlap.txt. Current results: audit/experience-accordion-{build,browser}.txt.
   Independent accessibility/state review found no blocking issue. Publication
   and direct live accordion checks are in progress.
+- Initial accordion commit 7461db6 deployed successfully; CI 40676826524 and four
+  live HTTP/asset checks passed. Live Chrome confirmed first-open and switching
+  sections. The owner then requested a smooth opening animation before this task
+  was finalized. Added a 300 ms height/opacity transition for opening and closing,
+  with reduced-motion support; collapsed panels now use inert/aria-hidden and
+  disabled photo tab stops so they remain inaccessible during the animation.
+  Follow-up build and four existing Experience browser scenarios pass; those
+  regression scenarios use reduced motion. Live animation check and deployment
+  verification follow. Evidence: experience-accordion-smooth-{build,browser}.txt.
 
 ## Previous task — event access and Experience management (2026-10-28)
 

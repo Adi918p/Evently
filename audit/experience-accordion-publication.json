@@ -1,0 +1,54 @@
+{
+  "checkedAt": "2026-10-28T11:04:21.460Z",
+  "commit": "7461db6d3a63bba09a4ca3e5492f8b335bc14f27",
+  "scope": "Read-only public GitHub and website requests; no credentials, database writes or messages.",
+  "ci": {
+    "id": 40676826524,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Adi918p/Evently/actions/runs/40676826524",
+    "head": "7461db6d3a63bba09a4ca3e5492f8b335bc14f27"
+  },
+  "deployment": {
+    "id": 7383586003,
+    "environment": "Production",
+    "state": "success",
+    "url": "https://evently-eizrlrflh-evently3.vercel.app",
+    "createdAt": "2026-10-28T11:03:00Z"
+  },
+  "checks": [
+    {
+      "name": "live Experience serves tested entry",
+      "url": "https://event-ly.in/experience",
+      "status": 200,
+      "passed": true
+    },
+    {
+      "name": "deployed asset matches tested build",
+      "asset": "/assets/index-BfhbiGiE.js",
+      "status": 200,
+      "sameBytes": true,
+      "immutable": true,
+      "passed": true
+    },
+    {
+      "name": "deployed asset matches tested build",
+      "asset": "/assets/Experience-inBTLanL.js",
+      "status": 200,
+      "sameBytes": true,
+      "immutable": true,
+      "passed": true
+    },
+    {
+      "name": "published Experience API remains available",
+      "status": 200,
+      "sectionCount": 2,
+      "passed": true
+    }
+  ],
+  "summary": {
+    "total": 4,
+    "passed": 4,
+    "failed": 0
+  }
+}

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { CaretDown, Images, Sparkle } from "@phosphor-icons/react";
 import GlassCard from "../components/ui/GlassCard";
 import Modal from "../components/ui/Modal";
@@ -9,6 +10,7 @@ import { experience as experienceApi } from "../lib/api";
 
 /** The showcase contains only sections deliberately published by an admin. */
 export default function Experience() {
+  const reduced = useReducedMotion();
   const { data, error, loading, reload } = useApi((signal) => experienceApi.list(signal), []);
   const [selected, setSelected] = useState(null);
   // Undefined follows the first loaded section; null means the visitor closed it.
@@ -44,15 +46,20 @@ export default function Experience() {
                 className="flex w-full items-center justify-between gap-4 p-5 text-left sm:p-8">
                 <span className="min-w-0 wrap-anywhere">{section.title}</span>
                 <CaretDown size={22} aria-hidden="true"
-                  className={`shrink-0 text-[var(--color-fg-muted)] transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`} />
+                  className={`shrink-0 text-[var(--color-fg-muted)] transition-transform duration-300 motion-reduce:transition-none ${open ? "rotate-180" : ""}`} />
               </button>
             </h2>
-            <div id={panelId} role="region" aria-labelledby={triggerId} hidden={!open} className="px-5 pb-5 sm:px-8 sm:pb-8">
+            <motion.div id={panelId} role="region" aria-labelledby={triggerId}
+              aria-hidden={!open} inert={!open} initial={false}
+              animate={{ height: open ? "auto" : 0, opacity: open ? 1 : 0 }}
+              transition={{ duration: reduced ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden">
+            <div className="px-5 pb-5 sm:px-8 sm:pb-8">
             {section.description ? <p className="max-w-3xl whitespace-pre-line wrap-anywhere leading-relaxed text-[var(--color-fg-muted)]">{section.description}</p> : null}
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {section.images.map((photo, index) => (
                 <li key={photo.url} className="min-w-0">
-                  <button type="button" className="block w-full overflow-hidden rounded-[var(--radius-lg)] bg-white/[0.04]"
+                  <button type="button" tabIndex={open ? 0 : -1} className="block w-full overflow-hidden rounded-[var(--radius-lg)] bg-white/[0.04]"
                     aria-label={`View photo ${index + 1} from ${section.title}`}
                     onClick={() => setSelected({ ...photo, title: section.title, index })}>
                     <img src={photo.url} alt={photo.alt || `${section.title} — photo ${index + 1}`} loading="lazy" decoding="async"
@@ -62,6 +69,7 @@ export default function Experience() {
               ))}
             </ul>
             </div>
+            </motion.div>
           </GlassCard>
           );
         })}
