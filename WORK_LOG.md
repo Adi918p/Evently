@@ -17,9 +17,10 @@ Last updated: 2026-10-28 (Asia/Calcutta)
   single page-local expanded section ID: first published section opens after
   loading; selecting another collapses the rest; selecting the open one closes
   it. Reloading or navigating away/back resets to the first section.
-- Heading buttons expose expanded/control relationships and the collapsed
-  panels use hidden, keeping their photos out of the keyboard/accessibility
-  tree. Carets indicate state and respect reduced motion. Photo viewer remains.
+- Heading buttons expose expanded/control relationships. Collapsed animated
+  panels use inert/aria-hidden and disabled photo tab stops, keeping their photos
+  out of the keyboard/accessibility tree. Carets indicate state and respect
+  reduced motion. Photo viewer remains.
 - No API, schema, database records, admin editor or configuration changed.
   Production build and all four existing Experience Chrome scenarios pass.
   An initial browser run overlapped the asset rebuild and failed on the scanner
@@ -35,8 +36,21 @@ Last updated: 2026-10-28 (Asia/Calcutta)
   with reduced-motion support; collapsed panels now use inert/aria-hidden and
   disabled photo tab stops so they remain inaccessible during the animation.
   Follow-up build and four existing Experience browser scenarios pass; those
-  regression scenarios use reduced motion. Live animation check and deployment
-  verification follow. Evidence: experience-accordion-smooth-{build,browser}.txt.
+  regression scenarios use reduced motion. Evidence:
+  experience-accordion-smooth-{build,browser}.txt.
+- Smooth follow-up c91bbe83efe576a724cc009eff576e0950034a1e is live and pushed.
+  GitHub Actions 40677449200 and Vercel Production7383681293 succeeded. Four live
+  HTTP checks pass; entry and Experience bundles match the tested local files.
+  Evidence: experience-accordion-smooth-publication.json.
+- Live Chrome verified first-open after reload, switching to the second section
+  closes the first, keyboard collapse, and Events → Experience resets first-open.
+  Panel DOM styles settle to height:auto/opacity:1 or height:0/opacity:0. The
+  browser tooling did not capture intermediate animation frames, so no measured
+  frame-rate or timing claim is made. A browser-check timeout was recovered by
+  resetting the tool; no app fix was needed. Evidence:
+  experience-accordion-live-browser.json. No production content was changed.
+- Task complete. Final follow-up commit records release evidence only. Next work
+  is owner-directed; existing provider/device/load limitations remain separate.
 
 ## Previous task — event access and Experience management (2026-10-28)
 

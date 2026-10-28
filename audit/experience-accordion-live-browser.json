@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-28",
+  "timezone": "Asia/Calcutta",
+  "site": "https://event-ly.in/experience",
+  "release": "c91bbe83efe576a724cc009eff576e0950034a1e",
+  "mode": "read-only Chrome UI checks against the two existing published sections",
+  "checks": {
+    "firstSectionOpenAfterReload": true,
+    "secondSectionInitiallyCollapsed": true,
+    "openingSecondCollapsesFirst": true,
+    "keyboardCanCollapseOpenSection": true,
+    "leavingAndReturningResetsFirstOpen": true,
+    "expandedPanelSettlesToAutoHeightAndFullOpacity": true,
+    "collapsedPanelSettlesToZeroHeightAndOpacity": true,
+    "collapsedPanelMarkedAriaHidden": true
+  },
+  "animation": {
+    "implementedDurationMs": 300,
+    "properties": ["height", "opacity"],
+    "reducedMotionSupported": true,
+    "intermediateFramesCaptured": false,
+    "note": "DOM sampling returned settled styles; no measured animation timing or frame-rate claim."
+  },
+  "productionContentWrites": 0
+}
