@@ -1,0 +1,111 @@
+✖ organizer event selectors are scoped; administrators can select every nonarchived event, including rejected listings (4398.3512ms)
+✖ organizer totals remain scoped while administrator totals cover all organizers and historical events (53.1505ms)
+✔ event management and guest lists reject other organizers, ordinary users and anonymous requests (95.526ms)
+(node:22268) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:22268) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ event changes preserve ownership, reject foreign organizers and allow administrators across events (113.3995ms)
+✔ admission rejects foreign organizers without exposing the attendee and permits owner or administrator (63.6846ms)
+✔ ticket and receipt downloads allow buyer, owning organizer and admin while rejecting another organizer (234.7987ms)
+✖ a former organizer loses attendee document and email-management access immediately after demotion (51.5225ms)
+✔ ticket email management is restricted to the buyer, current owning organizer or admin (88.0975ms)
+✖ an orphaned event does not expose its guest list to another organizer and remains manageable by admin (35.501ms)
+MongoDB disconnected
+ℹ tests 9
+ℹ suites 0
+ℹ pass 5
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6299.3595
+
+✖ failing tests:
+
+test at tests\event-access.test.cjs:63:1
+✖ organizer event selectors are scoped; administrators can select every nonarchived event, including rejected listings (4398.3512ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+  + []
+  - [
+  -   '6ae1bbfa4203c69ba8d38c26',
+  -   '6ae1bbfa4203c69ba8d38c27'
+  - ]
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\event-access.test.cjs:71:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [],
+    expected: [ '6ae1bbfa4203c69ba8d38c26', '6ae1bbfa4203c69ba8d38c27' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\event-access.test.cjs:74:1
+✖ organizer totals remain scoped while administrator totals cover all organizers and historical events (53.1505ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+    {
+  +   revenue: 0,
+  -   revenue: 600,
+      success: true,
+  +   ticketsSold: 0,
+  +   totalBookings: 0,
+  +   totalEvents: 0
+  -   ticketsSold: 6,
+  -   totalBookings: 3,
+  -   totalEvents: 3
+    }
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\event-access.test.cjs:80:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { success: true, totalEvents: 0, totalBookings: 0, ticketsSold: 0, revenue: 0 },
+    expected: { success: true, totalEvents: 3, totalBookings: 3, ticketsSold: 6, revenue: 600 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\event-access.test.cjs:141:1
+✖ a former organizer loses attendee document and email-management access immediately after demotion (51.5225ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  200 !== 403
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\event-access.test.cjs:145:16)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 200,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests\event-access.test.cjs:161:1
+✖ an orphaned event does not expose its guest list to another organizer and remains manageable by admin (35.501ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  500 !== 403
+
+      at TestContext.<anonymous> (C:\Users\Acer\Downloads\EVENTLY\tests\event-access.test.cjs:163:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+      at async Test.run (node:internal/test_runner/test:1313:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:897:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 500,
+    expected: 403,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

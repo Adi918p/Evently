@@ -46,6 +46,7 @@ const AdminEvents = lazy(() => import("./routes/admin/AdminEvents"));
 const AdminUsers = lazy(() => import("./routes/admin/AdminUsers"));
 const AdminInbox = lazy(() => import("./routes/admin/AdminInbox"));
 const AdminAnalytics = lazy(() => import("./routes/admin/AdminAnalytics"));
+const AdminExperience = lazy(() => import("./routes/admin/AdminExperience"));
 
 /* ==========================================================================
    Scroll restoration
@@ -225,6 +226,14 @@ function PageFrame() {
                 element={
                   <RequireRole roles="admin">
                     <AdminUsers />
+                  </RequireRole>
+                }
+              />
+              <Route
+                path="/admin/experience"
+                element={
+                  <RequireRole roles="admin">
+                    <AdminExperience />
                   </RequireRole>
                 }
               />

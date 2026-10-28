@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { ChartLine, EnvelopeSimple, Gauge, Ticket, Users } from "@phosphor-icons/react";
+import { ChartLine, EnvelopeSimple, Gauge, Images, Ticket, Users } from "@phosphor-icons/react";
 
 /**
  * Section nav shared by the five admin pages.
@@ -13,6 +13,7 @@ import { ChartLine, EnvelopeSimple, Gauge, Ticket, Users } from "@phosphor-icons
 const TABS = [
   { to: "/admin", label: "Overview", icon: Gauge },
   { to: "/admin/events", label: "Events", icon: Ticket },
+  { to: "/admin/experience", label: "Experience", icon: Images },
   { to: "/admin/users", label: "Users", icon: Users },
   { to: "/admin/inbox", label: "Inbox", icon: EnvelopeSimple },
   { to: "/admin/analytics", label: "Analytics", icon: ChartLine },

@@ -30,6 +30,7 @@ import Seo from "../../components/seo/Seo";
 import { useApi, useAction } from "../../lib/useApi";
 import { events as eventsApi } from "../../lib/api";
 import { useToast } from "../../lib/toast";
+import { useAuth } from "../../lib/auth";
 import {
   categoryLabel,
   eventDate,
@@ -254,6 +255,7 @@ function EventRow({ event, onDelete }) {
 
 export default function Dashboard() {
   const toast = useToast();
+  const { isAdmin } = useAuth();
   const [filter, setFilter] = useState("live");
   const [pendingDelete, setPendingDelete] = useState(null);
 
@@ -310,16 +312,18 @@ export default function Dashboard() {
 
   return (
     <div className="shell section">
-      <Seo title="Organizer Dashboard" noindex />
+      <Seo title={isAdmin ? "All event operations" : "Organizer Dashboard"} noindex />
 
       <header className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <div className="max-w-xl space-y-3">
-          <p className="kicker">Organizer</p>
+          <p className="kicker">{isAdmin ? "Administrator" : "Organizer"}</p>
           <h1 className="text-4xl">
-            Your <span className="text-grad-brand">events</span>
+            {isAdmin ? "All" : "Your"} <span className="text-grad-brand">events</span>
           </h1>
           <p className="text-md leading-relaxed text-[var(--color-fg-muted)]">
-            Everything you're running, how it's selling, and who's coming.
+            {isAdmin
+              ? "Manage every organizer's events, bookings, cash desk and admission."
+              : "Everything you're running, how it's selling, and who's coming."}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">

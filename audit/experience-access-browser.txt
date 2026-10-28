@@ -1,0 +1,37 @@
+
+> evently@1.0.0 test:browser
+> node --test tests/browser.test.cjs tests/experience-browser.test.cjs
+
+✔ a login remains usable when token persistence is blocked (4384.2973ms)
+✔ an old expiry timer preserves a replacement token before its storage event arrives (1099.5866ms)
+✔ free checkout validates required questions, confirms, survives refresh and downloads PDF (3374.9201ms)
+(node:23456) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ paid browser checkout completes through bound order verification (1991.0752ms)
+✔ mobile menu traps focus, restores the trigger and does not overflow (2160.1954ms)
+✔ city search waits for submission instead of fetching on every keystroke (1739.0515ms)
+✔ cash desk recovers an interrupted guest booking and provides ticket and receipt on mobile (4972.5644ms)
+(node:23456) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ organizer registration and ticket settings persist through the actual form (1241.2977ms)
+✔ scanner shows an OK-only result, plays supplied audio, persists admission and rejects reuse (2993.0068ms)
+Scanner OK-to-next-request timings (ms): 20, 30
+✔ camera pauses through verification and result, resumes promptly on OK and never overlaps decodes (5507.177ms)
+✔ scanner recovers from network and invalid QR errors, supports mute and discards a stale camera frame (3094.6076ms)
+Invalid camera QR to result (ms): 70
+✔ unrelated camera QR codes are refused promptly without verification or roster requests (3384.0974ms)
+✔ scanner bounds a lost confirmation response and safely retries a committed admission (9992.7472ms)
+✔ browser pages produced no uncaught JavaScript errors (0.3069ms)
+MongoDB disconnected
+✔ Experience has an honest empty state, retryable failure and admin-only editor (4612.6ms)
+✔ admin drafts, uploads, publishes, edits, unpublishes and deletes a section with public photo viewing (5981.9835ms)
+✔ mobile gallery editing preserves input on save failure and fits the screen (5964.6902ms)
+✔ admin event links open another organizer roster, cash desk and selected scanner; organizer sees only owned doors (5283.1577ms)
+MongoDB disconnected
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 47819.8226

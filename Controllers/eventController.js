@@ -241,7 +241,8 @@ exports.getMyEvents = async (req, res) => {
     try {
 
         const events = await Event.find({
-            organizer: req.user.id, archivedAt: null
+            archivedAt: null,
+            ...(req.user.role === 'admin' ? {} : { organizer: req.user.id })
         });
 
         res.status(200).json({
@@ -268,7 +269,7 @@ exports.getDashboardStats = async (req, res) => {
 
         const events =
             await Event.find({
-                organizer: req.user.id
+                ...(req.user.role === 'admin' ? {} : { organizer: req.user.id })
             }).select('_id').lean();
 
         const eventIds =
@@ -520,7 +521,7 @@ exports.getEventBookings = async (req, res) => {
         // ownership check
         if (
             req.user.role !== "admin" &&
-            event.organizer._id.toString() !== req.user.id
+            String(event.organizer?._id || '') !== req.user.id
         ) {
             return res.status(403).json({
                 success: false,

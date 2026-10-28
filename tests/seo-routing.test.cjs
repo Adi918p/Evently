@@ -60,7 +60,7 @@ test('all account/operator routes including the cash desk are noindex without ev
     for (const route of [
         '/login', '/profile', '/my-bookings', '/booking/success', '/create-event',
         '/dashboard', '/scanner', '/admin', '/admin/events', '/admin/users',
-        '/admin/inbox', '/admin/analytics', `/events/${eventId}/edit`,
+        '/admin/inbox', '/admin/analytics', '/admin/experience', `/events/${eventId}/edit`,
         `/events/${eventId}/bookings`, `/events/${eventId}/cash`,
         `/events/${eventId}/cash/?q=test`,
     ]) {

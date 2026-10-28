@@ -558,7 +558,8 @@ const PRIVATE_ROUTES = new Set([
     "/admin/events",
     "/admin/users",
     "/admin/inbox",
-    "/admin/analytics"
+    "/admin/analytics",
+    "/admin/experience"
 ]);
 const EVENT_OPERATOR_PATH = /^\/events\/[a-f\d]{24}\/(edit|bookings|cash)$/i;
 

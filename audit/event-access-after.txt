@@ -1,0 +1,37 @@
+✔ cash registration creates a guest pass, server-priced receipt data and queued email without an account or provider purchase (2260.0128ms)
+✔ cash booking requires a current active organizer owning the event, or an administrator (103.8572ms)
+✔ cash inputs, displayed amount, 10-ticket limit and event questions are validated before seat allocation (139.6915ms)
+✔ concurrent cash retries issue one booking and reject changed details even after the event price changes (165.406ms)
+✔ last-seat cash races cannot oversell and a failed booking write rolls back its seat allocation (96.8091ms)
+✔ cash sales stay open through the Indian event day while past, hidden and unapproved events reject sales (76.1185ms)
+✔ guest passes preserve attendee details for scanner and authorized ticket/receipt downloads (291.705ms)
+✔ manual email retry checks ownership and confirmation, and refuses sent, pending or actively leased deliveries (195.0596ms)
+✔ manual email retry refuses legacy bookings that the delivery worker cannot process (44.6691ms)
+✔ cash guest email is retried by the worker with safe failure and provider message bookkeeping (104.978ms)
+MongoDB disconnected
+✔ organizer event selectors are scoped; administrators can select every nonarchived event, including rejected listings (2250.5512ms)
+✔ organizer totals remain scoped while administrator totals cover all organizers and historical events (71.691ms)
+✔ event management and guest lists reject other organizers, ordinary users and anonymous requests (128.9656ms)
+(node:13292) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:13292) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ event changes preserve ownership, reject foreign organizers and allow administrators across events (130.1178ms)
+✔ admission rejects foreign organizers without exposing the attendee and permits owner or administrator (92.9551ms)
+✔ ticket and receipt downloads allow buyer, owning organizer and admin while rejecting another organizer (287.4296ms)
+✔ a former organizer loses attendee document and email-management access immediately after demotion (73.0486ms)
+✔ ticket email management is restricted to the buyer, current owning organizer or admin (86.7024ms)
+✔ an orphaned event does not expose its guest list to another organizer and remains manageable by admin (58.7274ms)
+MongoDB disconnected
+✔ card summaries retain listing fields and filters while full endpoints retain event details (2265.2685ms)
+✔ card summaries retain default values for older events (35.931ms)
+✔ dashboard totals include confirmed historical bookings and exclude other organizers and unconfirmed payments (74.8727ms)
+✔ dashboard responds with zero totals when the organizer has no events or bookings (30.7817ms)
+MongoDB disconnected
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4543.3872

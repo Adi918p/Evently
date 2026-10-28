@@ -1,0 +1,183 @@
+
+> evently@1.0.0 test
+> node --test tests/integration.test.cjs tests/unit.test.cjs tests/mailer.test.cjs tests/webhook-relay.test.cjs tests/email-signup.test.cjs tests/ticket-delivery.test.cjs tests/receipt.test.cjs tests/cash-bookings.test.cjs tests/performance-api.test.cjs tests/auth-races.test.cjs tests/scanner-payload.test.cjs tests/seo-routing.test.cjs tests/static-routing.test.cjs tests/event-access.test.cjs tests/experience.test.cjs
+
+✔ a delayed old-session 401 rejects its caller without clearing the newer login (56.5388ms)
+✔ a 401 for the current session still clears authentication and rejects its caller (16.8777ms)
+✔ a rejected unauthenticated request cannot invalidate a signed-in session (1.2841ms)
+✔ a delayed PDF-download 401 also preserves a newer login (2.6538ms)
+✔ a PDF-download 401 for the current session still signs out (1.3ms)
+✔ a storage write failure keeps the new session available to protected requests (1.3893ms)
+✔ a transient storage read failure does not discard the last known session (0.5221ms)
+✔ a blocked token replacement removes the older persisted login when removal is available (0.6412ms)
+✔ fully blocked token storage still permits a tab-local login and logout (0.6372ms)
+✔ decoding an expired or malformed supplied token cannot clear a different active login (0.7821ms)
+✔ conditional token invalidation ignores a replaced session but clears the matching session (0.2997ms)
+✔ temporary server and network failures never invalidate the session (4.5642ms)
+✔ a failed storage removal cannot restore a signed-out token (0.3952ms)
+✔ a cross-tab sign-out also clears a memory-only login (0.3564ms)
+✔ a current expired token is still removed (0.3799ms)
+✔ cash registration creates a guest pass, server-priced receipt data and queued email without an account or provider purchase (3340.581ms)
+✔ cash booking requires a current active organizer owning the event, or an administrator (138.9513ms)
+✔ cash inputs, displayed amount, 10-ticket limit and event questions are validated before seat allocation (264.3924ms)
+✔ concurrent cash retries issue one booking and reject changed details even after the event price changes (217.1105ms)
+✔ last-seat cash races cannot oversell and a failed booking write rolls back its seat allocation (145.3629ms)
+✔ cash sales stay open through the Indian event day while past, hidden and unapproved events reject sales (138.2111ms)
+✔ guest passes preserve attendee details for scanner and authorized ticket/receipt downloads (328.7959ms)
+✔ manual email retry checks ownership and confirmation, and refuses sent, pending or actively leased deliveries (243.8604ms)
+✔ manual email retry refuses legacy bookings that the delivery worker cannot process (41.8297ms)
+✔ cash guest email is retried by the worker with safe failure and provider message bookkeeping (108.1743ms)
+MongoDB disconnected
+✔ signup and OTP resend report provider outage safely and log its actionable category (503.2296ms)
+✔ organizer event selectors are scoped; administrators can select every nonarchived event, including rejected listings (3339.7345ms)
+✔ organizer totals remain scoped while administrator totals cover all organizers and historical events (105.2504ms)
+✔ event management and guest lists reject other organizers, ordinary users and anonymous requests (223.4009ms)
+(node:18392) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18392) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ event changes preserve ownership, reject foreign organizers and allow administrators across events (191.0349ms)
+✔ admission rejects foreign organizers without exposing the attendee and permits owner or administrator (115.6853ms)
+✔ ticket and receipt downloads allow buyer, owning organizer and admin while rejecting another organizer (385.5607ms)
+✔ a former organizer loses attendee document and email-management access immediately after demotion (76.338ms)
+✔ ticket email management is restricted to the buyer, current owning organizer or admin (121.342ms)
+✔ an orphaned event does not expose its guest list to another organizer and remains manageable by admin (78.6707ms)
+MongoDB disconnected
+✔ experience starts empty and administration checks the current account role on every route (3345.0986ms)
+✔ draft, publish, ordered public gallery, edit, unpublish and delete form a complete section lifecycle (328.7883ms)
+✔ section inputs are bounded and typed before a database write; invalid or absent ids have distinct errors (331.5785ms)
+✔ missing image references roll back section creation and edits without changing existing images (125.2923ms)
+✔ shared section images remain retained until the last reference is removed, including drafts (182.8626ms)
+(node:11544) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ event, booking and purchase references survive section deletion; event edits retain experience images (191.5921ms)
+✔ concurrent detach and attach retain the final shared image reference (181.5073ms)
+✔ simultaneous partial edits retry against the latest section instead of losing independent fields (127.1718ms)
+✔ a metadata edit that read before a concurrent delete cannot resurrect the deleted section or retain its image (123.7592ms)
+Request failed: Injected retention write failure
+✔ failed image retention aborts section deletion and preserves the published gallery (79.9298ms)
+MongoDB disconnected
+✔ paid direct booking is rejected; free booking succeeds without a provider order (3072.2567ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ signature, account, event, quantity, amount and captured status are enforced (163.1961ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ concurrent replay issues exactly one booking and one seat increment (241.5169ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ last-seat race fulfills one buyer and refunds the other exactly once (201.2137ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ booking insertion failure rolls back reservation and can recover (144.4366ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ recovery finds a captured payment after the browser disappears (84.9052ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ required answers are validated before payment and immutable purchase details survive edits (126.2875ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ lost order persistence is recovered by receipt without creating a second order (94.1769ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ a webhook beating the order-create response cannot regress a fulfilled purchase (114.1796ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ status polling and account refresh do not exhaust mutation attempt limits (803.25ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ provider full refunds revoke passes and release seats only once under concurrent replay (151.8901ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ a payment refunded before fulfillment never issues a pass (57.4194ms)
+✔ archiving an unsold event removes it from public, organizer and admin event lists (55.3045ms)
+✔ rejected, archived and past events cannot be purchased or exposed publicly (57.2929ms)
+✔ current account restrictions override previously-issued JWT roles (37.5692ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ admission persists and rejects duplicate, pending and foreign-event scans (154.0785ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ a refund racing with check-in reports cancellation, not an already-used pass (130.7274ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ events with confirmed bookings cannot be deleted and capacity cannot drop below sales (127.1219ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ admin responses exclude hashes and reject invalid roles and admin demotion (43.3369ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ foreign images cannot be attached; shared images survive one event removing them (87.2057ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ OTP attempts are capped and a consumed code cannot be replayed (139.0508ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ recovery worker fulfills a captured purchase and retries failed ticket delivery (197.7524ms)
+✔ OAuth state is browser-bound, expires and is consumed only once (34.0934ms)
+(node:16100) [MONGOOSE] Warning: mongoose: the `new` option for `findOneAndUpdate()` and `findOneAndReplace()` is deprecated. Use `returnDocument: 'after'` instead.
+✔ webhook rejects incorrect signatures and processes a valid captured notification idempotently (87.7949ms)
+✔ search includes later dates and venue-only city matches; archived rows are excluded (43.9751ms)
+✔ SEO returns true unknown-page errors, venue-specific metadata and temporary-error status (49.0219ms)
+MongoDB disconnected
+✔ Brevo receives sender, recipient, text, reply-to and base64 PDF bytes (26.2994ms)
+✔ Brevo failure cannot silently fall back to Gmail or leak provider response data (1.4014ms)
+✔ Brevo key, verified sender configuration and message ID are required (0.7337ms)
+✔ timeouts, invalid recipients and missing attachments are reported without sending another message (29.3579ms)
+✔ Brevo IP rejection gives an actionable safe diagnostic without exposing the provider payload (1.1975ms)
+✔ Brevo preflight is read-only and requires the configured active sender (0.969ms)
+✔ TLS verification failures are diagnosed and never retried insecurely (0.7136ms)
+✔ card summaries retain listing fields and filters while full endpoints retain event details (3300.6885ms)
+✔ card summaries retain default values for older events (45.4282ms)
+✔ dashboard totals include confirmed historical bookings and exclude other organizers and unconfirmed payments (90.9753ms)
+✔ dashboard responds with zero totals when the organizer has no events or bookings (65.3623ms)
+MongoDB disconnected
+✔ receipt contains saved attendee, quantity, immutable totals and cash method in a one-page PDF (120.1466ms)
+✔ digital receipt has provider reference and concurrent requests have distinct safe files (66.2708ms)
+✔ free receipt is labelled free and invalid financial data cannot produce a receipt (34.2716ms)
+✔ maximum event price and long attendee/event values stay on one page without losing amounts (23.6475ms)
+✔ current raw and JSON ticket codes retain identifiers for server verification (3.2951ms)
+✔ historical timestamp and paid EVLT tickets remain supported in raw and JSON forms (0.6774ms)
+✔ plausible prefixed IDs are not restricted to the current generated length (0.6054ms)
+✔ a valid booking ID is usable alone and QR event data is not trusted (0.6118ms)
+✔ a bad booking ID does not hide a valid legacy ticket ID (0.4503ms)
+✔ unrelated QR formats and arbitrary text are rejected locally (0.3836ms)
+✔ malformed JSON and non-string identifier fields cannot become ticket lookups (0.4691ms)
+✔ oversized QR payloads and identifiers are refused before lookup (0.3472ms)
+✔ crawler unknown nested and prefix-lookalike routes are genuine noindex 404s (149.2318ms)
+✔ all account/operator routes including the cash desk are noindex without event data (45.0919ms)
+✔ fixed public pages and curated club metadata remain indexable (28.8677ms)
+✔ public event metadata and missing-event status remain distinct (50.1033ms)
+✔ database outages remain retryable uncached 503s rather than missing pages (5.3824ms)
+✔ robots excludes the cash desk without blocking public events; legacy links still redirect (9.5633ms)
+✔ missing static resources return uncached 404 responses instead of the SPA shell (159.19ms)
+✔ existing hashed assets keep immutable caching and media keeps its content type (42.7787ms)
+✔ SPA deep links and legacy HTML routes still load the application (13.8624ms)
+✔ Vercel asset-miss function overrides immutable headers for GET and HEAD (13.6338ms)
+✔ ticket delivery submits both PDFs once, returns message ID and removes only its temporary receipt (49.9879ms)
+✔ provider rejection remains a failed delivery with a safe code and cleans up its receipt (9.733ms)
+✔ ticket PDF failure prevents receipt generation and any email submission (0.987ms)
+✔ receipt PDF failure never sends a partial ticket-only email (0.8168ms)
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+(node:19440) [MONGOOSE] Warning: Mongoose: `Document.prototype.validateSync()` is deprecated and will be removed in Mongoose 10. Use `Document.prototype.validate()` instead.
+✔ money, capacities and content limits reject malformed direct input (27.6125ms)
+✔ booking cutoff uses Indian event start time, with end-of-day fallback (2.2653ms)
+✔ checkout display agrees with the server cutoff across visitor time zones (8245.5526ms)
+✔ duplicate question keys remain unique and within schema length limits (3.1522ms)
+✔ all registration answer types enforce definitions and required fields (1.767ms)
+✔ image sniffing rejects a declared MIME type that does not match its bytes (0.6872ms)
+✔ upload batching respects byte and count limits for accepted GIF files (63.0313ms)
+✔ migration cleanup preserves current and historical references and refuses out-of-root targets (2.1343ms)
+✔ upgraded mail transport builds an attachment message without contacting a mail server (113.2166ms)
+✔ public relay exposes only the signed webhook and forwards raw bytes unchanged (182.9858ms)
+✔ relay refuses an external forwarding target or absent signing secret (1.1899ms)
+ℹ tests 119
+ℹ suites 0
+ℹ pass 119
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9653.1413

@@ -56,6 +56,18 @@ to register 1–10 tickets after collecting cash. Ticket emails include an admis
 pass and an itemized receipt. `npm run check:email` checks Brevo access and sender
 configuration without sending a message.
 
+Organizers manage only the events they own. Administrators can manage all events,
+including their guest lists, cash desks and scanners, from **Admin → Events**.
+Existing booking and admission safeguards still apply.
+
+Use **Admin → Experience** to create sections, upload up to 12 photos per section,
+add image descriptions, choose their display order, and save drafts or publish.
+Published sections require at least one image. The public Experience page shows
+only these published sections; sample recaps and automatic past-event listings
+are removed. Sections and uploaded images persist in MongoDB. Removing a section
+releases its unshared images for cleanup while keeping images referenced by
+other sections, events or booking history.
+
 For a controlled frontend performance comparison after a build, run
 `node tests/performance-smoke.cjs audit/performance-latest.json`. It uses fixed
 local event data and cold desktop/mobile Chrome contexts; it does not measure

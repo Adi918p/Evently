@@ -1,6 +1,6 @@
 # Evently work log
 
-Last updated: 2026-10-27 (Asia/Calcutta)
+Last updated: 2026-10-28 (Asia/Calcutta)
 
 ## Working agreement
 
@@ -8,10 +8,39 @@ Last updated: 2026-10-27 (Asia/Calcutta)
 - Update this file after each task with changes, checks/results, unresolved issues and next steps.
 - Follow reproduce → implement → test → evaluate → fix/retest when a defect remains. Do not repeat passing checks without a new change or concrete concern.
 - Never describe passing tests as proof that the entire website is bug-free or breach-proof. Record external and untested flows explicitly.
-- Current authorization: the owner reviewed the live audit and said "fix these things also". Implement the reported routing/cache fixes and investigate session loss, then update the same repository under the preceding requested workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and production QA-record cleanup remain separate decisions.
+- Current authorization: verify organizer access to their own events and administrator access across events; fix gaps. Replace the empty/sample Experience sections with database-backed sections and images managed by admins, and remove the old sample sections from the database if present. Continue the existing repository publication workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and unrelated production QA-record cleanup remain separate decisions.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
-## Current task — live audit remediation (2026-10-27)
+## Current task — event access and Experience management (2026-10-28)
+
+- Verified existing organizer ownership checks and reproduced four access gaps:
+  admin selectors/stats scoped to self, demoted organizers retaining attendee
+  document access, and orphaned-owner guest lists failing with 500. Admin event
+  selectors/totals now span organizers; UI provides roster/cash/scanner links.
+  Current database role controls attendee documents/email retries, and missing
+  event owners no longer cause a roster error. Booking safeguards still apply.
+- Experience now uses an ExperienceSection collection and published-only public
+  API. Admin → Experience supports create/edit/delete, drafts/publishing, section
+  ordering, up to 12 uploaded photos, image descriptions, photo ordering/removal,
+  previews and failure recovery. Published sections require a photo. Removed all
+  five sample recaps and automatic past-event listings from the active page.
+- Read-only inspection matched both public event IDs to the configured database:
+  no Experience/recap/section collection and no matching sample-title events.
+  There were no placeholder database rows to delete. No production event, booking,
+  email or admission writes occurred. Existing QA records remain unchanged.
+- Section mutations and image reference changes are transactional. Shared draft,
+  published, event, booking and purchase references retain image bytes; unshared
+  removed images receive the existing 24-hour TTL. Concurrent partial edits,
+  delete/edit races, attach/detach races and injected failures are tested.
+- Verification: production frontend build passes; 119/119 backend tests and
+  18/18 Chrome browser tests pass; syntax passes for 78 JS files. Desktop/mobile
+  editor/gallery screenshots inspected in ignored .cache/experience-browser.
+  Existing Vite chunk-size and Mongoose deprecation warnings remain non-failing.
+- Evidence: audit/EXPERIENCE_ACCESS_2026-10-28.md, event-access-{before,after}.txt,
+  experience-access-{backend,browser,build,syntax}.txt, and
+  experience-database-inspection.json. Publication/live checks pending below.
+
+## Previous task — live audit remediation (2026-10-27)
 
 - Reproduced static fallthrough (HTML 200 for missing files), crawler route
   classification failures, and independent client storage/stale-expiry session

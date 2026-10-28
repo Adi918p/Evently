@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import {
   ArrowLeft,
@@ -121,6 +121,8 @@ function Verdict({ result, onAcknowledge }) {
 
 export default function Scanner() {
   const reduced = useReducedMotion();
+  const [searchParams] = useSearchParams();
+  const requestedEventId = searchParams.get("event");
 
   const [eventId, setEventId] = useState("");
   const [manual, setManual] = useState("");
@@ -176,9 +178,10 @@ export default function Scanner() {
   // answer, and making someone pick it every time is friction for nothing.
   useEffect(() => {
     if (eventId || !myEvents.length) return;
-    const next = myEvents.find((event) => !isPastEvent(event)) || myEvents[0];
+    const next = myEvents.find((event) => event._id === requestedEventId)
+      || myEvents.find((event) => !isPastEvent(event)) || myEvents[0];
     if (next?._id) setEventId(next._id);
-  }, [eventId, myEvents]);
+  }, [eventId, myEvents, requestedEventId]);
 
   const bookings = useMemo(
     () => (Array.isArray(roster.data?.bookings) ? roster.data.bookings : []),

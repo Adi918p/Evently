@@ -16,6 +16,7 @@ const passport = require("passport");
 const contactRoute = require("./routes/contact");
 const adminRoutes = require("./routes/admin");
 const imageRoutes = require("./routes/images");
+const experienceRoutes = require("./routes/experience");
 const seo = require("./routes/seo");
 
 
@@ -66,6 +67,7 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/bookings", bookingRoutes);
 app.use("/api/contact", contactRoute);
 app.use("/api/admin", adminRoutes);
+app.use("/api/experience", experienceRoutes.publicRouter);
 
 // Uploaded event artwork, served out of the database. Public and unauthenticated
 // because these are banners on the discover page - see Controllers/imageController.

@@ -122,7 +122,7 @@ const downloadBookingDocument = (render, suffix = '', removeAfterDownload = fals
 
         const isOwner = String(booking.user?._id || booking.user) === String(req.user.id);
         const isOrganizer =
-            String(booking.event?.organizer || "") === String(req.user.id);
+            req.user.role === "organizer" && String(booking.event?.organizer || "") === String(req.user.id);
 
         if (!isOwner && !isOrganizer && req.user.role !== "admin") {
             return res.status(403).json({
@@ -180,7 +180,7 @@ exports.retryTicketEmail = async (req, res) => {
         const booking = await Booking.findById(req.params.id).populate('event', 'organizer');
         if (!booking) throw new HttpError(404, 'Booking not found.');
         const isOwner = String(booking.user || '') === req.user.id;
-        const isOrganizer = String(booking.event?.organizer || '') === req.user.id;
+        const isOrganizer = req.user.role === 'organizer' && String(booking.event?.organizer || '') === req.user.id;
         if (!isOwner && !isOrganizer && req.user.role !== 'admin') throw new HttpError(403, 'This booking is not yours to manage.');
         if (booking.status !== 'confirmed') throw new HttpError(409, 'Only confirmed bookings can receive ticket email.');
         if (!booking.purchase && booking.paymentMethod !== 'cash') throw new HttpError(409, 'This older booking needs support review before email can be retried.');

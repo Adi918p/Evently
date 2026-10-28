@@ -416,7 +416,7 @@ export default function EventBookings() {
 
           <div className="flex flex-wrap gap-3">
             <Button variant="secondary" to={`/events/${id}/cash`}>Cash desk</Button>
-            <Button variant="secondary" to="/scanner">
+            <Button variant="secondary" to={`/scanner?event=${id}`}>
               <QrCode size={17} aria-hidden="true" />
               Scanner
             </Button>

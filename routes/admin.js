@@ -15,6 +15,7 @@ require("../Controllers/adminController");
 router.use(authMiddleware.authM);
 router.use(authMiddleware.requireAuth);
 router.use(requireAdmin); 
+router.use("/experience", require("./experience").adminRouter);
 
 router.get(
     "/dashboard",

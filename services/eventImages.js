@@ -2,6 +2,7 @@ const EventImage = require('../models/EventImage');
 const Event = require('../models/Events');
 const Booking = require('../models/Booking');
 const Purchase = require('../models/Purchase');
+const ExperienceSection = require('../models/ExperienceSection');
 const { imageKey, isLegacyUpload } = require('../utils/imagePaths');
 const { HttpError } = require('../utils/httpError');
 const paths = event => [event?.banner, ...(event?.gallery || []), ...(event?.lineup || []).map(row => row.image)].filter(Boolean);
@@ -21,7 +22,8 @@ async function syncImages(before, after, actor, session) {
         if (newPaths.has(value) || !imageKey(value)) continue;
         const referenced = await Event.exists({ $or: [{ banner: value }, { gallery: value }, { 'lineup.image': value }] }).session(session)
             || await Booking.exists({ 'eventSnapshot.banner': value }).session(session)
-            || await Purchase.exists({ 'eventSnapshot.banner': value }).session(session);
+            || await Purchase.exists({ 'eventSnapshot.banner': value }).session(session)
+            || await ExperienceSection.exists({ 'images.url': value }).session(session);
         await EventImage.updateOne({ key: imageKey(value) }, { $set: { expiresAt: referenced ? null : new Date(Date.now() + EventImage.UNCLAIMED_MS) }, $inc: { referenceVersion: 1 } }, { session });
     }
 }

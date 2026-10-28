@@ -1,0 +1,5 @@
+
+> evently@1.0.0 test:syntax
+> node scripts/check-js.js
+
+Checked 78 JavaScript files.

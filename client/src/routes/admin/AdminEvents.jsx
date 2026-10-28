@@ -4,14 +4,17 @@ import { motion, useReducedMotion } from "motion/react";
 import {
   CalendarBlank,
   CheckCircle,
+  CurrencyInr,
   Eye,
   MagnifyingGlass,
   MapPin,
   PencilSimple,
   Prohibit,
+  QrCode,
   Ticket,
   Trash,
   UserCircle,
+  Users,
 } from "@phosphor-icons/react";
 import { format } from "date-fns";
 import GlassCard from "../../components/ui/GlassCard";
@@ -48,9 +51,8 @@ import { respectMotion, riseIn } from "../../motion/presets";
  * approve and reject return only { success, message } - no updated document -
  * so the row's status is patched locally rather than refetching the whole list.
  *
- * Deleting here uses the admin endpoint, which unlike the organizer one does
- * not clean up uploaded images. Bookings are also left behind, pointing at an
- * event that no longer exists. The confirm dialog says both.
+ * Administrators can open the editor, roster, cash desk and scanner for any
+ * event. The server keeps confirmed-booking safeguards on moderation actions.
  */
 
 const FILTERS = [
@@ -157,6 +159,18 @@ function EventRow({ event, onApprove, onReject, onDelete, busy }) {
             <Button variant="ghost" size="sm" to={`/events/${event._id}/edit`}>
               <PencilSimple size={15} aria-hidden="true" />
               Edit
+            </Button>
+            <Button variant="secondary" size="sm" to={`/events/${event._id}/bookings`}>
+              <Users size={15} aria-hidden="true" />
+              Bookings
+            </Button>
+            <Button variant="secondary" size="sm" to={`/events/${event._id}/cash`}>
+              <CurrencyInr size={15} aria-hidden="true" />
+              Cash desk
+            </Button>
+            <Button variant="ghost" size="sm" to={`/scanner?event=${event._id}`}>
+              <QrCode size={15} aria-hidden="true" />
+              Scanner
             </Button>
             <Button
               variant="ghost"

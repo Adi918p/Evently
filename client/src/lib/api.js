@@ -429,6 +429,14 @@ export const events = {
     }),
 };
 
+export const experience = {
+  list: (signal) => request("/api/experience", { signal }),
+  all: (signal) => request("/api/admin/experience", { auth: true, signal }),
+  create: (payload) => request("/api/admin/experience", { method: "POST", body: payload, auth: true }),
+  update: (id, payload) => request(`/api/admin/experience/${encodeURIComponent(id)}`, { method: "PUT", body: payload, auth: true }),
+  remove: (id) => request(`/api/admin/experience/${encodeURIComponent(id)}`, { method: "DELETE", auth: true }),
+};
+
 /* ==========================================================================
    Payments + bookings
    ========================================================================== */
