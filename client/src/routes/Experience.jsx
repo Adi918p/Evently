@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Images, Sparkle } from "@phosphor-icons/react";
+import { CaretDown, Images, Sparkle } from "@phosphor-icons/react";
 import GlassCard from "../components/ui/GlassCard";
 import Modal from "../components/ui/Modal";
 import { EmptyState, ErrorState, SkeletonRows } from "../components/ui/Feedback";
@@ -11,7 +11,11 @@ import { experience as experienceApi } from "../lib/api";
 export default function Experience() {
   const { data, error, loading, reload } = useApi((signal) => experienceApi.list(signal), []);
   const [selected, setSelected] = useState(null);
+  // Undefined follows the first loaded section; null means the visitor closed it.
+  // Page-local state resets on navigation back here or a full reload.
+  const [openSectionId, setOpenSectionId] = useState(undefined);
   const sections = Array.isArray(data?.sections) ? data.sections : [];
+  const activeSectionId = openSectionId === undefined ? sections[0]?._id : openSectionId;
 
   return (
     <div className="shell section">
@@ -21,17 +25,30 @@ export default function Experience() {
         <h1 className="text-4xl">Our event <span className="text-grad-brand">experiences</span></h1>
         <p className="text-md leading-relaxed text-[var(--color-fg-muted)]">Moments, people and memories from Evently events.</p>
       </header>
-      <div className="mt-12 space-y-10">
+      <div className="mt-12 space-y-4">
         {loading ? <SkeletonRows count={3} /> : error ? (
           <ErrorState title="Couldn't load experiences" message={error.message} onRetry={reload} />
         ) : sections.length === 0 ? (
           <EmptyState icon={Images} title="New memories are on the way"
             description="Photos from our events will appear here soon. Find your next experience in the meantime."
             action="Explore events" actionTo="/events" />
-        ) : sections.map((section) => (
-          <GlassCard key={section._id} role="region" aria-labelledby={`experience-${section._id}`} elevation={2} radius="xl" className="overflow-hidden p-5 sm:p-8">
-            <h2 id={`experience-${section._id}`} className="wrap-anywhere text-2xl sm:text-3xl">{section.title}</h2>
-            {section.description ? <p className="mt-3 max-w-3xl whitespace-pre-line wrap-anywhere leading-relaxed text-[var(--color-fg-muted)]">{section.description}</p> : null}
+        ) : sections.map((section) => {
+          const open = activeSectionId === section._id;
+          const triggerId = `experience-${section._id}-trigger`;
+          const panelId = `experience-${section._id}-panel`;
+          return (
+          <GlassCard key={section._id} elevation={2} radius="xl" className="overflow-hidden">
+            <h2 className="text-2xl sm:text-3xl">
+              <button type="button" id={triggerId} aria-expanded={open} aria-controls={panelId}
+                onClick={() => setOpenSectionId(open ? null : section._id)}
+                className="flex w-full items-center justify-between gap-4 p-5 text-left sm:p-8">
+                <span className="min-w-0 wrap-anywhere">{section.title}</span>
+                <CaretDown size={22} aria-hidden="true"
+                  className={`shrink-0 text-[var(--color-fg-muted)] transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`} />
+              </button>
+            </h2>
+            <div id={panelId} role="region" aria-labelledby={triggerId} hidden={!open} className="px-5 pb-5 sm:px-8 sm:pb-8">
+            {section.description ? <p className="max-w-3xl whitespace-pre-line wrap-anywhere leading-relaxed text-[var(--color-fg-muted)]">{section.description}</p> : null}
             <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {section.images.map((photo, index) => (
                 <li key={photo.url} className="min-w-0">
@@ -44,8 +61,10 @@ export default function Experience() {
                 </li>
               ))}
             </ul>
+            </div>
           </GlassCard>
-        ))}
+          );
+        })}
       </div>
       <Modal open={Boolean(selected)} onClose={() => setSelected(null)} title={selected?.title} size="xl">
         {selected ? <img src={selected.url} alt={selected.alt || `${selected.title} — photo ${selected.index + 1}`}

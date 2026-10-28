@@ -1,0 +1,13 @@
+✔ Experience has an honest empty state, retryable failure and admin-only editor (3987.306ms)
+✔ admin drafts, uploads, publishes, edits, unpublishes and deletes a section with public photo viewing (5726.2143ms)
+✔ mobile gallery editing preserves input on save failure and fits the screen (5500.0217ms)
+✔ admin event links open another organizer roster, cash desk and selected scanner; organizer sees only owned doors (4797.6364ms)
+MongoDB disconnected
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21724.7014

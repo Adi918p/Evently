@@ -8,10 +8,28 @@ Last updated: 2026-10-28 (Asia/Calcutta)
 - Update this file after each task with changes, checks/results, unresolved issues and next steps.
 - Follow reproduce → implement → test → evaluate → fix/retest when a defect remains. Do not repeat passing checks without a new change or concrete concern.
 - Never describe passing tests as proof that the entire website is bug-free or breach-proof. Record external and untested flows explicitly.
-- Current authorization: verify organizer access to their own events and administrator access across events; fix gaps. Replace the empty/sample Experience sections with database-backed sections and images managed by admins, and remove the old sample sections from the database if present. Continue the existing repository publication workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and unrelated production QA-record cleanup remain separate decisions.
+- Current authorization: restore collapsible Experience sections, opening the first on each visit and allowing only one expanded section at a time. Continue the existing repository publication workflow. Preserve live domains, database connections, credentials and Razorpay test mode. Cash/free cancellation and unrelated production QA-record cleanup remain separate decisions.
 - 21st scope: Evently only. No project dependency/config/runtime integration was found, so nothing project-specific needed uninstalling. Computer-wide tools and skills were left untouched.
 
-## Current task — event access and Experience management (2026-10-28)
+## Current task — Experience accordion (2026-10-28)
+
+- Source confirmed all published section bodies were always visible. Added a
+  single page-local expanded section ID: first published section opens after
+  loading; selecting another collapses the rest; selecting the open one closes
+  it. Reloading or navigating away/back resets to the first section.
+- Heading buttons expose expanded/control relationships and the collapsed
+  panels use hidden, keeping their photos out of the keyboard/accessibility
+  tree. Carets indicate state and respect reduced motion. Photo viewer remains.
+- No API, schema, database records, admin editor or configuration changed.
+  Production build and all four existing Experience Chrome scenarios pass.
+  An initial browser run overlapped the asset rebuild and failed on the scanner
+  page; rerunning after build completion passed without any scanner change.
+  That initial output is retained in ignored .cache/experience-accordion-browser-
+  build-overlap.txt. Current results: audit/experience-accordion-{build,browser}.txt.
+  Independent accessibility/state review found no blocking issue. Publication
+  and direct live accordion checks are in progress.
+
+## Previous task — event access and Experience management (2026-10-28)
 
 - Verified existing organizer ownership checks and reproduced four access gaps:
   admin selectors/stats scoped to self, demoted organizers retaining attendee
