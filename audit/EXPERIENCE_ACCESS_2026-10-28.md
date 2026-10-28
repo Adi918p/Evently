@@ -75,4 +75,23 @@ every possible application case or physical phone has been tested.
 
 ## Publication
 
-Pending implementation commit, CI and bounded live verification.
+Implementation commit `e77cf9e7ddf109647480819caf97f0736be60e2b` was pushed normally
+to main. [GitHub Actions 40663324953](https://github.com/Adi918p/Evently/actions/runs/40663324953)
+passed, and Vercel Production deployment 7381536021 succeeded for that exact commit.
+
+All 13 bounded live HTTP checks passed: both website/API hosts expose the empty
+published Experience list; anonymous admin access returns 401; the admin crawler
+page is noindex; existing event listings remain available. Deployed entry JS/CSS
+and Experience/AdminExperience bundles match the tested local build byte-for-byte.
+
+Live Chrome confirms the empty Experience state, absence of sample recaps and the
+automatic archive, and regular-user denial for the editor. No captured console
+warnings/errors. A connected admin browser session was unavailable, so no live
+editor mutation was performed; the full editor workflow was tested with isolated
+fixtures. The user can now add real photos at
+[Admin → Experience](https://event-ly.in/admin/experience).
+
+Evidence: experience-access-publication.json, experience-access-live-http.json
+and experience-access-live-browser.json. The final follow-up commit contains only
+documentation/evidence; successful CI and live checks above refer to the tested
+implementation commit.

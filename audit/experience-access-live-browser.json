@@ -1,0 +1,20 @@
+{
+  "date": "2026-10-28",
+  "timezone": "Asia/Calcutta",
+  "site": "https://event-ly.in",
+  "release": "e77cf9e7ddf109647480819caf97f0736be60e2b",
+  "mode": "read-only Chrome smoke using the existing user session",
+  "results": {
+    "experienceLoadsAfterReload": true,
+    "emptyStateVisible": true,
+    "sampleRecapsAbsent": true,
+    "automaticPastEventsShelfAbsent": true,
+    "ordinaryUserDeniedAdminExperience": true,
+    "capturedWarningsOrErrorsOnExperience": []
+  },
+  "limits": [
+    "No connected admin browser session was available for a live editor mutation.",
+    "Editor CRUD, upload, ordering and publication were exercised in isolated browser tests.",
+    "No production content, booking, email or admission mutations were performed."
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-10-28T09:21:52.691Z",
+  "commit": "e77cf9e7ddf109647480819caf97f0736be60e2b",
+  "ci": {
+    "id": 40663324953,
+    "status": "completed",
+    "conclusion": "success",
+    "url": "https://github.com/Adi918p/Evently/actions/runs/40663324953",
+    "head": "e77cf9e7ddf109647480819caf97f0736be60e2b"
+  },
+  "deployment": {
+    "id": 7381536021,
+    "environment": "Production",
+    "state": "success",
+    "url": "https://evently-ilvwsy2vw-evently3.vercel.app",
+    "logUrl": "https://evently-ilvwsy2vw-evently3.vercel.app",
+    "createdAt": "2026-10-28T09:19:44Z"
+  }
+}

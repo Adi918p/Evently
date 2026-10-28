@@ -1,0 +1,238 @@
+{
+  "startedAt": "2026-10-28T09:20:55.264Z",
+  "scope": "Bounded read-only public GET deployment checks. No credentials, production database access, mutations or messages.",
+  "expectedCommit": "e77cf9e7ddf109647480819caf97f0736be60e2b",
+  "checks": [
+    {
+      "name": "frontend serves tested entry",
+      "checkedAt": "2026-10-28T09:20:55.527Z",
+      "method": "GET",
+      "url": "https://event-ly.in/",
+      "status": 200,
+      "bytes": 4258,
+      "ms": 261,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "assertions": {
+        "status200": true,
+        "sameEntry": true,
+        "sameStyles": true
+      },
+      "passed": true
+    },
+    {
+      "name": "tested deployed asset index-YK-coo0R.js",
+      "checkedAt": "2026-10-28T09:20:55.686Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/index-YK-coo0R.js",
+      "status": 200,
+      "bytes": 537700,
+      "ms": 158,
+      "contentType": "application/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "assertions": {
+        "status200": true,
+        "sameBytes": true,
+        "immutable": true
+      },
+      "passed": true
+    },
+    {
+      "name": "tested deployed asset index-B_DtEWMp.css",
+      "checkedAt": "2026-10-28T09:20:55.743Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/index-B_DtEWMp.css",
+      "status": 200,
+      "bytes": 69643,
+      "ms": 57,
+      "contentType": "text/css; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "assertions": {
+        "status200": true,
+        "sameBytes": true,
+        "immutable": true
+      },
+      "passed": true
+    },
+    {
+      "name": "tested deployed asset Experience--mMN4R-L.js",
+      "checkedAt": "2026-10-28T09:20:55.791Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/Experience--mMN4R-L.js",
+      "status": 200,
+      "bytes": 2573,
+      "ms": 48,
+      "contentType": "application/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "assertions": {
+        "status200": true,
+        "sameBytes": true,
+        "immutable": true
+      },
+      "passed": true
+    },
+    {
+      "name": "tested deployed asset AdminExperience-6YulP-W5.js",
+      "checkedAt": "2026-10-28T09:20:56.095Z",
+      "method": "GET",
+      "url": "https://event-ly.in/assets/AdminExperience-6YulP-W5.js",
+      "status": 200,
+      "bytes": 11150,
+      "ms": 303,
+      "contentType": "application/javascript; charset=utf-8",
+      "cacheControl": "public, max-age=31536000, immutable",
+      "assertions": {
+        "status200": true,
+        "sameBytes": true,
+        "immutable": true
+      },
+      "passed": true
+    },
+    {
+      "name": "empty published experience https://event-ly.in",
+      "checkedAt": "2026-10-28T09:20:56.690Z",
+      "method": "GET",
+      "url": "https://event-ly.in/api/experience",
+      "status": 200,
+      "bytes": 30,
+      "ms": 595,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "assertions": {
+        "status200": true,
+        "success": true,
+        "emptySections": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "admin experience rejects anonymous https://event-ly.in",
+      "checkedAt": "2026-10-28T09:20:57.460Z",
+      "method": "GET",
+      "url": "https://event-ly.in/api/admin/experience",
+      "status": 401,
+      "bytes": 31,
+      "ms": 770,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "assertions": {
+        "status401": true,
+        "isJson": true
+      },
+      "passed": true
+    },
+    {
+      "name": "existing event listing retained https://event-ly.in",
+      "checkedAt": "2026-10-28T09:20:58.000Z",
+      "method": "GET",
+      "url": "https://event-ly.in/api/events?summary=1",
+      "status": 200,
+      "bytes": 962,
+      "ms": 540,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "public, max-age=0, must-revalidate",
+      "assertions": {
+        "status200": true,
+        "sameTwoRecords": true
+      },
+      "passed": true
+    },
+    {
+      "name": "empty published experience https://api.event-ly.in",
+      "checkedAt": "2026-10-28T09:20:59.167Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/api/experience",
+      "status": 200,
+      "bytes": 30,
+      "ms": 1167,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "assertions": {
+        "status200": true,
+        "success": true,
+        "emptySections": true,
+        "noStore": true
+      },
+      "passed": true
+    },
+    {
+      "name": "admin experience rejects anonymous https://api.event-ly.in",
+      "checkedAt": "2026-10-28T09:20:59.471Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/api/admin/experience",
+      "status": 401,
+      "bytes": 31,
+      "ms": 304,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": "no-store",
+      "assertions": {
+        "status401": true,
+        "isJson": true
+      },
+      "passed": true
+    },
+    {
+      "name": "existing event listing retained https://api.event-ly.in",
+      "checkedAt": "2026-10-28T09:21:00.013Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/api/events?summary=1",
+      "status": 200,
+      "bytes": 962,
+      "ms": 542,
+      "contentType": "application/json; charset=utf-8",
+      "cacheControl": null,
+      "assertions": {
+        "status200": true,
+        "sameTwoRecords": true
+      },
+      "passed": true
+    },
+    {
+      "name": "admin experience is not indexable on frontend",
+      "checkedAt": "2026-10-28T09:21:00.395Z",
+      "method": "GET",
+      "url": "https://event-ly.in/admin/experience",
+      "status": 200,
+      "bytes": 2205,
+      "ms": 382,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=300, s-maxage=600",
+      "assertions": {
+        "status200": true,
+        "noindex": true
+      },
+      "passed": true
+    },
+    {
+      "name": "admin experience is not indexable on backend",
+      "checkedAt": "2026-10-28T09:21:00.881Z",
+      "method": "GET",
+      "url": "https://api.event-ly.in/seo/render/admin/experience",
+      "status": 200,
+      "bytes": 2205,
+      "ms": 486,
+      "contentType": "text/html; charset=utf-8",
+      "cacheControl": "public, max-age=300, s-maxage=600",
+      "assertions": {
+        "status200": true,
+        "noindex": true
+      },
+      "passed": true
+    }
+  ],
+  "localBuild": {
+    "js": "/assets/index-YK-coo0R.js",
+    "css": "/assets/index-B_DtEWMp.css",
+    "chunks": [
+      "/assets/Experience--mMN4R-L.js",
+      "/assets/AdminExperience-6YulP-W5.js"
+    ]
+  },
+  "completedAt": "2026-10-28T09:21:00.881Z",
+  "summary": {
+    "total": 13,
+    "passed": 13,
+    "failed": 0
+  }
+}
